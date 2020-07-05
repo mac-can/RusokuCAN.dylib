@@ -20,22 +20,22 @@
 #
 
 all:
-	$(MAKE) -C Library/TouCAN $@
+	$(MAKE) -C Libraries/TouCAN $@
 	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	$(MAKE) -C Library/CANAPI $@
+	$(MAKE) -C Libraries/CANAPI $@
 	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	$(MAKE) -C Examples/can_test $@
 	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	$(MAKE) -C Examples/can_moni $@
 
 clean:
-	$(MAKE) -C Library/TouCAN $@
-	$(MAKE) -C Library/CANAPI $@
+	$(MAKE) -C Libraries/TouCAN $@
+	$(MAKE) -C Libraries/CANAPI $@
 	$(MAKE) -C Examples/can_test $@
 	$(MAKE) -C Examples/can_moni $@
 
 install:
-	$(MAKE) -C Library/TouCAN $@
-	$(MAKE) -C Library/CANAPI $@
+	$(MAKE) -C Libraries/TouCAN $@
+	$(MAKE) -C Libraries/CANAPI $@
 #	$(MAKE) -C Examples/can_test $@
 #	$(MAKE) -C Examples/can_moni $@

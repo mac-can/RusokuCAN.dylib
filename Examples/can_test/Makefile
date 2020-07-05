@@ -119,7 +119,7 @@ $(OUTDIR)/MacCAN_IOUsbPipe.o: $(MACCAN_DIR)/MacCAN_IOUsbPipe.c
 $(OUTDIR)/can_btr.o: $(CANAPI_DIR)/can_btr.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
-$(OUTDIR)/TouCAN.o: $(TOUCAN_DIR)/TouCAN.cpp
+$(OUTDIR)/TouCAN.o: $(SOURCE_DIR)/TouCAN.cpp
 	$(CXX) $(CXXFLAGS) -MMD -MF $*.d -o $@ -c $<
 
 $(OUTDIR)/TouCAN_USB.o: $(TOUCAN_DIR)/TouCAN_USB.c

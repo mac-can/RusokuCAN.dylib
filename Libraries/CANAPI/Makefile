@@ -134,7 +134,7 @@ $(OUTDIR)/can_btr.o: $(CANAPI_DIR)/can_btr.c
 $(OUTDIR)/can_msg.o: $(CANAPI_DIR)/can_msg.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
-$(OUTDIR)/TouCAN.o: $(TOUCAN_DIR)/TouCAN.cpp
+$(OUTDIR)/TouCAN.o: $(SOURCE_DIR)/TouCAN.cpp
 	$(CXX) $(CXXFLAGS) -MMD -MF $*.d -o $@ -c $<
 
 $(OUTDIR)/TouCAN_USB.o: $(TOUCAN_DIR)/TouCAN_USB.c

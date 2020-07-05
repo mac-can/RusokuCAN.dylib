@@ -19,7 +19,7 @@
 
 /* Begin PBXFileReference section */
 		0F6741B2244B670F000970A8 /* TouCAN_USB.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = TouCAN_USB.c; path = ../../Sources/TouCAN_Driver/TouCAN_USB.c; sourceTree = "<group>"; };
-		0F6741B3244B670F000970A8 /* TouCAN.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TouCAN.cpp; path = ../../Sources/TouCAN_Driver/TouCAN.cpp; sourceTree = "<group>"; };
+		0F6741B3244B670F000970A8 /* TouCAN.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TouCAN.cpp; path = ../../Sources/TouCAN.cpp; sourceTree = "<group>"; };
 		0F6741B6244B675C000970A8 /* MacCAN_IOUsbPipe.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MacCAN_IOUsbPipe.c; path = ../../Sources/MacCAN_Core/MacCAN_IOUsbPipe.c; sourceTree = "<group>"; };
 		0F6741B7244B675C000970A8 /* MacCAN_Debug.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MacCAN_Debug.c; path = ../../Sources/MacCAN_Core/MacCAN_Debug.c; sourceTree = "<group>"; };
 		0F6741B8244B675C000970A8 /* MacCAN_IOUsbKit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MacCAN_IOUsbKit.c; path = ../../Sources/MacCAN_Core/MacCAN_IOUsbKit.c; sourceTree = "<group>"; };

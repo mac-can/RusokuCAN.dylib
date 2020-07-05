@@ -37,8 +37,8 @@
 		0F5EBD7423FEF78A00EB42FF /* MacCAN_IOUsbPipe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MacCAN_IOUsbPipe.h; path = ../../Sources/MacCAN_Core/MacCAN_IOUsbPipe.h; sourceTree = "<group>"; };
 		0F60A9BD23F7FDD700D34D0E /* TouCAN */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TouCAN; sourceTree = BUILT_PRODUCTS_DIR; };
 		0F60A9C023F7FDD700D34D0E /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		0F60A9E123F803E800D34D0E /* TouCAN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TouCAN.h; path = ../../Sources/TouCAN_Driver/TouCAN.h; sourceTree = "<group>"; };
-		0F60A9E223F803E800D34D0E /* TouCAN.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TouCAN.cpp; path = ../../Sources/TouCAN_Driver/TouCAN.cpp; sourceTree = "<group>"; };
+		0F60A9E123F803E800D34D0E /* TouCAN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TouCAN.h; path = ../../Sources/TouCAN.h; sourceTree = "<group>"; };
+		0F60A9E223F803E800D34D0E /* TouCAN.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TouCAN.cpp; path = ../../Sources/TouCAN.cpp; sourceTree = "<group>"; };
 		0F60A9E323F803E800D34D0E /* TouCAN_USB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TouCAN_USB.h; path = ../../Sources/TouCAN_Driver/TouCAN_USB.h; sourceTree = "<group>"; };
 		0F60A9E423F803E800D34D0E /* TouCAN_USB.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = TouCAN_USB.c; path = ../../Sources/TouCAN_Driver/TouCAN_USB.c; sourceTree = "<group>"; };
 		0F60A9E723F8043100D34D0E /* MacCAN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MacCAN.h; path = ../../Sources/MacCAN_Core/MacCAN.h; sourceTree = "<group>"; };

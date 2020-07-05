@@ -43,8 +43,8 @@
 		0F8A193F241E95A400BF7F1B /* Timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Timer.cpp; sourceTree = "<group>"; };
 		0F8A1940241E95A400BF7F1B /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Timer.h; sourceTree = "<group>"; };
 		0F8A1942241E95C800BF7F1B /* build_no.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = build_no.h; path = ../../../Sources/build_no.h; sourceTree = "<group>"; };
-		0F8A1943241E95F300BF7F1B /* TouCAN.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TouCAN.cpp; path = ../../../Sources/TouCAN_Driver/TouCAN.cpp; sourceTree = "<group>"; };
-		0F8A1944241E95F300BF7F1B /* TouCAN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TouCAN.h; path = ../../../Sources/TouCAN_Driver/TouCAN.h; sourceTree = "<group>"; };
+		0F8A1943241E95F300BF7F1B /* TouCAN.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TouCAN.cpp; path = ../../../Sources/TouCAN.cpp; sourceTree = "<group>"; };
+		0F8A1944241E95F300BF7F1B /* TouCAN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TouCAN.h; path = ../../../Sources/TouCAN.h; sourceTree = "<group>"; };
 		0F8A1945241E95F300BF7F1B /* TouCAN_USB.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = TouCAN_USB.c; path = ../../../Sources/TouCAN_Driver/TouCAN_USB.c; sourceTree = "<group>"; };
 		0F8A1946241E95F300BF7F1B /* TouCAN_USB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TouCAN_USB.h; path = ../../../Sources/TouCAN_Driver/TouCAN_USB.h; sourceTree = "<group>"; };
 		0F8A1949241E961E00BF7F1B /* MacCAN_IOUsbKit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MacCAN_IOUsbKit.c; path = ../../../Sources/MacCAN_Core/MacCAN_IOUsbKit.c; sourceTree = "<group>"; };
@@ -147,7 +147,7 @@
 		0F8A192D241E935600BF7F1B /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1140;
+				LastUpgradeCheck = 1150;
 				ORGANIZATIONNAME = "UV Software, Berlin";
 				TargetAttributes = {
 					0F8A1934241E935600BF7F1B = {

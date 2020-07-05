@@ -38,10 +38,10 @@
 		0FDC62D5241AAB8E000AE52B /* can_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = can_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		0FDC62D8241AAB8E000AE52B /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0FDC62DF241AC87C000AE52B /* build_no.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = build_no.h; path = ../../../Sources/build_no.h; sourceTree = "<group>"; };
-		0FDC62E0241AC89B000AE52B /* TouCAN.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TouCAN.cpp; path = ../../../Sources/TouCAN_Driver/TouCAN.cpp; sourceTree = "<group>"; };
+		0FDC62E0241AC89B000AE52B /* TouCAN.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TouCAN.cpp; path = ../../../Sources/TouCAN.cpp; sourceTree = "<group>"; };
 		0FDC62E1241AC89B000AE52B /* TouCAN_USB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TouCAN_USB.h; path = ../../../Sources/TouCAN_Driver/TouCAN_USB.h; sourceTree = "<group>"; };
 		0FDC62E2241AC89B000AE52B /* TouCAN_USB.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = TouCAN_USB.c; path = ../../../Sources/TouCAN_Driver/TouCAN_USB.c; sourceTree = "<group>"; };
-		0FDC62E3241AC89B000AE52B /* TouCAN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TouCAN.h; path = ../../../Sources/TouCAN_Driver/TouCAN.h; sourceTree = "<group>"; };
+		0FDC62E3241AC89B000AE52B /* TouCAN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TouCAN.h; path = ../../../Sources/TouCAN.h; sourceTree = "<group>"; };
 		0FDC62E6241AC8B7000AE52B /* MacCAN_Devices.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MacCAN_Devices.h; path = ../../../Sources/MacCAN_Core/MacCAN_Devices.h; sourceTree = "<group>"; };
 		0FDC62E7241AC8B7000AE52B /* MacCAN_IOUsbKit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MacCAN_IOUsbKit.c; path = ../../../Sources/MacCAN_Core/MacCAN_IOUsbKit.c; sourceTree = "<group>"; };
 		0FDC62E8241AC8B7000AE52B /* MacCAN_Devices.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MacCAN_Devices.c; path = ../../../Sources/MacCAN_Core/MacCAN_Devices.c; sourceTree = "<group>"; };
@@ -142,7 +142,7 @@
 		0FDC62CD241AAB8E000AE52B /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1130;
+				LastUpgradeCheck = 1150;
 				ORGANIZATIONNAME = "UV Software, Berlin";
 				TargetAttributes = {
 					0FDC62D4241AAB8E000AE52B = {
