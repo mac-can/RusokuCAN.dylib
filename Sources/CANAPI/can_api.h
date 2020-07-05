@@ -24,7 +24,7 @@
  *
  *  @author      $Author: eris $
  *
- *  @version     $Rev: 902 $
+ *  @version     $Rev: 914 $
  *
  *  @defgroup    can_api CAN Interface API, Version 3
  *  @{
@@ -55,8 +55,13 @@ extern "C" {
 #if (OPTION_CANAPI_LIBRARY == 0) && (OPTION_CANAPI_DRIVER == 0)
     #error Option for function signatures not set
 #endif
-#define CANAPI  extern
-
+#if (OPTION_CANAPI_DLLEXPORT != 0)
+    #define CANAPI  __declspec(dllexport)
+#elif (OPTION_CANAPI_DLLIMPORT != 0)
+    #define CANAPI  __declspec(dllimport)
+#else
+    #define CANAPI  extern
+#endif
 
 /*  -----------  defines  ------------------------------------------------
  */
@@ -131,7 +136,7 @@ CANAPI can_board_t can_boards[];        /**< list of CAN interface boards */
  *  @note        When a requested operation mode is not supported by the
  *               CAN controller, error CANERR_ILLPARA will be returned.
  *
- *  @remark      Any loaded DLL will be released when not referenced
+ *  @remarks     Any loaded DLL will be released when not referenced
  *               by another initialized CAN interface.
  *
  *  @param[in]   library - library id of the CAN interface
@@ -188,7 +193,7 @@ CANAPI int can_init(int32_t board, uint8_t mode, const void *param);
  *  @note        The handle is invalid after this operation and could be assigned
  *               to a different CAN controller board in a multy-board application.
  *
- *  @remark      Afterwards the loaded DLL will be released when not referenced
+ *  @remarks     Afterwards the loaded DLL will be released when not referenced
  *               by another initialized CAN interface.
  *
  *  @param[in]   handle  - handle of the CAN interface, or (-1) to shutdown all
@@ -286,14 +291,15 @@ CANAPI int can_write(int handle, const can_message_t *message, uint16_t timeout)
 CANAPI int can_read(int handle, can_message_t *message, uint16_t timeout);
 
 
-#if defined(_WIN32) || defined(_WIN64)
 /** @brief       signals a waiting event object of the CAN interface. This can
  *               be used to terminate a blocking read operation in progress
  *               (e.g. by means of a Ctrl-C handler or similar).
  *
- *  @remark      Some driver DLLs are using an event object to realize blocking
- *               read by a call to WaitForSingleObject, but this event object
- *               is not terminated by Ctrl-C (SIGINT).
+ *  @remarks     Some drivers are using waitable objects to realize blocking
+ *               operations by a call to WaitForSingleObject (Windows) or
+ *               pthread_cond_wait (POSIX), but these waitable objects are
+ *               no cancellation points. This means that they cannot be
+ *               terminated by Ctrl-C (SIGINT).
  *
  *  @note        SIGINT is not supported for any Win32 application. [MSVC Docs]
  *
@@ -307,7 +313,6 @@ CANAPI int can_read(int handle, can_message_t *message, uint16_t timeout);
  *  @retval      others           - vendor-specific
  */
 CANAPI int can_kill(int handle);
-#endif
 
 
 /** @brief       retrieves the status register of the CAN interface.

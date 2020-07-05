@@ -77,7 +77,9 @@ static void _finalizer() {
 #else
 #define EXPORT
 #endif
-
+#ifndef CAN_MAX_HANDLES
+#define CAN_MAX_HANDLES  16
+#endif
 #define IS_HANDLE_VALID(hnd)  ((0 <= (hnd)) && ((hnd) < CAN_MAX_HANDLES))
 
  EXPORT

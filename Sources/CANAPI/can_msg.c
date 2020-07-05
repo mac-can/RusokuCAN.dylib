@@ -24,7 +24,7 @@
  *
  *  @author      $Author: eris $
  *
- *  @version     $Rev: 902 $
+ *  @version     $Rev: 909 $
  *
  *  @addtogroup  can_msg
  *  @{
@@ -210,7 +210,7 @@ char *msg_format_message(const msg_message_t *message, msg_direction_t direction
         strcat(msg_string, tmp_string);
 
         /* data (hex/dec/oct) plus ascii (optional) */
-        if (message->dlc) {
+        if (message->dlc && !message->rtr) {
             strcat(msg_string, (msg_option.separator == MSG_FMT_SEPARATOR_TABS) ? "\t" : "  ");
             format_data(tmp_string, message, (msg_option.ascii == MSG_FMT_OPTION_OFF) ? 0 : 1, (int)strlen(msg_string));
             strcat(msg_string, tmp_string);
@@ -781,6 +781,8 @@ static void format_dlc(char *string, const msg_message_t *message)
 #if (OPTION_CAN_2_0_ONLY == 0)
     if (message->fdf && blank)
         strcat(string, " ");
+#else
+    (void)blank;  /* to avoid compiler warnings */
 #endif
 }
 
