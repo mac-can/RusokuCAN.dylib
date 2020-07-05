@@ -71,7 +71,8 @@ CXXFLAGS += -g -Wall -Wextra -pthread \
 
 LIBRARIES =
 
-LDFLAGS  += -nostartfiles -dynamiclib -Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation
+LDFLAGS  += -nostartfiles -dynamiclib -fvisibility=hidden \
+	-Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation
 
 CXX = g++
 CC = gcc

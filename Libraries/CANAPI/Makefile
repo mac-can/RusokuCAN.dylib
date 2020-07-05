@@ -41,7 +41,7 @@ CANAPI_DIR = $(HOME_DIR)/Sources/CANAPI
 MACCAN_DIR = $(HOME_DIR)/Sources/MacCAN_Core
 TOUCAN_DIR = $(HOME_DIR)/Sources/TouCAN_Driver
 
-OBJECTS = $(OUTDIR)/can_api.o $(OUTDIR)/can_btr.o $(OUTDIR)/can_msg.o \
+OBJECTS = $(OUTDIR)/can_api.o $(OUTDIR)/can_btr.o \
 	$(OUTDIR)/MacCAN.o $(OUTDIR)/MacCAN_Debug.o $(OUTDIR)/MacCAN_Devices.o \
 	$(OUTDIR)/MacCAN_IOUsbKit.o $(OUTDIR)/MacCAN_IOUsbPipe.o \
 	$(OUTDIR)/TouCAN.o $(OUTDIR)/TouCAN_USB.o
@@ -71,7 +71,8 @@ CXXFLAGS += -g -Wall -Wextra -pthread \
 
 LIBRARIES =
 
-LDFLAGS  += -nostartfiles -dynamiclib -Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation
+LDFLAGS  += -nostartfiles -dynamiclib -fvisibility=hidden \
+	-Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation
 
 CXX = g++
 CC = gcc
@@ -129,9 +130,6 @@ $(OUTDIR)/MacCAN_IOUsbPipe.o: $(MACCAN_DIR)/MacCAN_IOUsbPipe.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
 $(OUTDIR)/can_btr.o: $(CANAPI_DIR)/can_btr.c
-	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
-
-$(OUTDIR)/can_msg.o: $(CANAPI_DIR)/can_msg.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
 $(OUTDIR)/TouCAN.o: $(SOURCE_DIR)/TouCAN.cpp

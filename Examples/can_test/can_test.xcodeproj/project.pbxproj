@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0F6B18D6242014AE00545209 /* can_msg.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F6B18D5242014AD00545209 /* can_msg.c */; };
 		0FDC62D9241AAB8E000AE52B /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FDC62D8241AAB8E000AE52B /* main.cpp */; };
 		0FDC62E4241AC89B000AE52B /* TouCAN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FDC62E0241AC89B000AE52B /* TouCAN.cpp */; };
 		0FDC62E5241AC89B000AE52B /* TouCAN_USB.c in Sources */ = {isa = PBXBuildFile; fileRef = 0FDC62E2241AC89B000AE52B /* TouCAN_USB.c */; };
@@ -33,8 +32,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0F6B18D4242014AD00545209 /* can_msg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = can_msg.h; path = ../../../Sources/CANAPI/can_msg.h; sourceTree = "<group>"; };
-		0F6B18D5242014AD00545209 /* can_msg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = can_msg.c; path = ../../../Sources/CANAPI/can_msg.c; sourceTree = "<group>"; };
 		0FDC62D5241AAB8E000AE52B /* can_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = can_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		0FDC62D8241AAB8E000AE52B /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0FDC62DF241AC87C000AE52B /* build_no.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = build_no.h; path = ../../../Sources/build_no.h; sourceTree = "<group>"; };
@@ -92,8 +89,6 @@
 				0FDC62F6241AC8E9000AE52B /* CANAPI_Types.h */,
 				0FDC62F5241AC8E9000AE52B /* can_btr.c */,
 				0FDC62F7241AC8E9000AE52B /* can_btr.h */,
-				0F6B18D5242014AD00545209 /* can_msg.c */,
-				0F6B18D4242014AD00545209 /* can_msg.h */,
 				0FDC62E9241AC8B7000AE52B /* MacCAN_Debug.c */,
 				0FDC62EC241AC8B7000AE52B /* MacCAN_Debug.h */,
 				0FDC62E8241AC8B7000AE52B /* MacCAN_Devices.c */,
@@ -177,7 +172,6 @@
 				0FDC62F1241AC8B7000AE52B /* MacCAN_Devices.c in Sources */,
 				0FDC62F2241AC8B7000AE52B /* MacCAN_Debug.c in Sources */,
 				0FE77019241C33B30026601D /* Timer.cpp in Sources */,
-				0F6B18D6242014AE00545209 /* can_msg.c in Sources */,
 				0FDC62F3241AC8B7000AE52B /* MacCAN.cpp in Sources */,
 				0FDC62D9241AAB8E000AE52B /* main.cpp in Sources */,
 				0FDC62F4241AC8B7000AE52B /* MacCAN_IOUsbPipe.c in Sources */,
