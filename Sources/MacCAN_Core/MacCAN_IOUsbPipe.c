@@ -29,9 +29,6 @@
 #include <pthread.h>
 #include <time.h>
 
-#define ENTER_CRITICAL_SECTION(queue)  assert(0 == pthread_mutex_lock(&queue->wait.mutex))
-#define LEAVE_CRITICAL_SECTION(queue)  assert(0 == pthread_mutex_unlock(&queue->wait.mutex))
-
 #define GET_TIME(ts)  do{ clock_gettime(CLOCK_REALTIME, &ts); } while(0)
 #define ADD_TIME(ts,to)  do{ ts.tv_sec += (time_t)(to / 1000U); \
                              ts.tv_nsec += (long)(to % 1000U) * (long)1000000; \
@@ -40,7 +37,10 @@
                                  ts.tv_sec += (time_t)1; \
                              } } while(0)
 
-#define SIGNAL_WAIT_CONDITION(queue)  do{ msgQueue->wait.flag = true; \
+#define ENTER_CRITICAL_SECTION(queue)  assert(0 == pthread_mutex_lock(&queue->wait.mutex))
+#define LEAVE_CRITICAL_SECTION(queue)  assert(0 == pthread_mutex_unlock(&queue->wait.mutex))
+
+#define SIGNAL_WAIT_CONDITION(queue)  do{ queue->wait.flag = true; \
                                           assert(0 == pthread_cond_signal(&queue->wait.cond)); } while(0)
 #define WAIT_CONDITION_INFINITE(queue,res)  do{ queue->wait.flag = false; \
                                                 res = pthread_cond_wait(&queue->wait.cond, &queue->wait.mutex); } while(0)
@@ -201,7 +201,7 @@ static Boolean EnqueueElement(CANUSB_MsgQueue_t *queue, const void *element) {
             queue->tail = (queue->tail + 1U) % queue->size;
         else
             queue->head = queue->tail;  /* to make sure */
-        (void) memcpy(&queue->queueElem[(queue->tail * queue->elemSize)], element, queue->elemSize);
+        (void)memcpy(&queue->queueElem[(queue->tail * queue->elemSize)], element, queue->elemSize);
         queue->used += 1U;
         return true;
     } else {
@@ -218,7 +218,7 @@ static Boolean DequeueElement(CANUSB_MsgQueue_t *queue, void *element) {
     assert(queue->queueElem);
 
     if (queue->used > 0U) {
-        (void) memcpy(element, &queue->queueElem[(queue->head * queue->elemSize)], queue->elemSize);
+        (void)memcpy(element, &queue->queueElem[(queue->head * queue->elemSize)], queue->elemSize);
         queue->head = (queue->head + 1U) % queue->size;
         queue->used -= 1U;
         return true;

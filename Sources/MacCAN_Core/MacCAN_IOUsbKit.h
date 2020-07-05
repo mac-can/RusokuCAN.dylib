@@ -40,7 +40,7 @@ typedef struct msg_queue_t_ {
     UInt32 used;
     UInt32 head;
     UInt32 tail;
-    void *queueElem;
+    UInt8 *queueElem;
     size_t elemSize;
     struct cond_wait_t {
         pthread_mutex_t mutex;
