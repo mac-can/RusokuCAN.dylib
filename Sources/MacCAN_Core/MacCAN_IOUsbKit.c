@@ -283,7 +283,7 @@ CANUSB_Handle_t CANUSB_OpenDevice(UInt16 vendorId, UInt16 productId, UInt8 chann
             handle = CANUSB_INVALID_HANDLE;
         }
     } else {
-        MACCAN_DEBUG_ERROR("+++ Unable to open a matching device (vendor = %02x, product = %02x, channel = %i)\n",
+        MACCAN_DEBUG_ERROR("+++ Unable to open a matching device (vendor = %03x, product = %03x, channel = %i)\n",
                      vendorId, productId, channelNo);
         handle = CANUSB_INVALID_HANDLE;
     }
@@ -616,12 +616,20 @@ CANUSB_Return_t CANUSB_WritePipe(CANUSB_Handle_t handle, UInt8 pipeRef, void *bu
 CANUSB_Handle_t CANUSB_GetFirstDevice(void) {
     CANUSB_Handle_t handle = CANUSB_INVALID_HANDLE;
 
-    for (idxDevice = 0; idxDevice < CANUSB_MAX_DEVICES; idxDevice++) {
+    /* must be initialized */
+    if (!fInitialized)
+        return CANUSB_INVALID_HANDLE;
+    
+    /* get the first registered device, if any */
+    if (idxDevice != 0)
+        idxDevice = 0;
+    while (idxDevice < CANUSB_MAX_DEVICES) {
         if (usbDevice[idxDevice].fPresent &&
             (usbDevice[idxDevice].ioDevice != NULL)) {
             handle = idxDevice;
             break;
         }
+        idxDevice++;
     }
     return handle;
 }
@@ -629,12 +637,20 @@ CANUSB_Handle_t CANUSB_GetFirstDevice(void) {
 CANUSB_Handle_t CANUSB_GetNextDevice(void) {
     CANUSB_Handle_t handle = CANUSB_INVALID_HANDLE;
     
-    for (; idxDevice < CANUSB_MAX_DEVICES; idxDevice++) {
+    /* must be initialized */
+    if (!fInitialized)
+        return CANUSB_INVALID_HANDLE;
+    
+    /* get the next registered device, if any */
+    if (idxDevice < CANUSB_MAX_DEVICES)
+        idxDevice += 1;
+    while (idxDevice < CANUSB_MAX_DEVICES) {
         if (usbDevice[idxDevice].fPresent &&
             (usbDevice[idxDevice].ioDevice != NULL)) {
             handle = idxDevice;
             break;
         }
+        idxDevice++;
     }
     return handle;
 }
@@ -1087,7 +1103,7 @@ static void DeviceAdded(void *refCon, io_iterator_t iterator)
         (void) (*device)->GetDeviceAddress(device, &address);
         (void) (*device)->GetDeviceSpeed(device, &speed);
         if (!CANDEV_GetDeviceById(vendor, product)) {
-            MACCAN_DEBUG_ERROR("+++ Found unwanted device (vendor = %02x, product = %02x)\n", vendor, product);
+            MACCAN_DEBUG_ERROR("+++ Found unwanted device (vendor = %03x, product = %03x)\n", vendor, product);
             (void) (*device)->Release(device);
             continue;
         }
@@ -1098,8 +1114,8 @@ static void DeviceAdded(void *refCon, io_iterator_t iterator)
             ENTER_CRITICAL_SECTION(index);
             if(!usbDevice[index].fPresent) {
                 MACCAN_DEBUG_CORE("      - Device #%i: %s\n", index, name);
-                MACCAN_DEBUG_CORE("        - Properties: vendor = %02x, product = %02x, release = %03x, speed = %d\n",
-                             vendor, product, vendor, product, release, speed);
+                MACCAN_DEBUG_CORE("        - Properties: vendor = %03x, product = %03x, release = %04x, speed = %d\n",
+                                             vendor, product, release, speed);
                 /* store the properties of the added device */
                 bzero(&usbDevice[index].usbInterface, sizeof(USBInterface_t));
                 usbDevice[index].usbInterface.fOpened = false;
@@ -1117,7 +1133,7 @@ static void DeviceAdded(void *refCon, io_iterator_t iterator)
         }
         if (!found) {
             /* no free entry available */
-            MACCAN_DEBUG_ERROR("+++ No free entry available for new device (vendor = %02x, product = %02x)\n", vendor, product);
+            MACCAN_DEBUG_ERROR("+++ No free entry available for new device (vendor = %03x, product = %03x)\n", vendor, product);
             (void) (*device)->Release(device);
         }
     }
@@ -1152,7 +1168,7 @@ static void DeviceRemoved(void *refCon, io_iterator_t iterator)
         for (index = 0; index < CANUSB_MAX_DEVICES; index++) {
             ENTER_CRITICAL_SECTION(index);
             if (location == (UInt64)usbDevice[index].u32Location) {
-                MACCAN_DEBUG_CORE("      - Device #%i is %s available (vendor = %02x, product = %02x)\n", index,
+                MACCAN_DEBUG_CORE("      - Device #%i is %s available (vendor = %03x, product = %03x)\n", index,
                              usbDevice[index].fPresent? "not longer" : "not", usbDevice[index].u16VendorId, usbDevice[index].u16ProductId);
                 /* reset the properties of the removed device */
                 bzero(&usbDevice[index].usbInterface, sizeof(USBInterface_t));
