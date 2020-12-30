@@ -21,6 +21,7 @@ current_OS := $(patsubst CYGWIN%,Cygwin,$(current_OS))
 current_OS := $(patsubst MINGW%,MinGW,$(current_OS))
 current_OS := $(patsubst MSYS%,MinGW,$(current_OS))
 
+##############################################################################
 
 TARGET  = can_moni
 
@@ -67,6 +68,8 @@ LIBRARIES =
 
 LDFLAGS  += -Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation
 
+##############################################################################
+
 CXX = g++
 CC = gcc
 LD = g++
@@ -75,9 +78,7 @@ CP = cp -f
 
 OUTDIR = .objects
 
-
 .PHONY: info outdir
-
 
 all: info outdir $(TARGET)
 
@@ -95,6 +96,7 @@ clean:
 install:
 	$(CP) $(TARGET) $(INSTALL)
 
+##############################################################################
 
 $(OUTDIR)/main.o: $(MAIN_DIR)/main.cpp
 	$(CXX) $(CXXFLAGS) -MMD -MF $*.d -o $@ -c $<
@@ -132,7 +134,10 @@ $(OUTDIR)/TouCAN.o: $(SOURCE_DIR)/TouCAN.cpp
 $(OUTDIR)/TouCAN_USB.o: $(TOUCAN_DIR)/TouCAN_USB.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
+##############################################################################
 
 $(TARGET): $(OBJECTS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBRARIES)
 	@echo "Target '"$@"' successfully build"
+
+##############################################################################

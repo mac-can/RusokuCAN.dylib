@@ -23,6 +23,7 @@ current_OS := $(patsubst CYGWIN%,Cygwin,$(current_OS))
 current_OS := $(patsubst MINGW%,MinGW,$(current_OS))
 current_OS := $(patsubst MSYS%,MinGW,$(current_OS))
 
+##############################################################################
 
 LIBRARY = libUVCANTOU
 
@@ -47,6 +48,8 @@ SOURCE_DIR = $(HOME_DIR)/Sources
 CANAPI_DIR = $(HOME_DIR)/Sources/CANAPI
 MACCAN_DIR = $(HOME_DIR)/Sources/MacCAN_Core
 TOUCAN_DIR = $(HOME_DIR)/Sources/TouCAN_Driver
+
+##############################################################################
 
 OBJECTS = $(OUTDIR)/can_api.o $(OUTDIR)/can_btr.o \
 	$(OUTDIR)/MacCAN.o $(OUTDIR)/MacCAN_Debug.o $(OUTDIR)/MacCAN_Devices.o \
@@ -84,6 +87,7 @@ LDFLAGS  += -nostartfiles -dynamiclib -fvisibility=hidden \
 	-current_version $(CURRENT_VERSION) \
 	-compatibility_version $(COMPATIBILITY_VERSION)
 
+##############################################################################
 
 CXX = g++
 CC = gcc
@@ -93,9 +97,7 @@ CP = cp -f
 
 OUTDIR = .objects
 
-
 .PHONY: info outdir
-
 
 all: info outdir $(TARGET)
 
@@ -121,6 +123,7 @@ endif
 	$(CP) $(HOME_DIR)/Sources/CANAPI/CANAPI_Types.h $(INCLUDE)
 	$(CP) $(HOME_DIR)/Sources/CANAPI/CANAPI_Defines.h $(INCLUDE)
 
+##############################################################################
 
 $(OUTDIR)/can_api.o: ./can_api.cpp
 	$(CXX) $(CXXFLAGS) -MMD -MF $*.d -o $@ -c $<
@@ -149,7 +152,10 @@ $(OUTDIR)/TouCAN.o: $(SOURCE_DIR)/TouCAN.cpp
 $(OUTDIR)/TouCAN_USB.o: $(TOUCAN_DIR)/TouCAN_USB.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
+##############################################################################
 
 $(TARGET): $(OBJECTS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBRARIES)
 	@echo "Target '"$@"' successfully build"
+
+##############################################################################

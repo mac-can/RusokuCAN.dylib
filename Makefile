@@ -20,6 +20,8 @@
 #
 
 all:
+	$(MAKE) -C Trial $@
+	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	$(MAKE) -C Libraries/TouCAN $@
 	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	$(MAKE) -C Libraries/CANAPI $@
@@ -29,12 +31,14 @@ all:
 	$(MAKE) -C Examples/can_moni $@
 
 clean:
+	$(MAKE) -C Trial $@
 	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Libraries/CANAPI $@
 	$(MAKE) -C Examples/can_test $@
 	$(MAKE) -C Examples/can_moni $@
 
 install:
+#	$(MAKE) -C Trial $@
 	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Libraries/CANAPI $@
 #	$(MAKE) -C Examples/can_test $@
