@@ -89,7 +89,7 @@ Repeat this step after each `git commit`, `git pull`, `git clone`, etc.
 
 #### libTouCAN
 
-This is a Xcode project, developed with Xcode 11.4 for macOS 10.15 (Catalina).
+This is a Xcode project, developed with Xcode 12.3 for macOS 11.1 (Big Sur).
 
 ___libTouCAN___ is a dynamic library with a CAN API V3 compatible application programming interface for use in __C++__ applications.
 See header file `TouCAN.h` for a description of all class members.
@@ -119,7 +119,7 @@ See [Rusoku](https://github.com/rusoku)´s GitHub page for further information.
 
 #### can_moni for MacCAN-TouCAN
 
-This is a Xcode project, developed with Xcode 11.4 for macOS 10.15 (Catalina).
+This is a Xcode project, developed with Xcode 12.3 for macOS 11.1 (Big Sur).
 
 `can_moni` is a command line tool to view incoming CAN messages.
 I hate this messing around with binary masks for identifier filtering.
@@ -129,7 +129,7 @@ Type `can_moni --help` to display all program options.
 
 #### can_test for MacCAN-TouCAN
 
-This is a Xcode project, developed with Xcode 11.4 for macOS 10.15 (Catalina).
+This is a Xcode project, developed with Xcode 12.3 for macOS 11.1 (Big Sur).
 
 `can_test` is a command line tool to test CAN communication.
 Originally developed for electronic environmental tests on an embedded Linux system with SocketCAN, I´m using it for many years as a traffic generator for CAN stress-tests.

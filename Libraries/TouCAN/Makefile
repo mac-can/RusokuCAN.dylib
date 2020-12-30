@@ -26,9 +26,16 @@ current_OS := $(patsubst MSYS%,MinGW,$(current_OS))
 
 LIBRARY = libTouCAN
 
-VERSION = 0.1
+MAJOR = 0
+MINOR = 1
+PATCH = 1
 
+VERSION = $(MAJOR).$(MINOR).$(PATCH)
 TARGET  = $(LIBRARY).$(VERSION).dylib
+
+INSTALL_NAME = $(TARGET)
+CURRENT_VERSION = $(VERSION)
+COMPATIBILITY_VERSION = $(MAJOR).$(MINOR).0
 
 INSTALL = /usr/local/lib
 
@@ -72,7 +79,10 @@ CXXFLAGS += -g -Wall -Wextra -pthread \
 LIBRARIES =
 
 LDFLAGS  += -nostartfiles -dynamiclib -fvisibility=hidden \
-	-Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation
+	-Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation \
+	-install_name $(INSTALL_NAME) \
+	-current_version $(CURRENT_VERSION) \
+	-compatibility_version $(COMPATIBILITY_VERSION)
 
 CXX = g++
 CC = gcc
