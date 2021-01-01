@@ -1,5 +1,5 @@
 /*
- *  MacCAN - macOS User-Space Driver for CAN to USB Interfaces
+ *  MacCAN - macOS User-Space Driver for USB-to-CAN Interfaces
  *
  *  Copyright (C) 2012-2020  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
@@ -84,6 +84,20 @@
     #define MACCAN_DEBUG_CODE(level,...)  while(0)
 #endif
 
+/* Write log message into a file
+ */
+    #define MACCAN_LOG_FILE  "mac-can.log"
+#if (OPTION_MACCAN_LOGGER > 0)
+    #define MACCAN_LOG_OPEN()  can_log_open(NULL)
+    #define MACCAN_LOG_CLOSE()  can_log_close()
+    #define MACCAN_LOG_PRINTF(...)  can_log_printf(__VA_ARGS__)
+    #define MACCAN_LOG_WRITE(buf,len,pre)  can_log_write(buf, len, pre)
+#else
+    #define MACCAN_LOG_OPEN()  while(0)
+    #define MACCAN_LOG_CLOSE()  while(0)
+    #define MACCAN_LOG_PRINTF(...)  while(0)
+    #define MACCAN_LOG_WRITE(buf,len,pre)  while(0)
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -93,7 +107,15 @@ extern int can_dbg_printf(FILE *file, const char *format,...);
 extern int can_dbg_func_printf(FILE *file, const char *name, const char *format,...);
 extern int can_dbg_code_printf(FILE *file, int line, int level, const char *format,...);
 
+extern int can_log_open(const char *filename);
+extern int can_log_close(void);
+extern int can_log_printf(const char *format,...);
+extern int can_log_write(unsigned char *buffer, size_t nbyte, const char *prefix);
+
 #ifdef __cplusplus
 }
 #endif
 #endif /* MACCAN_DEBUG_H_INCLUDED */
+
+/* * $Id: MacCAN_Debug.h 969 2020-12-27 15:56:48Z eris $ *** (C) UV Software, Berlin ***
+ */

@@ -1,7 +1,7 @@
 /*
- *  MacCAN - macOS User-Space Driver for CAN to USB Interfaces
+ *  MacCAN - macOS User-Space Driver for USB-to-CAN Interfaces
  *
- *  Copyright (C) 2012-2020  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+ *  Copyright (C) 2012-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
  *  This file is part of MacCAN-Core.
  *
@@ -47,7 +47,7 @@
  *
  *  @author    $Author: eris $
  *
- *  @version   $Rev: 877 $
+ *  @version   $Rev: 977 $
  *
  *  @defgroup  mac_can  macOS User-Space Driver for CAN to USB Interfaces
  *  @{
@@ -55,6 +55,7 @@
 #ifndef MACCAN_H_INCLUDED
 #define MACCAN_H_INCLUDED
 
+#include "CANAPI_Defines.h"
 #include "CANAPI_Types.h"
 
 /** @name   Aliases
@@ -94,23 +95,9 @@ typedef int MacCAN_Handle_t;
 typedef int MacCAN_Return_t;
 /** @} */
 
-/** @brief  CAN to USB Device identification:
- */
-typedef struct can_device_t_ {
-    uint16_t vendorId;   /**< USB vendor ID (16-bit) */
-    uint16_t productId;  /**< USB product ID (16-bit) */
-} MacCAN_Device_t;
-
-/** @brief  CAN to USB Device identification list
- *  @note   Each MacCAN driver implemenation has to implement
- *          an array with pairs of { <vendorId>, <productId> },
- *          terminated by a pair of { (-1), (-1) }.
- */
-extern const MacCAN_Device_t MacCAN_Devices[];
-
 #ifdef __cplusplus
 /// \name   MacCAN API
-/// \brief  MacCAN API based of CAN Interface API Version 3 (CAN API V3).
+/// \brief  MacCAN API based on CAN Interface API Version 3 (CAN API V3).
 /// \note   To implement a MacCAN driver derive a class from abstract class
 ///         CMacCAN, and override all pure virtual functions and optionally
 ///         the static function 'ProbeChannel'.
@@ -280,7 +267,7 @@ public:
     //
     /// \returns     0 if successful, or a negative value on error.
     //
-    virtual MacCAN_Return_t GetProperty(uint16_t param, void *value, uint32_t nbytes) = 0;
+    virtual MacCAN_Return_t GetProperty(uint16_t param, void *value, uint32_t nbyte) = 0;
 
     /// \brief       modifies a property value of the CAN interface.
     //
@@ -290,7 +277,7 @@ public:
     //
     /// \returns     0 if successful, or a negative value on error.
     //
-    virtual MacCAN_Return_t SetProperty(uint16_t param, const void *value, uint32_t nbytes) = 0;
+    virtual MacCAN_Return_t SetProperty(uint16_t param, const void *value, uint32_t nbyte) = 0;
 
     /// \brief       retrieves the hardware version of the CAN controller
     ///              board as a zero-terminated string.
@@ -318,15 +305,23 @@ public:
     static MacCAN_Return_t MapBitrate2Speed(MacCAN_Bitrate_t bitrate, MacCAN_BusSpeed_t &speed);
 /// \}
 
+/// \name   CAN FD Data Length Code
+/// \brief  Methods for DLC conversion.
+/// \{
+public:
+    static uint8_t DLc2Len(uint8_t dlc);
+    static uint8_t Len2Dlc(uint8_t len);
+/// \}
+
 /// \name   MacCAN Core (C++ Part)
 /// \brief  Methods to initialize and release the MacCAN IOUsbKit.
 /// \{
 public:
     /// \brief       initializes the IOUsbKit to be used by a MacCAN driver.
     //
-    /// \note        A CAN device identification list of type \ref MacCAN_Device_t
-    ///              (an array with pairs of { <vendorId>, <productId> }, terminated
-    ///              by a pair of { (-1), (-1) }) has to be provide.
+    /// \note        A CAN device identification list of name \ref CANDEV_Devices
+    ///              (an array with tuples of { <vendorId>, <productId>, <numChannels> },
+    ///              terminated by a tuple of { (-1), (-1), 0 }) has to be provide.
     //
     /// \remarks     This method must be called at the beginning of a MacCAN application
     ///              or in the initializer function of a dynamic library.
@@ -368,3 +363,6 @@ extern char *MacCAN_GetVersion(void);  /**< retrieves version information. */
 /** @}
  */
 #endif /* MACCAN_H_INCLUDED */
+
+/* * $Id: MacCAN.h 977 2021-01-01 16:12:40Z eris $ *** (C) UV Software, Berlin ***
+ */

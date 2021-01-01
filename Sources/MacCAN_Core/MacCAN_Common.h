@@ -18,33 +18,40 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with MacCAN-Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef MACCAN_DEVICES_H_INCLUDED
-#define MACCAN_DEVICES_H_INCLUDED
+#ifndef MACCAN_COMMAN_H_INCLUDED
+#define MACCAN_COMMAN_H_INCLUDED
 
-#include "MacCAN_Common.h"
+#include <MacTypes.h>
 
-#define CANDEV_LAST_ENTRY_IN_DEVICE_LIST  {0xFFFFU, 0xFFFFU, 0U}
+/* CAN API V3 compatible error codes */
+#define CANUSB_ERROR_FATAL    (-99)
+#define CANUSB_ERROR_NOTSUPP  (-98)
+#define CANUSB_ERROR_LIBRARY  (-97)
+#define CANUSB_ERROR_YETINIT  (-96)
+#define CANUSB_ERROR_NOTINIT  (-95)
+#define CANUSB_ERROR_NULLPTR  (-94)
+#define CANUSB_ERROR_ILLPARA  (-93)
+#define CANUSB_ERROR_HANDLE   (-92)
+#define CANUSB_ERROR_reserved (-91)
+#define CANUSB_ERROR_RESOURCE (-90)
+#define CANUSB_ERROR_TIMEOUT  (-50)
+#define CANUSB_ERROR_EMPTY    (-30)
+#define CANUSB_ERROR_FULL     (-20)
+#define CANUSB_ERROR_OK         (0)
+#define CANUSB_SUCCESS  CANUSB_ERROR_OK
 
-typedef struct can_device_t_ {
-    UInt16 vendorId;
-    UInt16 productId;
-    UInt8 numChannels;
-} CANDEV_Device_t, MacCAN_Device_t;
+/* CAN API V3 compatible time-out value */
+#define CANUSB_INFINITE  (65535U)
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern const CANDEV_Device_t *CANDEV_GetFirstDevice(void);
-
-extern const CANDEV_Device_t *CANDEV_GetNextDevice(void);
-
-extern const CANDEV_Device_t *CANDEV_GetDeviceById(UInt16 vendorId, UInt16 productId);
-
 #ifdef __cplusplus
 }
 #endif
-#endif /* MACCAN_DEVICES_H_INCLUDED */
+#endif /* MACCAN_COMMAN_H_INCLUDED */
 
-/* * $Id: MacCAN_Devices.h 969 2020-12-27 15:56:48Z eris $ *** (C) UV Software, Berlin ***
+/* * $Id: MacCAN_Common.h 969 2020-12-27 15:56:48Z eris $ *** (C) UV Software, Berlin ***
  */
+

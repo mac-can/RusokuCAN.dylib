@@ -1,5 +1,5 @@
 /*
- *  MacCAN - macOS User-Space Driver for CAN to USB Interfaces
+ *  MacCAN - macOS User-Space Driver for USB-to-CAN Interfaces
  *
  *  Copyright (C) 2012-2020  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
@@ -25,7 +25,7 @@
 #define FINAL_VENDOR_ID  (UInt16)-1
 #define FINAL_PRODUCT_ID  (UInt16)-1
 
-extern const CANDEV_Device_t MacCAN_Devices[];
+extern const CANDEV_Device_t CANDEV_Devices[];
 
 static int nIndex = 0;
 
@@ -34,8 +34,8 @@ const CANDEV_Device_t *CANDEV_GetFirstDevice(void)
     const CANDEV_Device_t *ptrDevice = NULL;
     
     nIndex = 0;
-    if (MacCAN_Devices[nIndex].vendorId != FINAL_VENDOR_ID)
-        ptrDevice = &MacCAN_Devices[nIndex];
+    if (CANDEV_Devices[nIndex].vendorId != FINAL_VENDOR_ID)
+        ptrDevice = &CANDEV_Devices[nIndex];
     return ptrDevice;
 }
 
@@ -43,10 +43,10 @@ const CANDEV_Device_t *CANDEV_GetNextDevice(void)
 {
     const CANDEV_Device_t *ptrDevice = NULL;
     
-    if (MacCAN_Devices[nIndex].vendorId != FINAL_VENDOR_ID)
+    if (CANDEV_Devices[nIndex].vendorId != FINAL_VENDOR_ID)
         nIndex += 1;
-    if (MacCAN_Devices[nIndex].vendorId != FINAL_VENDOR_ID)
-        ptrDevice = &MacCAN_Devices[nIndex];
+    if (CANDEV_Devices[nIndex].vendorId != FINAL_VENDOR_ID)
+        ptrDevice = &CANDEV_Devices[nIndex];
     return ptrDevice;
 }
 
@@ -54,12 +54,15 @@ const CANDEV_Device_t *CANDEV_GetDeviceById(UInt16 vendorId, UInt16 productId)
 {
     const CANDEV_Device_t *ptrDevice = NULL;
     
-    for (int i = 0; MacCAN_Devices[i].vendorId != FINAL_VENDOR_ID; i++) {
-        if ((MacCAN_Devices[i].vendorId == vendorId) &&
-            (MacCAN_Devices[i].productId == productId)) {
-            ptrDevice = &MacCAN_Devices[i];
+    for (int i = 0; CANDEV_Devices[i].vendorId != FINAL_VENDOR_ID; i++) {
+        if ((CANDEV_Devices[i].vendorId == vendorId) &&
+            (CANDEV_Devices[i].productId == productId)) {
+            ptrDevice = &CANDEV_Devices[i];
             break;
         }
     }
     return ptrDevice;
 }
+
+/* * $Id: MacCAN_Devices.c 969 2020-12-27 15:56:48Z eris $ *** (C) UV Software, Berlin ***
+ */

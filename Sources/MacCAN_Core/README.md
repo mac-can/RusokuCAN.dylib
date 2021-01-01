@@ -1,14 +1,14 @@
 ### Creation of USB User-Space Drivers for CAN Interfaces under macOS&reg;
 
-_Copyright &copy; 2012-2020  Uwe Vogt, UV Software, Berlin (info@mac-can.com)_
+_Copyright &copy; 2012-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)_
 
-Version $Rev: 893 $
+Version $Rev: 977 $
 
 # Running CAN and CAN FD on a Mac&reg;
 
 _Running CAN and CAN FD on a Mac_ is the mission of the MacCAN project.
 The MacCAN-Core repo is not aimed at building a driver or a library.
-It provides the source code of an abstraction (or rather a wrapper) of Apple´s IOUsbKit to create USB user-space drivers for CAN interfaces from various vendors under macOS.
+It provides the source code of an abstraction (or rather of a wrapper) of Apple´s IOUsbKit to create USB user-space drivers for CAN interfaces from various vendors under macOS.
 
 ## A Stupid Question
 
@@ -22,7 +22,7 @@ But that poor boy only owned a Mac.
 
 ## MacCAN - macOS Driver for PCAN-USB Interfaces and more
 
-In 2012 I´ve started with the development of an OS X user-space driver for my PEAK CAN to USB dongle.
+In the absence of a CAN driver for Mac, I started developing an OS X user space driver for my PEAK USB-to-CAN dongle.
 Many thanks to Uwe Wilhelm, CEO of PEAK-System Technik GmbH, who had supported me with technical information and several hardware.
 
 ### PCBUSB Library
@@ -55,7 +55,7 @@ goto https://github.com/mac-can/RusokuCAN/.
 
 ```C++
 /// \name   MacCAN API
-/// \brief  MacCAN API based of CAN Interface API Version 3 (CAN API V3).
+/// \brief  MacCAN API based on CAN Interface API Version 3 (CAN API V3).
 /// \note   To implement a MacCAN driver derive a class from abstract class
 ///         CMacCAN, and override all pure virtual functions and optionally
 ///         the static function 'ProbeChannel'.
@@ -261,6 +261,14 @@ public:
     static MacCAN_Return_t MapString2Bitrate(const char *string, MacCAN_Bitrate_t &bitrate);
     static MacCAN_Return_t MapBitrate2String(MacCAN_Bitrate_t bitrate, char *string, size_t length);
     static MacCAN_Return_t MapBitrate2Speed(MacCAN_Bitrate_t bitrate, MacCAN_BusSpeed_t &speed);
+/// \}
+
+/// \name   CAN FD Data Length Code
+/// \brief  Methods for DLC conversion.
+/// \{
+public:
+    static uint8_t DLc2Len(uint8_t dlc);
+    static uint8_t Len2Dlc(uint8_t len);
 /// \}
 };
 /// \}

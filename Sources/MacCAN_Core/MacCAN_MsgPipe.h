@@ -18,33 +18,33 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with MacCAN-Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef MACCAN_DEVICES_H_INCLUDED
-#define MACCAN_DEVICES_H_INCLUDED
+#ifndef MACCAN_MSGPIPE_H_INCLUDED
+#define MACCAN_MSGPIPE_H_INCLUDED
 
 #include "MacCAN_Common.h"
 
-#define CANDEV_LAST_ENTRY_IN_DEVICE_LIST  {0xFFFFU, 0xFFFFU, 0U}
+typedef struct msg_pipe_t_ {
+    int fildes[2];
+} *CANPIP_MsgPipe_t;
 
-typedef struct can_device_t_ {
-    UInt16 vendorId;
-    UInt16 productId;
-    UInt8 numChannels;
-} CANDEV_Device_t, MacCAN_Device_t;
+typedef int CANPIP_Return_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern const CANDEV_Device_t *CANDEV_GetFirstDevice(void);
+extern CANPIP_MsgPipe_t CANPIP_Create(void);
 
-extern const CANDEV_Device_t *CANDEV_GetNextDevice(void);
+extern CANPIP_Return_t CANPIP_Destroy(CANPIP_MsgPipe_t msgPipe);
 
-extern const CANDEV_Device_t *CANDEV_GetDeviceById(UInt16 vendorId, UInt16 productId);
+extern CANPIP_Return_t CANPIP_Write(CANPIP_MsgPipe_t msgPipe, void const *buffer, size_t nbyte);
+
+extern CANPIP_Return_t CANPIP_Read(CANPIP_MsgPipe_t msgPipe, void *buffer, size_t maxbyte, UInt16 timeout);
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* MACCAN_DEVICES_H_INCLUDED */
+#endif /* MACCAN_MSGPIPE_H_INCLUDED */
 
-/* * $Id: MacCAN_Devices.h 969 2020-12-27 15:56:48Z eris $ *** (C) UV Software, Berlin ***
+/* * $Id: MacCAN_MsgPipe.h 971 2020-12-27 16:02:24Z eris $ *** (C) UV Software, Berlin ***
  */
