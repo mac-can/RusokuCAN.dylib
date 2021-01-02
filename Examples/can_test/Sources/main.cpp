@@ -1,7 +1,7 @@
 //
 //  CAN Tester for Rusoku USB TouCAN Interfaces
 //
-//  Copyright (C) 2007,2020  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+//  Copyright (C) 2007,2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@
 
 #include "build_no.h"
 #define VERSION_MAJOR    0
-#define VERSION_MINOR    1
+#define VERSION_MINOR    2
 #define VERSION_PATCH    0
 #define VERSION_BUILD    BUILD_NO
 #define VERSION_STRING   TOSTRING(VERSION_MAJOR) "." TOSTRING(VERSION_MINOR) "." TOSTRING(VERSION_PATCH) " (" TOSTRING(BUILD_NO) ")"
@@ -56,7 +56,7 @@ static const char APPLICATION[] = "CAN Tester for Rusoku TouCAN USB Interfaces, 
 #else
 static const char APPLICATION[] = "CAN Tester for Rusoku TouCAN USB Interfaces, Version " VERSION_STRING;
 #endif
-static const char COPYRIGHT[]   = "Copyright (C) 2007,2020 by Uwe Vogt, UV Software, Berlin";
+static const char COPYRIGHT[]   = "Copyright (C) 2007,2020-2021 by Uwe Vogt, UV Software, Berlin";
 static const char WARRANTY[]    = "This program comes with ABSOLUTELY NO WARRANTY!\n\n" \
                                   "This is free software, and you are welcome to redistribute it\n" \
                                   "under certain conditions; type `--version' for details.";

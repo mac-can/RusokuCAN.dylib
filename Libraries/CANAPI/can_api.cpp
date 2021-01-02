@@ -1,7 +1,7 @@
 //
 //  CAN Interface API, Version 3 (for Rusoku TouCAN USB Interfaces)
 //
-//  Copyright (C) 2020  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+//  Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
 //
 //  This file is part of MacCAN-TouCAN.
 //
@@ -29,7 +29,7 @@
 
 #include "build_no.h"
 #define VERSION_MAJOR     0
-#define VERSION_MINOR     1
+#define VERSION_MINOR     2
 #define VERSION_PATCH     0
 #define VERSION_BUILD     BUILD_NO
 #define VERSION_STRING    TOSTRING(VERSION_MAJOR) "." TOSTRING(VERSION_MINOR) "." TOSTRING(VERSION_PATCH) "-" TOSTRING(BUILD_NO)
@@ -143,7 +143,7 @@ int can_init(int32_t channel, uint8_t mode, const void *param)
         // TODO: ...
         init = 1;
     }
-    // sanity checks
+    // sanity check
     if (!init)
         return CANERR_FATAL;
     if (!IS_HANDLE_VALID(channel))
@@ -167,7 +167,7 @@ int can_exit(int handle)
 {
     MacCAN_Return_t retVal = CMacCAN::FatalError;
 
-    // sanity checks
+    // sanity check
     if (!init)
         return CANERR_NOTINIT;
     if (handle != CANEXIT_ALL) {
@@ -193,7 +193,7 @@ int can_start(int handle, const can_bitrate_t *bitrate)
 {
     MacCAN_Return_t retVal = CMacCAN::FatalError;
 
-    // sanity checks
+    // sanity check
     if (!init)
         return CANERR_NOTINIT;
     if (!IS_HANDLE_VALID(handle))
@@ -214,7 +214,7 @@ int can_reset(int handle)
 {
     MacCAN_Return_t retVal = CMacCAN::FatalError;
 
-    // sanity checks
+    // sanity check
     if (!init)
         return CANERR_NOTINIT;
     if (!IS_HANDLE_VALID(handle))
@@ -233,7 +233,7 @@ int can_write(int handle, const can_message_t *message, uint16_t timeout)
 {
     MacCAN_Return_t retVal = CMacCAN::FatalError;
 
-    // sanity checks
+    // sanity check
     if (!init)
         return CANERR_NOTINIT;
     if (!IS_HANDLE_VALID(handle))
@@ -254,7 +254,7 @@ int can_read(int handle, can_message_t *message, uint16_t timeout)
 {
     MacCAN_Return_t retVal = CMacCAN::FatalError;
 
-    // sanity checks
+    // sanity check
     if (!init)
         return CANERR_NOTINIT;
     if (!IS_HANDLE_VALID(handle))
@@ -277,7 +277,7 @@ int can_status(int handle, uint8_t *status)
     MacCAN_Return_t retVal = CMacCAN::FatalError;
     MacCAN_Status_t tmpStatus;
 
-    // sanity checks
+    // sanity check
     if (!init)
         return CANERR_NOTINIT;
     if (!IS_HANDLE_VALID(handle))
@@ -301,7 +301,7 @@ int can_busload(int handle, uint8_t *load, uint8_t *status)
     MacCAN_Status_t tmpStatus;
     uint8_t tmpLoad;
 
-    // sanity checks
+    // sanity check
     if (!init)
         return CANERR_NOTINIT;
     if (!IS_HANDLE_VALID(handle))
@@ -332,7 +332,7 @@ int can_bitrate(int handle, can_bitrate_t *bitrate, can_speed_t *speed)
     MacCAN_Bitrate_t tmpBitrate;
     MacCAN_BusSpeed_t tmpSpeed;
 
-    // sanity checks
+    // sanity check
     if (!init)
         return CANERR_NOTINIT;
     if (!IS_HANDLE_VALID(handle))
@@ -360,7 +360,7 @@ int can_property(int handle, uint16_t param, void *value, uint32_t nbytes)
 {
     MacCAN_Return_t retVal = CMacCAN::FatalError;
 
-    // sanity checks
+    // sanity check
     if (!init)
         return CANERR_NOTINIT;
     if (!IS_HANDLE_VALID(handle))
@@ -379,7 +379,7 @@ int can_property(int handle, uint16_t param, void *value, uint32_t nbytes)
 EXPORT
 char *can_hardware(int handle)
 {
-    // sanity checks
+    // sanity check
     if (!init)
         return NULL;
     if (!IS_HANDLE_VALID(handle))
@@ -392,7 +392,7 @@ char *can_hardware(int handle)
 EXPORT
 char *can_software(int handle)
 {
-    // sanity checks
+    // sanity check
     if (!init)
         return NULL;
     if (!IS_HANDLE_VALID(handle))

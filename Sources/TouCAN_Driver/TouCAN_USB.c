@@ -1,7 +1,7 @@
 /*
  * TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Adapters
  *
- * Copyright (C) 2020  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+ * Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
  * The following source code was copied from CANAL-DLL for Windows
  * and modified to run under macOS 10.15 and later (x86_64 architecture)
@@ -676,6 +676,14 @@ int TouCAN_set_filter_ext_list_mask(CANUSB_Handle_t hDevice, Filter_Type_TypeDef
 }
 
 // ///////////////////////////////////////////////////////////////////
+// MacCAN-TouCAN list of supported devices
+//
+const CANDEV_Device_t CANDEV_Devices[] = {
+    {RUSOKU_VENDOR_ID, RUSOKU_TOUCAN_USB_ID, 1U},
+    {0xFFFFU, 0xFFFFU}
+};
+
+// ///////////////////////////////////////////////////////////////////
 // MacCAN-TouCAN reception and transmission (asynchronous)
 //
 #define TOUCAN_MSG_STD_FRAME  (UInt8)0x00  // CANAL_IDFLAG_STANDARD
@@ -696,32 +704,31 @@ int TouCAN_set_filter_ext_list_mask(CANUSB_Handle_t hDevice, Filter_Type_TypeDef
 #define TOUCAN_STS_CRC        (UInt8)0x27  // CANAL_STATUSMSG_CRC
 
 static void ReceptionCallback(void *refCon, UInt8 *buffer, UInt32 length) {
-    CANUSB_UsbPipe_t *usbPipe = (CANUSB_UsbPipe_t *)refCon;
+    TouCAN_ReceiveData_t *context = (TouCAN_ReceiveData_t *)refCon;
     MacCAN_Message_t message;
     UInt32 index = 0;
-    
+
     assert(refCon);
     assert(buffer);
-    
+
     while (length >= TOUCAN_USB_RX_DATA_FRAME_SIZE) {
         bzero(&message, sizeof(MacCAN_Message_t));
-        (void) TouCAN_DecodeMessage(&message, &buffer[index], (CANUSB_MsgParam_t)usbPipe->ptrParam);
-        (void) CANUSB_Enqueue(usbPipe, &message);
+        (void) TouCAN_DecodeMessage(&message, &buffer[index], &context->m_MsgParam);
+        (void) CANQUE_Enqueue(context->m_MsgQueue, &message);
         index += TOUCAN_USB_RX_DATA_FRAME_SIZE;
         length -= TOUCAN_USB_RX_DATA_FRAME_SIZE;
     }
 }
 
-int TouCAN_StartReception(CANUSB_Handle_t hDevice, CANUSB_UsbPipe_t *usbPipe, const TouCAN_MsgParam_t *msgParam) {
-    /* set up context for USB receive notifications */
-    CANUSB_PIPE_CONTEXT(usbPipe, hDevice, TOUCAN_USB_RX_DATA_PIPE_REF, ReceptionCallback, (CANUSB_MsgParam_t)msgParam);
+int TouCAN_StartReception(TouCAN_ReceivePipe_t pipe, const TouCAN_ReceiveData_t *context) {
     /* start asynchronous read on endpoint #2 */
-    return (int)CANUSB_ReadPipeAsyncStart(hDevice, TOUCAN_USB_RX_DATA_PIPE_REF, usbPipe);
+    return (int)CANUSB_ReadPipeAsyncStart(pipe, ReceptionCallback, (void *)context);
 }
 
-int TouCAN_AbortReception(CANUSB_Handle_t hDevice) {
+int TouCAN_AbortReception(TouCAN_ReceivePipe_t pipe) {
+
     /* stop asynchronous read on endpoint #2 */
-    return CANUSB_ReadPipeAsyncAbort(hDevice, TOUCAN_USB_RX_DATA_PIPE_REF);;
+    return (int)CANUSB_ReadPipeAsyncAbort(pipe);
 }
 
 int TouCAN_EncodeMessage(UInt8 *buffer, const MacCAN_Message_t *message) {

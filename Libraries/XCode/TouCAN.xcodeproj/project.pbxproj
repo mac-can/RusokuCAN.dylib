@@ -9,24 +9,24 @@
 /* Begin PBXBuildFile section */
 		0F6741B4244B670F000970A8 /* TouCAN_USB.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F6741B2244B670F000970A8 /* TouCAN_USB.c */; };
 		0F6741B5244B670F000970A8 /* TouCAN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F6741B3244B670F000970A8 /* TouCAN.cpp */; };
-		0F6741BB244B675C000970A8 /* MacCAN_IOUsbPipe.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F6741B6244B675C000970A8 /* MacCAN_IOUsbPipe.c */; };
 		0F6741BC244B675C000970A8 /* MacCAN_Debug.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F6741B7244B675C000970A8 /* MacCAN_Debug.c */; };
 		0F6741BD244B675C000970A8 /* MacCAN_IOUsbKit.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F6741B8244B675C000970A8 /* MacCAN_IOUsbKit.c */; };
 		0F6741BE244B675C000970A8 /* MacCAN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F6741B9244B675C000970A8 /* MacCAN.cpp */; };
 		0F6741BF244B675C000970A8 /* MacCAN_Devices.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F6741BA244B675C000970A8 /* MacCAN_Devices.c */; };
 		0F6741C1244B6836000970A8 /* can_btr.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F6741C0244B6836000970A8 /* can_btr.c */; };
+		0FCA745225A0570300727824 /* MacCAN_MsgQueue.c in Sources */ = {isa = PBXBuildFile; fileRef = 0FCA745125A0570300727824 /* MacCAN_MsgQueue.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0F6741B2244B670F000970A8 /* TouCAN_USB.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = TouCAN_USB.c; path = ../../Sources/TouCAN_Driver/TouCAN_USB.c; sourceTree = "<group>"; };
 		0F6741B3244B670F000970A8 /* TouCAN.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TouCAN.cpp; path = ../../Sources/TouCAN.cpp; sourceTree = "<group>"; };
-		0F6741B6244B675C000970A8 /* MacCAN_IOUsbPipe.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MacCAN_IOUsbPipe.c; path = ../../Sources/MacCAN_Core/MacCAN_IOUsbPipe.c; sourceTree = "<group>"; };
 		0F6741B7244B675C000970A8 /* MacCAN_Debug.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MacCAN_Debug.c; path = ../../Sources/MacCAN_Core/MacCAN_Debug.c; sourceTree = "<group>"; };
 		0F6741B8244B675C000970A8 /* MacCAN_IOUsbKit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MacCAN_IOUsbKit.c; path = ../../Sources/MacCAN_Core/MacCAN_IOUsbKit.c; sourceTree = "<group>"; };
 		0F6741B9244B675C000970A8 /* MacCAN.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MacCAN.cpp; path = ../../Sources/MacCAN_Core/MacCAN.cpp; sourceTree = "<group>"; };
 		0F6741BA244B675C000970A8 /* MacCAN_Devices.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MacCAN_Devices.c; path = ../../Sources/MacCAN_Core/MacCAN_Devices.c; sourceTree = "<group>"; };
 		0F6741C0244B6836000970A8 /* can_btr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = can_btr.c; path = ../../Sources/CANAPI/can_btr.c; sourceTree = "<group>"; };
 		0F67E08A240A473D00C5C9BB /* libTouCAN.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libTouCAN.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		0FCA745125A0570300727824 /* MacCAN_MsgQueue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MacCAN_MsgQueue.c; path = ../../Sources/MacCAN_Core/MacCAN_MsgQueue.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,7 +47,7 @@
 				0F6741B7244B675C000970A8 /* MacCAN_Debug.c */,
 				0F6741BA244B675C000970A8 /* MacCAN_Devices.c */,
 				0F6741B8244B675C000970A8 /* MacCAN_IOUsbKit.c */,
-				0F6741B6244B675C000970A8 /* MacCAN_IOUsbPipe.c */,
+				0FCA745125A0570300727824 /* MacCAN_MsgQueue.c */,
 				0F6741B9244B675C000970A8 /* MacCAN.cpp */,
 				0F6741B2244B670F000970A8 /* TouCAN_USB.c */,
 				0F6741B3244B670F000970A8 /* TouCAN.cpp */,
@@ -138,12 +138,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0FCA745225A0570300727824 /* MacCAN_MsgQueue.c in Sources */,
 				0F6741BF244B675C000970A8 /* MacCAN_Devices.c in Sources */,
 				0F6741BE244B675C000970A8 /* MacCAN.cpp in Sources */,
 				0F6741BC244B675C000970A8 /* MacCAN_Debug.c in Sources */,
 				0F6741C1244B6836000970A8 /* can_btr.c in Sources */,
 				0F6741B4244B670F000970A8 /* TouCAN_USB.c in Sources */,
-				0F6741BB244B675C000970A8 /* MacCAN_IOUsbPipe.c in Sources */,
 				0F6741BD244B675C000970A8 /* MacCAN_IOUsbKit.c in Sources */,
 				0F6741B5244B670F000970A8 /* TouCAN.cpp in Sources */,
 			);
@@ -199,7 +199,10 @@
 					"OPTION_TOUCAN_DYLIB=1",
 					"OPTION_CANAPI_DRIVER=1",
 					"OPTION_CANAPI_COMPANIONS=1",
-					"OPTION_MACCAN_DEBUG_PRINT=1",
+					"OPTION_MACCAN_LOGGER=0",
+					"OPTION_MACCAN_MULTICHANNEL=0",
+					"OPTION_MACCAN_PIPE_TIMEOUT=0",
+					"OPTION_MACCAN_DEBUG_LEVEL=1",
 					"OPTION_MACCAN_INSTRUMENTATION=0",
 					"$(inherited)",
 				);
@@ -268,6 +271,9 @@
 					"OPTION_TOUCAN_DYLIB=1",
 					"OPTION_CANAPI_DRIVER=1",
 					"OPTION_CANAPI_COMPANIONS=1",
+					"OPTION_MACCAN_LOGGER=0",
+					"OPTION_MACCAN_MULTICHANNEL=0",
+					"OPTION_MACCAN_PIPE_TIMEOUT=0",
 					"OPTION_MACCAN_DEBUG_LEVEL=0",
 					"OPTION_MACCAN_INSTRUMENTATION=0",
 				);

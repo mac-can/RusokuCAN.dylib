@@ -1,7 +1,7 @@
 //
 //  CAN Monitor for Rusoku TouCAN USB Interfaces
 //
-//  Copyright (C) 2007,2020  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+//  Copyright (C) 2007,2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@
 
 #include "build_no.h"
 #define VERSION_MAJOR    0
-#define VERSION_MINOR    1
+#define VERSION_MINOR    2
 #define VERSION_PATCH    0
 #define VERSION_BUILD    BUILD_NO
 #define VERSION_STRING   TOSTRING(VERSION_MAJOR) "." TOSTRING(VERSION_MINOR) "." TOSTRING(VERSION_PATCH) " (" TOSTRING(BUILD_NO) ")"
@@ -57,7 +57,7 @@ static const char APPLICATION[] = "CAN Monitor for Rusoku TouCAN USB Interfaces,
 #else
 static const char APPLICATION[] = "CAN Monitor for Rusoku TouCAN USB Interfaces, Version " VERSION_STRING;
 #endif
-static const char COPYRIGHT[]   = "Copyright (C) 2007,2020 by Uwe Vogt, UV Software, Berlin";
+static const char COPYRIGHT[]   = "Copyright (C) 2007,2020-2021 by Uwe Vogt, UV Software, Berlin";
 static const char WARRANTY[]    = "This program comes with ABSOLUTELY NO WARRANTY!\n\n" \
                                   "This is free software, and you are welcome to redistribute it\n" \
                                   "under certain conditions; type `--version' for details.";
@@ -169,13 +169,13 @@ int main(int argc, const char * argv[]) {
         .byte = CANMODE_DEFAULT
     };
     MacCAN_Return_t retVal = 0;
-    
+
     /* default bit-timing */
     MacCAN_BusSpeed_t speed = {};
     (void) CCanDriver::MapIndex2Bitrate(bitrate.index, bitrate);
     (void) CCanDriver::MapBitrate2Speed(bitrate, speed);
     (void) op;
-    
+
     /* default format options */
     (void) CCanMessage::SetTimestampFormat(modeTime);
     (void) CCanMessage::SetIdentifierFormat(modeId);
@@ -621,7 +621,7 @@ finalize:
 
 int CCanDriver::ListCanDevices(const char *vendor) {
     int32_t library = EOF; int n = 0;
-    
+
     if (vendor != NULL) {
         /* search library ID in the vendor list */
         for (int32_t i = 0; CCanDriver::m_CanVendors[i].id != EOF; i++) {
@@ -656,7 +656,7 @@ int CCanDriver::ListCanDevices(const char *vendor) {
 
 int CCanDriver::TestCanDevices(MacCAN_OpMode_t opMode, const char *vendor) {
     int32_t library = EOF; int n = 0;
-    
+
     if (vendor != NULL) {
         /* search library ID in the vendor list */
         for (int32_t i = 0; CCanDriver::m_CanVendors[i].id != EOF; i++) {
@@ -695,10 +695,10 @@ uint64_t CCanDriver::ReceptionLoop() {
     MacCAN_Message_t message;
     MacCAN_Return_t retVal;
     uint64_t frames = 0U;
-    
+
     char string[CANPROP_MAX_STRING_LENGTH+1];
     bzero(string, CANPROP_MAX_STRING_LENGTH+1);
-    
+
     fprintf(stderr, "\nPress ^C to abort.\n\n");
     while(running) {
         if ((retVal = ReadMessage(message)) == CMacCAN::NoError) {
@@ -731,7 +731,7 @@ static int get_exclusion(const char *arg)
         errno = 0;
         id = strtol(val, &end, 0);
 printf("%s\n%li|\n",val,id);
-        
+
         if (errno == ERANGE && (id == LONG_MAX || id == LONG_MIN))
             return 0;
         if (errno != 0 && id == 0)

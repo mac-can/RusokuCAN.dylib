@@ -1,7 +1,7 @@
 #
 #	TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Interfaces
 #
-#	Copyright (C) 2020  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+#	Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
 #
 #	This file is part of MacCAN-TouCAN.
 #
@@ -28,15 +28,15 @@ current_OS := $(patsubst MSYS%,MinGW,$(current_OS))
 LIBRARY = libTouCAN
 
 MAJOR = 0
-MINOR = 1
-PATCH = 1
+MINOR = 2
+PATCH = 0
 
 VERSION = $(MAJOR).$(MINOR).$(PATCH)
 TARGET  = $(LIBRARY).$(VERSION).dylib
 
 INSTALL_NAME = $(TARGET)
 CURRENT_VERSION = $(VERSION)
-COMPATIBILITY_VERSION = $(MAJOR).$(MINOR).0
+COMPATIBILITY_VERSION = $(MAJOR).1.0
 
 INSTALL = /usr/local/lib
 
@@ -53,7 +53,7 @@ TOUCAN_DIR = $(HOME_DIR)/Sources/TouCAN_Driver
 
 OBJECTS = $(OUTDIR)/TouCAN.o $(OUTDIR)/TouCAN_USB.o \
 	$(OUTDIR)/MacCAN.o $(OUTDIR)/MacCAN_Debug.o $(OUTDIR)/MacCAN_Devices.o \
-	$(OUTDIR)/MacCAN_IOUsbKit.o $(OUTDIR)/MacCAN_IOUsbPipe.o \
+	$(OUTDIR)/MacCAN_IOUsbKit.o $(OUTDIR)/MacCAN_MsgQueue.o \
 	$(OUTDIR)/can_btr.o
 
 DEFINES = -DOPTION_CAN_2_0_ONLY=0 \
@@ -61,7 +61,9 @@ DEFINES = -DOPTION_CAN_2_0_ONLY=0 \
 	-DOPTION_CANAPI_DRIVER=1 \
 	-DOPTION_CANAPI_RETVALS=0 \
 	-DOPTION_CANAPI_COMPANIONS=1 \
-	-DOPTION_CANAPI_DEBUG_LEVEL=0 \
+	-DOPTION_MACCAN_LOGGER=1 \
+	-DOPTION_MACCAN_MULTICHANNEL=0 \
+	-DOPTION_MACCAN_PIPE_TIMEOUT=0 \
 	-DOPTION_MACCAN_DEBUG_LEVEL=0 \
 	-DOPTION_MACCAN_INSTRUMENTATION=0
 
@@ -120,9 +122,10 @@ ifeq ($(current_OS),Darwin)
 	$(RM) $(INSTALL)/$(LIBRARY).dylib; ln -s $(INSTALL)/$(TARGET) $(INSTALL)/$(LIBRARY).dylib
 endif
 	@echo "Copying header files..."
-	$(CP) $(HOME_DIR)/Sources/TouCAN_Driver/TouCAN.h $(INCLUDE)
+	$(CP) $(HOME_DIR)/Sources/TouCAN.h $(INCLUDE)
 	$(CP) $(HOME_DIR)/Sources/MacCAN_Core/MacCAN.h $(INCLUDE)
 	$(CP) $(HOME_DIR)/Sources/CANAPI/CANAPI_Types.h $(INCLUDE)
+	$(CP) $(HOME_DIR)/Sources/CANAPI/CANAPI_Defines.h $(INCLUDE)
 
 ##############################################################################
 
@@ -144,7 +147,7 @@ $(OUTDIR)/MacCAN_Devices.o: $(MACCAN_DIR)/MacCAN_Devices.c
 $(OUTDIR)/MacCAN_IOUsbKit.o: $(MACCAN_DIR)/MacCAN_IOUsbKit.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
-$(OUTDIR)/MacCAN_IOUsbPipe.o: $(MACCAN_DIR)/MacCAN_IOUsbPipe.c
+$(OUTDIR)/MacCAN_MsgQueue.o: $(MACCAN_DIR)/MacCAN_MsgQueue.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
 $(OUTDIR)/can_btr.o: $(CANAPI_DIR)/can_btr.c

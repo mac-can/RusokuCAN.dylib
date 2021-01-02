@@ -1,7 +1,7 @@
 //
 //  TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Interfaces
 //
-//  Copyright (C) 2020  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+//  Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
 //
 //  This file is part of MacCAN-TouCAN.
 //
@@ -20,7 +20,6 @@
 //
 #include "TouCAN.h"
 #include "TouCAN_USB.h"
-#include "MacCAN_Debug.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -30,8 +29,8 @@
 
 #include "build_no.h"
 #define VERSION_MAJOR     0
-#define VERSION_MINOR     1
-#define VERSION_PATCH     1
+#define VERSION_MINOR     2
+#define VERSION_PATCH     0
 #define VERSION_BUILD     BUILD_NO
 #define VERSION_STRING    TOSTRING(VERSION_MAJOR) "." TOSTRING(VERSION_MINOR) "." TOSTRING(VERSION_PATCH) " (" TOSTRING(BUILD_NO) ")"
 #if defined(_WIN64)
@@ -71,25 +70,18 @@ static void _finalizer() {
 #define SUPPORTED_OP_MODE  (CANMODE_DEFAULT | CANMODE_MON | CANMODE_ERR /* TODO: | CANMODE_NXTD | CANMODE_NRTR*/)
 #define ASYNCHRONOUS_READ
 
-const MacCAN_Device_t MacCAN_Devices[] = {
-    {RUSOKU_VENDOR_ID, RUSOKU_TOUCAN_USB_ID},
-    {0xFFFFU, 0xFFFFU}
-};
-
 struct CTouCAN::STouCAN {
     // attributes
     uint16_t m_u16VendorId;  ///< vendor id.
     uint16_t m_u16ProductId;  ///< product id.
-    TouCAN_MsgParam_t m_MsgParam;  ///< time synchronization
-    CANUSB_UsbPipe_t m_ReceivePipe;  ///< USB reception pipe
-//    CANUSB_UsbPipe_t m_TransmitPipe;  ///< USB transmission pipe
+    TouCAN_ReceiveData_t m_ReceiveData;  ///< CAN reception data
+    TouCAN_ReceivePipe_t m_ReceivePipe;  ///< USB reception pipe
     // constructor
     STouCAN() {
         m_u16VendorId = RUSOKU_VENDOR_ID;
         m_u16ProductId = RUSOKU_TOUCAN_USB_ID;
-        bzero(&m_MsgParam, sizeof(TouCAN_MsgParam_t));
-        bzero(&m_ReceivePipe, sizeof(CANUSB_UsbPipe_t));
-//        bzero(&m_TransmitPipe, sizeof(CANUSB_UsbPipe_t));
+        bzero(&m_ReceiveData, sizeof(TouCAN_ReceiveData_t));
+        m_ReceivePipe = NULL;
     }
 };
 
@@ -126,8 +118,8 @@ EXPORT
 MacCAN_Return_t CTouCAN::ProbeChannel(int32_t channel, MacCAN_OpMode_t opMode, const void *param, EChannelState &state) {
     MacCAN_Return_t retVal = CMacCAN::NoError;
 
-    if (CANUSB_IsDevicePresent((MacCAN_Handle_t)channel)) {
-        if (CANUSB_IsDeviceOpened((MacCAN_Handle_t)channel))
+    if (CANUSB_IsDevicePresent((CANUSB_Index_t)channel)) {
+        if (CANUSB_IsDeviceOpened((CANUSB_Index_t)channel))
             state = CMacCAN::ChannelOccupied;
         else
             state = CMacCAN::ChannelAvailable;
@@ -150,60 +142,55 @@ MacCAN_Return_t CTouCAN::InitializeChannel(int32_t channel, MacCAN_OpMode_t opMo
 
     // (§) CAN interface must not be initialized
     if (m_hDevice == CANUSB_INVALID_HANDLE) {
-        // (1) range limitation (channel is UInt8 on MacCAN IOUsbKit)
-        if ((channel < 0) || (255 < channel)) {
-            MACCAN_DEBUG_ERROR("+++ TouCAN: invalid channel number (%i)\n", channel);
-            retVal = CMacCAN::IllegalParameter;
-            goto error_initialize;
-        }
-        // (2) check if requested operation mode is supported
+        // (1) check if requested operation mode is supported
         if ((opMode.byte & (uint8_t)(~SUPPORTED_OP_MODE)) != 0) {
             MACCAN_DEBUG_ERROR("+++ TouCAN: unsupported operation mode (%02x)\n", opMode);
             retVal = CMacCAN::NotSupported;
             goto error_initialize;
         }
-        // (3) open a MacCAN device (returns a device handle on success)
-        m_hDevice = CANUSB_OpenDevice(m_pTouCAN->m_u16VendorId, m_pTouCAN->m_u16ProductId, (uint8_t)channel);
+        // (2) open a MacCAN device (returns a device handle on success)
+        m_hDevice = CANUSB_OpenDevice((CANUSB_Index_t)channel, m_pTouCAN->m_u16VendorId, m_pTouCAN->m_u16ProductId);
         if (m_hDevice == CANUSB_INVALID_HANDLE) {
             retVal = CMacCAN::NotInitialized;
             goto error_initialize;
         }
-        // (4.a) create a MacCAN pipe context for reception
-        retVal = CANUSB_CreatePipe(&m_pTouCAN->m_ReceivePipe, TOUCAN_USB_RX_DATA_PIPE_SIZE, TOUCAN_USB_RCV_QUEUE_SIZE, sizeof(MacCAN_Message_t));
-        if (retVal != CANERR_NOERROR) {
+        // (3.a) create a MacCAN pipe context for reception
+        m_pTouCAN->m_ReceivePipe = CANUSB_CreatePipeAsync(m_hDevice, TOUCAN_USB_RX_DATA_PIPE_REF, TOUCAN_USB_RX_DATA_PIPE_SIZE);
+        if (m_pTouCAN->m_ReceivePipe == NULL) {
             (void) CANUSB_CloseDevice(m_hDevice);
             m_hDevice = CANUSB_INVALID_HANDLE;
+            retVal = CMacCAN::ResourceError;
             goto error_initialize;
         }
-        // (4.b) create a MacCAN pipe context for transmission
-#if (0)
-        retVal = CANUSB_CreatePipe(&m_pTouCAN->m_TransmitPipe, TOUCAN_USB_TX_DATA_PIPE_SIZE, TOUCAN_USB_TRM_QUEUE_SIZE, sizeof(MacCAN_Message_t));
-        if (retVal != CANERR_NOERROR) {
-            (void) CANUSB_DestroyPipe(&m_pTouCAN->m_ReceivePipe);
+        // (3.b) create a MacCAN message queue for reception
+        m_pTouCAN->m_ReceiveData.m_MsgQueue = CANQUE_Create(TOUCAN_USB_RCV_QUEUE_SIZE, sizeof(MacCAN_Message_t));
+        if (m_pTouCAN->m_ReceiveData.m_MsgQueue == NULL) {
+            (void) CANUSB_DestroyPipeAsync(m_pTouCAN->m_ReceivePipe);
             (void) CANUSB_CloseDevice(m_hDevice);
             m_hDevice = CANUSB_INVALID_HANDLE;
+            retVal = CMacCAN::ResourceError;
             goto error_initialize;
         }
-#endif
-        // (5) initialize the CAN controller
+        // (4) initialize the CAN controller
         MACCAN_DEBUG_DRIVER("    Initializing Rusoku TouCAN USB driver...\n");
         // (!) initialize the TouCAN device (reset it before)
         m_Status.byte = CANSTAT_RESET;
         retVal = TouCAN_InitializeInterface(m_hDevice);
         if (retVal != CANERR_NOERROR) {
-//            (void) CANUSB_DestroyPipe(&m_pTouCAN->m_TransmitPipe);
-            (void) CANUSB_DestroyPipe(&m_pTouCAN->m_ReceivePipe);
+            (void) CANQUE_Destroy(m_pTouCAN->m_ReceiveData.m_MsgQueue);
+            (void) CANUSB_DestroyPipeAsync(m_pTouCAN->m_ReceivePipe);
             (void) CANUSB_CloseDevice(m_hDevice);
             m_hDevice = CANUSB_INVALID_HANDLE;
             goto error_initialize;
         }
-        // (6) start the MacCAN reception loop
+        // (5) start the MacCAN reception loop
 #ifndef SYNCHRONOUS_READ
-        retVal = TouCAN_StartReception(m_hDevice, &m_pTouCAN->m_ReceivePipe, &m_pTouCAN->m_MsgParam);
+        retVal = TouCAN_StartReception(m_pTouCAN->m_ReceivePipe, &m_pTouCAN->m_ReceiveData);
         if (retVal != CANERR_NOERROR) {
             (void) TouCAN_deinit(m_hDevice);
-//            (void) CANUSB_DestroyPipe(&m_pTouCAN->m_TransmitPipe);
-            (void) CANUSB_DestroyPipe(&m_pTouCAN->m_ReceivePipe);
+            (void) CANQUE_Destroy(m_pTouCAN->m_ReceiveData.m_MsgQueue);
+            (void) CANUSB_DestroyPipeAsync(m_pTouCAN->m_ReceivePipe);
+            (void) CANUSB_CloseDevice(m_hDevice);
             (void) CANUSB_CloseDevice(m_hDevice);
             m_hDevice = CANUSB_INVALID_HANDLE;
             goto error_initialize;
@@ -226,31 +213,29 @@ MacCAN_Return_t CTouCAN::TeardownChannel() {
     if (m_hDevice != CANUSB_INVALID_HANDLE) {
         (void) ResetController(); // m_Status.can_stopped := 1
         MACCAN_DEBUG_DRIVER("    Teardown Rusoku TouCAN USB driver...\n");
-        // (6) stop the MacCAN reception loop
-        retVal = TouCAN_AbortReception(m_hDevice);
+        // (5) stop the MacCAN reception loop
+        retVal = TouCAN_AbortReception(m_pTouCAN->m_ReceivePipe);
         if (retVal != CANERR_NOERROR)
             goto error_teardown;
         // (!) wait a minute!
         usleep(54945U);
-        // (5) de-initialize the CAN controller
+        // (4) de-initialize the CAN controller
         retVal = TouCAN_TeardownInterface(m_hDevice);
         if (retVal != CANERR_NOERROR)
             goto error_teardown;
-        // (4.b) destroy the MacCAN pipe context for transmission
-#if (0)
-        retVal = CANUSB_DestroyPipe(&m_pTouCAN->m_TransmitPipe);
+        // (3.a) destroy the MacCAN pipe context for reception
+        retVal = CANUSB_DestroyPipeAsync(m_pTouCAN->m_ReceivePipe);
         if (retVal != CANERR_NOERROR)
             goto error_teardown;
-#endif
-        // (4.a) destroy the MacCAN pipe context for transmission
-        retVal = CANUSB_DestroyPipe(&m_pTouCAN->m_ReceivePipe);
+        // (3.b) destroy the MacCAN message queue for reception
+        retVal = CANQUE_Destroy(m_pTouCAN->m_ReceiveData.m_MsgQueue);
         if (retVal != CANERR_NOERROR)
             goto error_teardown;
-        // (3) close the MacCAN device
+        // (2) close the MacCAN device
         retVal = CANUSB_CloseDevice(m_hDevice);
         if (retVal != CANERR_NOERROR)
             goto error_teardown;
-        // :-( invalidate the device handle
+        // (1) invalidate the device handle
         m_hDevice = CANUSB_INVALID_HANDLE;
     }
 error_teardown:
@@ -286,9 +271,9 @@ MacCAN_Return_t CTouCAN::StartController(MacCAN_Bitrate_t bitrate) {
             m_Counter.u64TxMessages = 0U;
             m_Counter.u64RxMessages = 0U;
             m_Counter.u64ErrorFrames = 0U;
-            m_pTouCAN->m_MsgParam.m_u8StatusByte = 0x00U;
-            (void) CANUSB_ResetQueue(&m_pTouCAN->m_ReceivePipe);
-//            (void) CANUSB_ResetQueue(&m_pTouCAN->m_TransmitPipe);
+            // TODO: pipe contex
+            m_pTouCAN->m_ReceiveData.m_MsgParam.m_u8StatusByte = 0x00U;
+            (void) CANQUE_Reset(m_pTouCAN->m_ReceiveData.m_MsgQueue);
             // (3) start CAN controller
             retVal = (MacCAN_Return_t)TouCAN_start(m_hDevice);
             m_Status.can_stopped = (retVal != CANERR_NOERROR) ? 1 : 0;
@@ -344,7 +329,7 @@ MacCAN_Return_t CTouCAN::WriteMessage(MacCAN_Message_t message, uint16_t timeout
 
             int size = TouCAN_EncodeMessage(buffer, &message);
 
-            retVal = CANUSB_WritePipe(m_hDevice, TOUCAN_USB_TX_DATA_PIPE_REF, (void *)buffer, (UInt32)size);
+            retVal = CANUSB_WritePipe(m_hDevice, TOUCAN_USB_TX_DATA_PIPE_REF, buffer, (UInt32)size, timeout);
             m_Status.transmitter_busy = (retVal != CANERR_NOERROR) ? 1 : 0;
             m_Counter.u64TxMessages += (retVal == CANERR_NOERROR) ? 1U : 0U;
 
@@ -377,18 +362,18 @@ MacCAN_Return_t CTouCAN::ReadMessage(MacCAN_Message_t &message, uint16_t timeout
                 printf("{%u} ",size);fflush(stdout);
                 while (size >= TOUCAN_USB_RX_DATA_FRAME_SIZE) {
                     (void) TouCAN_DecodeMessage(&frame, &buffer[index]);
-                    (void) CANUSB_Enqueue(&m_pTouCAN->m_ReceivePipe, &frame);
+                    (void) CANQUE_Enqueue(m_pTouCAN->m_ReceiveData.m_MsgQueue, &frame);
                     index += TOUCAN_USB_RX_DATA_FRAME_SIZE;
                     size -= TOUCAN_USB_RX_DATA_FRAME_SIZE;
                 }
-                retVal = CANUSB_Dequeue(&m_pTouCAN->m_ReceivePipe, &message, 0);
+                retVal = CANQUE_Dequeue(m_pTouCAN->m_ReceiveData.m_MsgQueue, &message, 0);
             }
             else printf("[%x]\n",retVal);
 #else
-            retVal = CANUSB_Dequeue(&m_pTouCAN->m_ReceivePipe, &message, timeout);
+            retVal = CANQUE_Dequeue(m_pTouCAN->m_ReceiveData.m_MsgQueue, &message, timeout);
 #endif
             m_Status.receiver_empty = (retVal != CANERR_NOERROR) ? 1 : 0;
-            m_Status.queue_overrun = CANUSB_QUEUE_OVERFLOW(m_pTouCAN->m_ReceivePipe) ? 1 : 0;
+            m_Status.queue_overrun = CANQUE_OverflowFlag(m_pTouCAN->m_ReceiveData.m_MsgQueue) ? 1 : 0;
             m_Counter.u64RxMessages += ((retVal == CANERR_NOERROR) && !message.sts) ? 1U : 0U;
             m_Counter.u64ErrorFrames += ((retVal == CANERR_NOERROR) && message.sts) ? 1U : 0U;
         } else
@@ -404,7 +389,7 @@ MacCAN_Return_t CTouCAN::GetStatus(MacCAN_Status_t &status) {
     // (§) CAN interface must be initialized
     if (m_hDevice != CANUSB_INVALID_HANDLE) {
         // (1) get status from received status frames
-        m_Status.byte |= m_pTouCAN->m_MsgParam.m_u8StatusByte;
+        m_Status.byte |= m_pTouCAN->m_ReceiveData.m_MsgParam.m_u8StatusByte;
         // (2) get (and clear) interface error code
         UInt32 errorCode;
         retVal = TouCAN_get_interface_error_code(m_hDevice, &errorCode);

@@ -82,6 +82,7 @@ public:
         ReceiverEmpty = CANERR_RX_EMPTY,  ///< receiver empty
         ErrorFrame = CANERR_ERR_FRAME,  ///< error frame
         Timeout = CANERR_TIMEOUT,  ///< timed out
+        ResourceError = CANERR_RESOURCE,  ///< resource allocation
         InvalidBaudrate = CANERR_BAUDRATE,  ///<  illegal baudrate
         IllegalParameter = CANERR_ILLPARA,  ///< illegal parameter
         NullPointer = CANERR_NULLPTR,  ///< null-pointer assignment

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0FCA746125A063A400727824 /* MacCAN_MsgQueue.c in Sources */ = {isa = PBXBuildFile; fileRef = 0FCA745F25A063A400727824 /* MacCAN_MsgQueue.c */; };
 		0FDC62D9241AAB8E000AE52B /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FDC62D8241AAB8E000AE52B /* main.cpp */; };
 		0FDC62E4241AC89B000AE52B /* TouCAN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FDC62E0241AC89B000AE52B /* TouCAN.cpp */; };
 		0FDC62E5241AC89B000AE52B /* TouCAN_USB.c in Sources */ = {isa = PBXBuildFile; fileRef = 0FDC62E2241AC89B000AE52B /* TouCAN_USB.c */; };
@@ -14,7 +15,6 @@
 		0FDC62F1241AC8B7000AE52B /* MacCAN_Devices.c in Sources */ = {isa = PBXBuildFile; fileRef = 0FDC62E8241AC8B7000AE52B /* MacCAN_Devices.c */; };
 		0FDC62F2241AC8B7000AE52B /* MacCAN_Debug.c in Sources */ = {isa = PBXBuildFile; fileRef = 0FDC62E9241AC8B7000AE52B /* MacCAN_Debug.c */; };
 		0FDC62F3241AC8B7000AE52B /* MacCAN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FDC62EA241AC8B7000AE52B /* MacCAN.cpp */; };
-		0FDC62F4241AC8B7000AE52B /* MacCAN_IOUsbPipe.c in Sources */ = {isa = PBXBuildFile; fileRef = 0FDC62EE241AC8B7000AE52B /* MacCAN_IOUsbPipe.c */; };
 		0FDC62F8241AC8E9000AE52B /* can_btr.c in Sources */ = {isa = PBXBuildFile; fileRef = 0FDC62F5241AC8E9000AE52B /* can_btr.c */; };
 		0FE77019241C33B30026601D /* Timer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FE77018241C33B30026601D /* Timer.cpp */; };
 /* End PBXBuildFile section */
@@ -32,6 +32,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0FCA745E25A063A400727824 /* MacCAN_MsgQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MacCAN_MsgQueue.h; path = ../../../Sources/MacCAN_Core/MacCAN_MsgQueue.h; sourceTree = "<group>"; };
+		0FCA745F25A063A400727824 /* MacCAN_MsgQueue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MacCAN_MsgQueue.c; path = ../../../Sources/MacCAN_Core/MacCAN_MsgQueue.c; sourceTree = "<group>"; };
+		0FCA746025A063A400727824 /* MacCAN_Common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MacCAN_Common.h; path = ../../../Sources/MacCAN_Core/MacCAN_Common.h; sourceTree = "<group>"; };
 		0FDC62D5241AAB8E000AE52B /* can_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = can_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		0FDC62D8241AAB8E000AE52B /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0FDC62DF241AC87C000AE52B /* build_no.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = build_no.h; path = ../../../Sources/build_no.h; sourceTree = "<group>"; };
@@ -46,8 +49,6 @@
 		0FDC62EA241AC8B7000AE52B /* MacCAN.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MacCAN.cpp; path = ../../../Sources/MacCAN_Core/MacCAN.cpp; sourceTree = "<group>"; };
 		0FDC62EB241AC8B7000AE52B /* MacCAN_IOUsbKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MacCAN_IOUsbKit.h; path = ../../../Sources/MacCAN_Core/MacCAN_IOUsbKit.h; sourceTree = "<group>"; };
 		0FDC62EC241AC8B7000AE52B /* MacCAN_Debug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MacCAN_Debug.h; path = ../../../Sources/MacCAN_Core/MacCAN_Debug.h; sourceTree = "<group>"; };
-		0FDC62ED241AC8B7000AE52B /* MacCAN_IOUsbPipe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MacCAN_IOUsbPipe.h; path = ../../../Sources/MacCAN_Core/MacCAN_IOUsbPipe.h; sourceTree = "<group>"; };
-		0FDC62EE241AC8B7000AE52B /* MacCAN_IOUsbPipe.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MacCAN_IOUsbPipe.c; path = ../../../Sources/MacCAN_Core/MacCAN_IOUsbPipe.c; sourceTree = "<group>"; };
 		0FDC62EF241AC8B7000AE52B /* MacCAN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MacCAN.h; path = ../../../Sources/MacCAN_Core/MacCAN.h; sourceTree = "<group>"; };
 		0FDC62F5241AC8E9000AE52B /* can_btr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = can_btr.c; path = ../../../Sources/CANAPI/can_btr.c; sourceTree = "<group>"; };
 		0FDC62F6241AC8E9000AE52B /* CANAPI_Types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CANAPI_Types.h; path = ../../../Sources/CANAPI/CANAPI_Types.h; sourceTree = "<group>"; };
@@ -86,6 +87,9 @@
 		0FDC62D7241AAB8E000AE52B /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				0FCA746025A063A400727824 /* MacCAN_Common.h */,
+				0FCA745F25A063A400727824 /* MacCAN_MsgQueue.c */,
+				0FCA745E25A063A400727824 /* MacCAN_MsgQueue.h */,
 				0FDC62F6241AC8E9000AE52B /* CANAPI_Types.h */,
 				0FDC62F5241AC8E9000AE52B /* can_btr.c */,
 				0FDC62F7241AC8E9000AE52B /* can_btr.h */,
@@ -95,8 +99,6 @@
 				0FDC62E6241AC8B7000AE52B /* MacCAN_Devices.h */,
 				0FDC62E7241AC8B7000AE52B /* MacCAN_IOUsbKit.c */,
 				0FDC62EB241AC8B7000AE52B /* MacCAN_IOUsbKit.h */,
-				0FDC62EE241AC8B7000AE52B /* MacCAN_IOUsbPipe.c */,
-				0FDC62ED241AC8B7000AE52B /* MacCAN_IOUsbPipe.h */,
 				0FDC62EA241AC8B7000AE52B /* MacCAN.cpp */,
 				0FDC62EF241AC8B7000AE52B /* MacCAN.h */,
 				0FDC62E2241AC89B000AE52B /* TouCAN_USB.c */,
@@ -170,11 +172,11 @@
 			files = (
 				0FDC62E5241AC89B000AE52B /* TouCAN_USB.c in Sources */,
 				0FDC62F1241AC8B7000AE52B /* MacCAN_Devices.c in Sources */,
+				0FCA746125A063A400727824 /* MacCAN_MsgQueue.c in Sources */,
 				0FDC62F2241AC8B7000AE52B /* MacCAN_Debug.c in Sources */,
 				0FE77019241C33B30026601D /* Timer.cpp in Sources */,
 				0FDC62F3241AC8B7000AE52B /* MacCAN.cpp in Sources */,
 				0FDC62D9241AAB8E000AE52B /* main.cpp in Sources */,
-				0FDC62F4241AC8B7000AE52B /* MacCAN_IOUsbPipe.c in Sources */,
 				0FDC62F0241AC8B7000AE52B /* MacCAN_IOUsbKit.c in Sources */,
 				0FDC62F8241AC8E9000AE52B /* can_btr.c in Sources */,
 				0FDC62E4241AC89B000AE52B /* TouCAN.cpp in Sources */,
@@ -232,9 +234,13 @@
 					"OPTION_CANAPI_DRIVER=1",
 					"OPTION_CANAPI_RETVALS=1",
 					"OPTION_CANAPI_COMPANIONS=1",
-					"OPTION_CANAPI_DEBUG_LEVEL=0",
+					"OPTION_MACCAN_LOGGER=0",
+					"OPTION_MACCAN_MULTICHANNEL=0",
+					"OPTION_MACCAN_PIPE_TIMEOUT=0",
 					"OPTION_MACCAN_DEBUG_LEVEL=0",
 					"OPTION_MACCAN_INSTRUMENTATION=0",
+					"OPTION_CANAPI_DEBUG_LEVEL=0",
+					"OPTION_CANAPI_INSTRUMENTATION=0",
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -300,9 +306,13 @@
 					"OPTION_CANAPI_DRIVER=1",
 					"OPTION_CANAPI_RETVALS=1",
 					"OPTION_CANAPI_COMPANIONS=1",
-					"OPTION_CANAPI_DEBUG_LEVEL=0",
+					OPTION_MACCAN_LOGGER0,
 					"OPTION_MACCAN_DEBUG_LEVEL=0",
+					"OPTION_MACCAN_MULTICHANNEL=0",
+					"OPTION_MACCAN_PIPE_TIMEOUT=0",
 					"OPTION_MACCAN_INSTRUMENTATION=0",
+					"OPTION_CANAPI_DEBUG_LEVEL=0",
+					"OPTION_CANAPI_INSTRUMENTATION=0",
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;

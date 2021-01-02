@@ -1,7 +1,7 @@
 #
 #	CAN Monitor for Rusoku TouCAN USB Interfaces
 #
-#	Copyright (C) 2020  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+#	Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
 #
 #	This program is free software: you can redistribute it and/or modify
 #	it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ TOUCAN_DIR = $(HOME_DIR)/Sources/TouCAN_Driver
 
 OBJECTS = $(OUTDIR)/main.o $(OUTDIR)/Timer.o $(OUTDIR)/Message.o \
 	$(OUTDIR)/MacCAN.o $(OUTDIR)/MacCAN_Debug.o $(OUTDIR)/MacCAN_Devices.o \
-	$(OUTDIR)/MacCAN_IOUsbKit.o $(OUTDIR)/MacCAN_IOUsbPipe.o \
+	$(OUTDIR)/MacCAN_IOUsbKit.o $(OUTDIR)/MacCAN_MsgQueue.o \
 	$(OUTDIR)/can_btr.o  $(OUTDIR)/can_msg.o \
 	$(OUTDIR)/TouCAN.o $(OUTDIR)/TouCAN_USB.o
 
@@ -45,9 +45,13 @@ DEFINES = -DOPTION_CAN_2_0_ONLY=1 \
 	-DOPTION_CANAPI_DRIVER=1 \
 	-DOPTION_CANAPI_RETVALS=1 \
 	-DOPTION_CANAPI_COMPANIONS=1 \
-	-DOPTION_CANAPI_DEBUG_LEVEL=0 \
+	-DOPTION_MACCAN_LOGGER=0 \
+	-DOPTION_MACCAN_MULTICHANNEL=0 \
+	-DOPTION_MACCAN_PIPE_TIMEOUT=0 \
 	-DOPTION_MACCAN_DEBUG_LEVEL=0 \
-	-DOPTION_MACCAN_INSTRUMENTATION=0
+	-DOPTION_MACCAN_INSTRUMENTATION=0 \
+	-DOPTION_CANAPI_DEBUG_LEVEL=0 \
+	-DOPTION_CANAPI_INSTRUMENTATION=0
 
 INCLUDE = -I$(MAIN_DIR) \
 	-I$(SOURCE_DIR) \
@@ -119,7 +123,7 @@ $(OUTDIR)/MacCAN_Devices.o: $(MACCAN_DIR)/MacCAN_Devices.c
 $(OUTDIR)/MacCAN_IOUsbKit.o: $(MACCAN_DIR)/MacCAN_IOUsbKit.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
-$(OUTDIR)/MacCAN_IOUsbPipe.o: $(MACCAN_DIR)/MacCAN_IOUsbPipe.c
+$(OUTDIR)/MacCAN_MsgQueue.o: $(MACCAN_DIR)/MacCAN_MsgQueue.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
 $(OUTDIR)/can_btr.o: $(CANAPI_DIR)/can_btr.c
