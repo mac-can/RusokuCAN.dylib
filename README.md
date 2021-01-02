@@ -87,39 +87,33 @@ uv-pc013mac:Sources eris$ ./build_no.sh
 ```
 Repeat this step after each `git commit`, `git pull`, `git clone`, etc.
 
-#### libTouCAN
+Then you can build all targets by typing the usual commands:
+```
+uv-pc013mac:Sources eris$ cd ~/Projects/MacCAN/TouCAN
+uv-pc013mac:CANAPI eris$ make clean
+uv-pc013mac:CANAPI eris$ make all
+uv-pc013mac:CANAPI eris$ sudo make install
+uv-pc013mac:CANAPI eris$
+```
+_(The version number of the library can be adapted by editing the appropriated `Makefile` and changing the variable `VERSION` accordingly. Don´t forget to set the version number also in the source files)_
 
-This is a Xcode project, developed with Xcode 12.3 for macOS 11.1 (Big Sur).
+#### libTouCAN
 
 ___libTouCAN___ is a dynamic library with a CAN API V3 compatible application programming interface for use in __C++__ applications.
 See header file `TouCAN.h` for a description of all class members.
 
 #### libUVCANTOU
 
-This is a `Makefile` project, so type the usual commands:
-```
-uv-pc013mac:Sources eris$ cd ~/Projects/MacCAN/TouCAN/Library/CANAPI/
-uv-pc013mac:CANAPI eris$ make clean
-uv-pc013mac:CANAPI eris$ make all
-uv-pc013mac:CANAPI eris$ sudo make install
-uv-pc013mac:CANAPI eris$
-```
-_(The version number of the library can be adapted by editing the `Makefile` and changing the variable `VERSION` accordingly.)_
-
 ___libUVCANTOU___ is a dynamic library with a CAN API V3 compatible application programming interface for use in __C__ applications.
 See header file `can_api.h` for a description of all API functions.
 
-#### libCANAL
-
-_Sorry, not realized yet!_
+#### libCANAL (_Sorry, not realized yet!_)
 
 ___libCANAL___ is a dynamic library with a VSCP CANAL compatible application programming interface.
 The TouCAN USB hardware is delivered with a CANAL (CAN Application Layer) DLL for Windows.
 See [Rusoku](https://github.com/rusoku)´s GitHub page for further information.
 
 #### can_moni for MacCAN-TouCAN
-
-This is a Xcode project, developed with Xcode 12.3 for macOS 11.1 (Big Sur).
 
 `can_moni` is a command line tool to view incoming CAN messages.
 I hate this messing around with binary masks for identifier filtering.
@@ -129,16 +123,37 @@ Type `can_moni --help` to display all program options.
 
 #### can_test for MacCAN-TouCAN
 
-This is a Xcode project, developed with Xcode 12.3 for macOS 11.1 (Big Sur).
-
 `can_test` is a command line tool to test CAN communication.
 Originally developed for electronic environmental tests on an embedded Linux system with SocketCAN, I´m using it for many years as a traffic generator for CAN stress-tests.
 
 Type `can_test --help` to display all program options.
 
+### Target Platform
+
+- Apple´s macOS (x86_64)
+
+### Development Environment
+
+#### macOS Big Sur
+
+- macOS Big Sur (11.1) on a MacBook Pro (2019)
+- Apple clang version 12.0.0 (clang-1200.0.32.28)
+- Xcode Version 12.3 (12C33)
+
+#### macOS High Sierra
+
+- macOS High Sierra (10.13.6) on a MacBook Pro (late 2011)
+- Apple LLVM version 10.0.0 (clang-1000.11.45.5)
+- Xcode Version 10.1 (10B61)
+
+### CAN Hardware
+
+- TouCAN USB (Model F4FS1, Hardware 1.0.0, Firmware 1.0.1)
+
 ## This and That
 
-For reasons unknown to me, the Xcode targets recognize the TouCAN USB adapter only under macOS 10.15 (Catalina). The Makefile targets also recognize the adapter under macOS 10.13 (High Sierra). So I hope that the Makefile targets are downward compatible up to version 10.6 (Mountain Lion) of the world´s mostest advanced OS.
+For reasons unknown to me, the Xcode targets recognize the TouCAN USB adapter only under macOS 10.15 (Catalina) and higher.
+The Makefile targets also recognize the adapter under macOS 10.13 (High Sierra). So I hope that the Makefile targets are backward compatible up to version 10.6 (Mountain Lion) of the world´s mostest advanced OS.
 
 ### MacCAN-Core Repo
 

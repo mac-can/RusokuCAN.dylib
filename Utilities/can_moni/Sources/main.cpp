@@ -419,12 +419,23 @@ int main(int argc, const char * argv[]) {
                 fprintf(stderr, "%s: missing argument for option `--wrap' (%c)\n", basename(argv[0]), opt);
                 return 1;
             }
-            if (sscanf(optarg, "%i", &wraparound) != 1) {
-                if (strcasecmp(optarg, "NO") && strcasecmp(optarg, "n") && strcasecmp(optarg, "0")) {
+            if (!strcasecmp(optarg, "NO") || !strcasecmp(optarg, "n") || !strcasecmp(optarg, "0"))
+                wraparound = CCanMessage::OptionWraparoundNo;
+            else if (!strcasecmp(optarg, "8"))
+                wraparound = CCanMessage::OptionWraparound8;
+#if (OPTION_CAN_2_0_ONLY == 0)
+            else if (!strcasecmp(optarg, "10"))
+                wraparound = CCanMessage::OptionWraparound10;
+            else if (!strcasecmp(optarg, "16"))
+                wraparound = CCanMessage::OptionWraparound16;
+            else if (!strcasecmp(optarg, "32"))
+                wraparound = CCanMessage::OptionWraparound32;
+            else if (!strcasecmp(optarg, "64"))
+                wraparound = CCanMessage::OptionWraparound64;
+#endif
+            else {
                     fprintf(stderr, "%s: illegal argument for option `--wrap' (%c)\n", basename(argv[0]), opt);
                     return 1;
-                }
-                wraparound = CCanMessage::OptionWraparoundNo;
             }
             if (!CCanMessage::SetWraparound(wraparound)) {
                 fprintf(stderr, "%s: illegal argument for option `--wrap' (%c)\n", basename(argv[0]), opt);

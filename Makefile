@@ -1,7 +1,7 @@
 #
 #	TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Interfaces
 #
-#	Copyright (C) 2020  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+#	Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
 #
 #	This file is part of MacCAN-TouCAN.
 #
@@ -26,20 +26,20 @@ all:
 	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	$(MAKE) -C Libraries/CANAPI $@
 	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	$(MAKE) -C Examples/can_test $@
+	$(MAKE) -C Utilities/can_test $@
 	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	$(MAKE) -C Examples/can_moni $@
+	$(MAKE) -C Utilities/can_moni $@
 
 clean:
 	$(MAKE) -C Trial $@
 	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Libraries/CANAPI $@
-	$(MAKE) -C Examples/can_test $@
-	$(MAKE) -C Examples/can_moni $@
+	$(MAKE) -C Utilities/can_test $@
+	$(MAKE) -C Utilities/can_moni $@
 
 install:
 #	$(MAKE) -C Trial $@
 	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Libraries/CANAPI $@
-#	$(MAKE) -C Examples/can_test $@
-#	$(MAKE) -C Examples/can_moni $@
+#	$(MAKE) -C Utilities/can_test $@
+#	$(MAKE) -C Utilities/can_moni $@
