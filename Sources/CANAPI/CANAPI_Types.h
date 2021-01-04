@@ -1,7 +1,7 @@
 /*
  *  CAN Interface API, Version 3 (Data Types and Defines)
  *
- *  Copyright (C) 2004-2020  Uwe Vogt, UV Software, Berlin (info@uv-software.com)
+ *  Copyright (C) 2004-2021  Uwe Vogt, UV Software, Berlin (info@uv-software.com)
  *
  *  This file is part of CAN API V3.
  *
@@ -24,7 +24,7 @@
  *
  *  @author      $Author: eris $
  *
- *  @version     $Rev: 915 $
+ *  @version     $Rev: 918 $
  *
  *  @addtogroup  can_api
  *  @{
@@ -79,14 +79,14 @@ extern "C" {
 /** @name  CAN Data Length
  *  @brief CAN payload length and DLC definition
  *  @{ */
-#define CAN_MAX_DLC                  8  /**< max. data lenth code (CAN 2.0) */
+#define CAN_MAX_DLC                  8  /**< max. data length code (CAN 2.0) */
 #define CAN_MAX_LEN                  8  /**< max. payload length (CAN 2.0) */
 /** @} */
 
 /** @name  CAN FD Data Length
  *  @brief CAN FD payload length and DLC definition
  *  @{ */
-#define CANFD_MAX_DLC               15  /**< max. data lenth code (CAN FD) */
+#define CANFD_MAX_DLC               15  /**< max. data length code (CAN FD) */
 #define CANFD_MAX_LEN               64  /**< max. payload length (CAN FD) */
 /** @} */
 

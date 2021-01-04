@@ -243,6 +243,18 @@ error_teardown:
 }
 
 EXPORT
+MacCAN_Return_t CTouCAN::SignalChannel() {
+    MacCAN_Return_t retVal = CMacCAN::NotInitialized;
+
+    // (§) CAN interface must be initialized
+    if (m_hDevice != CANUSB_INVALID_HANDLE) {
+        // TODO: signal all waitable objects
+        retVal = CMacCAN::NotSupported;
+    }
+    return retVal;
+}
+
+EXPORT
 MacCAN_Return_t CTouCAN::StartController(MacCAN_Bitrate_t bitrate) {
     MacCAN_Return_t retVal = CMacCAN::NotInitialized;
     MacCAN_Bitrate_t temporary = bitrate;

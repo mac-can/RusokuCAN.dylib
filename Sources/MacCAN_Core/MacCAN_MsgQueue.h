@@ -51,11 +51,13 @@ extern CANQUE_MsgQueue_t CANQUE_Create(size_t numElem, size_t elemSize);
 
 extern CANQUE_Return_t CANQUE_Destroy(CANQUE_MsgQueue_t msgQueue);
 
-extern CANQUE_Return_t CANQUE_Reset(CANQUE_MsgQueue_t msgQueue);
+extern CANQUE_Return_t CANQUE_Signal(CANQUE_MsgQueue_t msgQueue);
 
 extern CANQUE_Return_t CANQUE_Enqueue(CANQUE_MsgQueue_t msgQueue, void const *message/*, UInt16 timeout*/);
 
 extern CANQUE_Return_t CANQUE_Dequeue(CANQUE_MsgQueue_t msgQueue, void *message, UInt16 timeout);
+
+extern CANQUE_Return_t CANQUE_Reset(CANQUE_MsgQueue_t msgQueue);
 
 extern Boolean CANQUE_OverflowFlag(CANQUE_MsgQueue_t msgQueue);
 
@@ -66,5 +68,5 @@ extern UInt64 CANQUE_OverflowCounter(CANQUE_MsgQueue_t msgQueue);
 #endif
 #endif /* MACCAN_MSGQUEUE_H_INCLUDED */
 
-/* * $Id: MacCAN_MsgQueue.h 970 2020-12-27 16:01:27Z eris $ *** (C) UV Software, Berlin ***
+/* * $Id: MacCAN_MsgQueue.h 979 2021-01-04 20:16:55Z eris $ *** (C) UV Software, Berlin ***
  */

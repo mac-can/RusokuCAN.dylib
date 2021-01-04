@@ -72,6 +72,7 @@ public:
 
     MacCAN_Return_t InitializeChannel(int32_t channel, MacCAN_OpMode_t opMode, const void *param = NULL);
     MacCAN_Return_t TeardownChannel();
+    MacCAN_Return_t SignalChannel();
 
     MacCAN_Return_t StartController(MacCAN_Bitrate_t bitrate);
     MacCAN_Return_t ResetController();

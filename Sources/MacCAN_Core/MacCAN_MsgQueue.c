@@ -94,21 +94,16 @@ CANQUE_Return_t CANQUE_Destroy(CANQUE_MsgQueue_t msgQueue) {
     return retVal;
 }
 
-CANQUE_Return_t CANQUE_Reset(CANQUE_MsgQueue_t msgQueue) {
+CANQUE_Return_t CANQUE_Signal(CANQUE_MsgQueue_t msgQueue) {
     CANQUE_Return_t retVal = CANUSB_ERROR_RESOURCE;
     
     if (msgQueue) {
         ENTER_CRITICAL_SECTION(msgQueue);
-        msgQueue->used = 0U;
-        msgQueue->head = 0U;
-        msgQueue->tail = 0U;
-        msgQueue->wait.flag = false;
-        msgQueue->ovfl.flag = false;
-        msgQueue->ovfl.counter = 0U;
+        SIGNAL_WAIT_CONDITION(msgQueue);
         LEAVE_CRITICAL_SECTION(msgQueue);
         retVal = CANUSB_SUCCESS;
     } else {
-        MACCAN_DEBUG_ERROR("+++ Unable to reset message queue (NULL pointer)\n");
+        MACCAN_DEBUG_ERROR("+++ Unable to signal message queue (NULL pointer)\n");
     }
     return retVal;
 }
@@ -159,6 +154,25 @@ dequeue:
         LEAVE_CRITICAL_SECTION(msgQueue);
     } else {
         MACCAN_DEBUG_ERROR("+++ Unable to dequeue message (NULL pointer)\n");
+    }
+    return retVal;
+}
+
+CANQUE_Return_t CANQUE_Reset(CANQUE_MsgQueue_t msgQueue) {
+    CANQUE_Return_t retVal = CANUSB_ERROR_RESOURCE;
+    
+    if (msgQueue) {
+        ENTER_CRITICAL_SECTION(msgQueue);
+        msgQueue->used = 0U;
+        msgQueue->head = 0U;
+        msgQueue->tail = 0U;
+        msgQueue->wait.flag = false;
+        msgQueue->ovfl.flag = false;
+        msgQueue->ovfl.counter = 0U;
+        LEAVE_CRITICAL_SECTION(msgQueue);
+        retVal = CANUSB_SUCCESS;
+    } else {
+        MACCAN_DEBUG_ERROR("+++ Unable to reset message queue (NULL pointer)\n");
     }
     return retVal;
 }
@@ -223,5 +237,5 @@ static Boolean DequeueElement(CANQUE_MsgQueue_t queue, void *element) {
         return false;
 }
 
-/* * $Id: MacCAN_MsgQueue.c 970 2020-12-27 16:01:27Z eris $ *** (C) UV Software, Berlin ***
+/* * $Id: MacCAN_MsgQueue.c 979 2021-01-04 20:16:55Z eris $ *** (C) UV Software, Berlin ***
  */

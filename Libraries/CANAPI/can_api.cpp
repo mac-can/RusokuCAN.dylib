@@ -189,6 +189,32 @@ int can_exit(int handle)
 }
 
 EXPORT
+int can_kill(int handle)
+{
+    MacCAN_Return_t retVal = CMacCAN::FatalError;
+
+    // sanity check
+    if (!init)
+        return CANERR_NOTINIT;
+    if (handle != CANEXIT_ALL) {
+        if (!IS_HANDLE_VALID(handle))
+            return CANERR_HANDLE;
+
+        // signal waitable objects (e.g. blocking operations)
+        retVal = canDevices[handle].SignalChannel();
+    } else {
+        for (int i = 0; i < CAN_MAX_HANDLES; i++)
+            (void) canDevices[i].SignalChannel();
+        // ignore induvidual error code
+        retVal = CANERR_NOERROR;
+    }
+#if (OPTION_CANAPI_DEBUG_LEVEL != 0)
+    fprintf(stdout, "CTouCAN[%i].SignalChannel: returned %i\n", handle, retVal);
+#endif
+    return (int)retVal;
+}
+
+EXPORT
 int can_start(int handle, const can_bitrate_t *bitrate)
 {
     MacCAN_Return_t retVal = CMacCAN::FatalError;

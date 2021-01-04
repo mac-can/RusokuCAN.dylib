@@ -47,7 +47,7 @@
  *
  *  @author    $Author: eris $
  *
- *  @version   $Rev: 977 $
+ *  @version   $Rev: 979 $
  *
  *  @defgroup  mac_can  macOS User-Space Driver for CAN to USB Interfaces
  *  @{
@@ -164,7 +164,7 @@ public:
     ///              no communication is possible in this state.
     //
     /// \param[in]   channel - channel number of the CAN interface
-    /// \param[in]   opMode  - operation mode of the CAN controller
+    /// \param[in]   opMode  - desired operation mode of the CAN controller
     /// \param[in]   param   - pointer to channel-specific parameters
     //
     /// \returns     handle of the CAN interface if successful,
@@ -178,6 +178,23 @@ public:
     /// \returns     0 if successful, or a negative value on error.
     ///
     virtual MacCAN_Return_t TeardownChannel() = 0;
+
+    /// \brief       signals waiting event objects of the CAN interface. This can
+    ///              be used to terminate blocking operations in progress
+    ///              (e.g. by means of a Ctrl-C handler or similar).
+    //
+    /// \remarks     Some drivers are using waitable objects to realize blocking
+    ///              operations by a call to WaitForSingleObject (Windows) or
+    ///              pthread_cond_wait (POSIX), but these waitable objects are
+    ///              no cancellation points. This means that they cannot be
+    ///              terminated by Ctrl-C (SIGINT).
+    //
+    /// \note        Even though this is not the case with Darwin, we support
+    ///              this feature for compatibility reasons..
+    //
+    /// \returns     0 if successful, or a negative value on error.
+    ///
+    virtual MacCAN_Return_t SignalChannel() = 0;
 
     /// \brief       initializes the operation mode and the bit-rate settings of the
     ///              CAN interface and sets the operation state of the CAN controller
@@ -202,10 +219,10 @@ public:
     /// \brief       transmits one message over the CAN bus. The CAN controller must
     ///              be in operation state 'running'.
     //
-    /// \param[in]   message - the message to send
+    /// \param[in]   message - the message to be sent
     /// \param[in]   timeout - time to wait for the transmission of the message:
     ///                             0 means the function returns immediately,
-    ///                             65535 means blocking read, and any other
+    ///                             65535 means blocking write, and any other
     ///                             value means the time to wait im milliseconds
     //
     /// \returns     0 if successful, or a negative value on error.
@@ -365,5 +382,5 @@ extern char *MacCAN_GetVersion(void);  /**< retrieves version information. */
  */
 #endif /* MACCAN_H_INCLUDED */
 
-/* * $Id: MacCAN.h 977 2021-01-01 16:12:40Z eris $ *** (C) UV Software, Berlin ***
+/* * $Id: MacCAN.h 979 2021-01-04 20:16:55Z eris $ *** (C) UV Software, Berlin ***
  */
