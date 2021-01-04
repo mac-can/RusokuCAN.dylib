@@ -113,6 +113,8 @@ extern CANUSB_Return_t CANUSB_ReadPipeAsyncStart(CANUSB_AsyncPipe_t asyncPipe, C
 
 extern CANUSB_Return_t CANUSB_ReadPipeAsyncAbort(CANUSB_AsyncPipe_t asyncPipe);
 
+extern Boolean CANUSB_IsPipeAsyncRunning(CANUSB_AsyncPipe_t asyncPipe);
+
 extern CANUSB_Index_t CANUSB_GetFirstDevice(void);
 
 extern CANUSB_Index_t CANUSB_GetNextDevice(void);
@@ -158,5 +160,5 @@ extern UInt32 CANUSB_GetVersion(void);
 #endif
 #endif /* MACCAN_IOUSBKIT_H_INCLUDED */
 
-/* * $Id: MacCAN_IOUsbKit.h 974 2020-12-29 22:30:51Z eris $ *** (C) UV Software, Berlin ***
+/* * $Id: MacCAN_IOUsbKit.h 980 2021-01-04 20:50:59Z eris $ *** (C) UV Software, Berlin ***
  */
