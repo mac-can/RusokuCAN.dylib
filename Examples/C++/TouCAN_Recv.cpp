@@ -5,7 +5,7 @@
 #include "TouCAN.h"
 
 #ifndef CHANNEL
-#define CHANNEL  1
+#define CHANNEL  0
 #endif
 #ifndef BAUDRATE
 #define BAUDRATE  CANBTR_INDEX_250K
