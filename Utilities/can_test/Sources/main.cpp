@@ -584,7 +584,7 @@ int main(int argc, const char * argv[]) {
     /* - initialize interface */
     fprintf(stdout, "Hardware=%s...", CCanDriver::m_CanDevices[channel].name);
     fflush (stdout);
-    retVal = canDriver.InitializeChannel(channel, opMode);
+    retVal = canDriver.InitializeChannel(CCanDriver::m_CanDevices[channel].adapter, opMode);
     if (retVal != CMacCAN::NoError) {
         fprintf(stdout, "FAILED!\n");
         fprintf(stderr, "+++ error: CAN Controller could not be initialized (%i)\n", retVal);

@@ -7,7 +7,7 @@ import sys
 
 # CAN API V3 driver library
 lib = 'libUVCANTOU.dylib'
-chn = 0
+chn = 1
 num = 1 + CAN_MAX_STD_ID
 
 # parse the command line

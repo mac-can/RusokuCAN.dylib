@@ -10,11 +10,19 @@
 #include <unistd.h>
 #include <signal.h>
 #include <errno.h>
+#include <time.h>
 #include <inttypes.h>
 
+#include "MacCAN_Debug.h"
+#define OPTION_NO   (0)
+#define OPTION_YES  (1)
+#define OPTION_TIME_DRIVER  (0)
+#define OPTION_TIME_ZERO    (1)
+#define OPTION_TIME_ABS     (2)
+#define OPTION_TIME_REL     (3)
 static void sigterm(int signo);
 
-static void verbose(const can_bitrate_t *bitrate, const can_speed_t *speed);
+static void verbose(const can_mode_t mode, const can_bitrate_t bitrate, const can_speed_t speed);
 
 static volatile int running = 1;
 
@@ -49,6 +57,7 @@ int main(int argc, const char * argv[]) {
     int32_t channel = 0;
     uint16_t timeout = CANREAD_INFINITE;
     useconds_t delay = 0U;
+    time_t now = time(NULL);
     CMacCAN::EChannelState state;
     char szVal[CANPROP_MAX_BUFFER_SIZE];
     uint16_t u16Val;
@@ -56,11 +65,12 @@ int main(int argc, const char * argv[]) {
     uint8_t u8Val;
     int32_t i32Val;
     int frames = 0;
-    int option_info = 0;
-    int option_test = 0;
-    int option_stop = 0;
-    int option_repeat = 0;
-    int option_transmit = 0;
+    int option_info = OPTION_NO;
+    int option_test = OPTION_NO;
+    int option_stop = OPTION_NO;
+    int option_echo = OPTION_YES;
+    int option_repeat = OPTION_NO;
+    int option_transmit = OPTION_NO;
 
     for (int i = 1, opt = 0; i < argc; i++) {
         /* TouCAN-USB channel */
@@ -90,11 +100,20 @@ int main(int argc, const char * argv[]) {
         if (!strncmp(argv[i], "C:", 2) && sscanf(argv[i], "C:%i", &opt) == 1) delay = (useconds_t)opt * 1000U;
         if (!strncmp(argv[i], "U:", 2) && sscanf(argv[i], "U:%i", &opt) == 1) delay = (useconds_t)opt;
         /* receive messages */
-        if (!strcmp(argv[i], "STOP")) option_stop = 1;
-        if (!strcmp(argv[i], "REPEAT")) option_repeat = 1;
+        if (!strcmp(argv[i], "STOP")) option_stop = OPTION_YES;
+//        if (!strcmp(argv[i], "IGNORE")) option_check = OPTION_NO;
+        if (!strcmp(argv[i], "REPEAT")) option_repeat = OPTION_YES;
+        if (!strcmp(argv[i], "SILENT")) option_echo = OPTION_NO;
+        /* time-stamps */
+//        if (!strcmp(argv[i], "ZERO")) option_time = OPTION_TIME_ZERO;
+//        if (!strcmp(argv[i], "ABS") || !strcmp(argv[i], "ABSOLUTE")) option_time = OPTION_TIME_ABS;
+//        if (!strcmp(argv[i], "REL") || !strcmp(argv[i], "RELATIVE")) option_time = OPTION_TIME_REL;
+        /* logging and debugging */
+//        if (!strcmp(argv[i], "TRACE")) option_trace = OPTION_YES;
+//        if (!strcmp(argv[i], "LOG")) option_log = OPTION_YES;
         /* query some informations: hw, sw, etc. */
-        if (!strcmp(argv[i], "INFO")) option_info = 1;
-        if (!strcmp(argv[i], "TEST")) option_test = 1;
+        if (!strcmp(argv[i], "INFO")) option_info = OPTION_YES;
+        if (!strcmp(argv[i], "TEST")) option_test = OPTION_YES;
         /* additional operation modes */
         if (!strcmp(argv[i], "SHARED")) opMode.shrd = 1;
         if (!strcmp(argv[i], "MONITOR")) opMode.mon = 1;
@@ -114,6 +133,8 @@ int main(int argc, const char * argv[]) {
         perror("+++ error");
         return errno;
     }
+    MACCAN_LOG_OPEN();
+    MACCAN_LOG_PRINTF("# MacCAN-PeakCAN - %s", ctime(&now));
     retVal = CMacCAN::Initializer();
     if (retVal != CMacCAN::NoError) {
         fprintf(stderr, "+++ error: CMacCAN::Initializer returned %i\n", retVal);
@@ -163,7 +184,7 @@ int main(int argc, const char * argv[]) {
                             (state == CTouCAN::ChannelOccupied) ? "occupied" :
                             (state == CTouCAN::ChannelAvailable) ? "available" :
                             (state == CTouCAN::ChannelNotAvailable) ? "not available" : "not testable");
-            fprintf(stdout, "%s", (retVal != CMacCAN::NoError) ? " (waring: Op.-Mode not supported)\n" : "\n");
+            fprintf(stdout, "%s", (retVal == CMacCAN::IllegalParameter) ? " (waring: Op.-Mode not supported)\n" : "\n");
         }
     }
     retVal = myTouCAN.InitializeChannel(channel, opMode);
@@ -180,7 +201,7 @@ int main(int argc, const char * argv[]) {
                         (state == CTouCAN::ChannelOccupied) ? "now occupied" :
                         (state == CTouCAN::ChannelAvailable) ? "available" :
                         (state == CTouCAN::ChannelNotAvailable) ? "not available" : "not testable");
-        fprintf(stdout, "%s", (retVal != CMacCAN::NoError) ? " (waring: Op.-Mode not supported)\n" : "\n");
+        fprintf(stdout, "%s", (retVal == CMacCAN::IllegalParameter) ? " (waring: Op.-Mode not supported)\n" : "\n");
     }
     if (option_info) {
         retVal = myTouCAN.GetProperty(TOUCAN_PROPERTY_DEVICE_TYPE, (void *)&i32Val, sizeof(int32_t));
@@ -203,6 +224,7 @@ int main(int argc, const char * argv[]) {
             fprintf(stdout, ">>> TouCAN.GetProperty(TOUCAN_PROPERTY_VENDOR_URL): value = '%s'\n", szVal);
         else
             fprintf(stderr, "+++ error: myTouCAN.GetProperty(TOUCAN_PROPERTY_VENDOR_URL) returned %i\n", retVal);
+		// TODO: get device id.
         retVal = myTouCAN.GetProperty(TOUCAN_PROPERTY_CLOCK_DOMAIN, (void *)&i32Val, sizeof(int32_t));
         if (retVal == CMacCAN::NoError)
             fprintf(stdout, ">>> TouCAN.GetProperty(TOUCAN_PROPERTY_CLOCK_DOMAIN): value = %d\n", i32Val);
@@ -228,7 +250,7 @@ int main(int argc, const char * argv[]) {
         MacCAN_BusSpeed_t speed;
         if ((myTouCAN.GetBitrate(bitrate) == CMacCAN::NoError) &&
             (myTouCAN.GetBusSpeed(speed) == CMacCAN::NoError))
-            verbose(&bitrate, &speed);
+            verbose(opMode, bitrate, speed);
     }
     fprintf(stdout, "Press Ctrl+C to abort...\n");
     while (running && (option_transmit-- > 0)) {
@@ -242,24 +264,31 @@ int main(int argc, const char * argv[]) {
     }
     while (running) {
         if ((retVal = myTouCAN.ReadMessage(message, timeout)) == CMacCAN::NoError) {
-            fprintf(stdout, "%i\t%7li.%04li\t%03x\t%c%c [%i]", frames++,
-                             message.timestamp.tv_sec, message.timestamp.tv_nsec / 100000,
-                             message.id, message.xtd? 'X' : 'S', message.rtr? 'R' : ' ', message.dlc);
-            for (int i = 0; i < message.dlc; i++)
-                fprintf(stdout, " %02x", message.data[i]);
-            if (message.sts)
-                fprintf(stdout, " <<< status frame");
-            else if (option_repeat) {
-                retVal = myTouCAN.WriteMessage(message);
-                if (retVal != CMacCAN::NoError) {
-                    fprintf(stderr, "+++ error: TouCAN.WriteMessage returned %i\n", retVal);
-                    goto teardown;
+            if (option_echo) {
+	            fprintf(stdout, "%i\t%7li.%04li\t%03x\t%c%c [%i]", frames++,
+	                             message.timestamp.tv_sec, message.timestamp.tv_nsec / 100000,
+	                             message.id, message.xtd? 'X' : 'S', message.rtr? 'R' : ' ', message.dlc);
+	            for (int i = 0; i < message.dlc; i++)
+	                fprintf(stdout, " %02x", message.data[i]);
+	            if (message.sts)
+	                fprintf(stdout, " <<< status frame");
+	            else if (option_repeat) {
+	                retVal = myTouCAN.WriteMessage(message);
+	                if (retVal != CMacCAN::NoError) {
+	                    fprintf(stderr, "+++ error: TouCAN.WriteMessage returned %i\n", retVal);
+	                    goto teardown;
+	                }
+	            }
+	            fprintf(stdout, "\n");
+            } else {
+                if(!(frames++ % 2048)) {
+                    fprintf(stdout, ".");
+                    fflush(stdout);
                 }
             }
-            fprintf(stdout, "\n");
         }
         else if (retVal != CMacCAN::ReceiverEmpty) {
-            running = 0;
+            goto teardown;
         }
     }
     if (myTouCAN.GetStatus(status) == CMacCAN::NoError) {
@@ -296,47 +325,58 @@ end:
         fprintf(stderr, "+++ error: CMacCAN::Finalizer returned %i\n", retVal);
         return retVal;
     }
-    fprintf(stdout, ">>> Cheers!\n");
+    now = time(NULL);
+    MACCAN_LOG_PRINTF("# MacCAN-PeakCAN - %s", ctime(&now));
+    MACCAN_LOG_CLOSE();
+    fprintf(stdout, "Cheers!\n");
     return retVal;
 }
 
-static void verbose(const can_bitrate_t *bitrate, const can_speed_t *speed)
+static void verbose(const can_mode_t mode, const can_bitrate_t bitrate, const can_speed_t speed)
 {
-   if (bitrate->btr.frequency > 0) {
-       fprintf(stdout, ">>> Bit-rate: %.0fkbps@%.1f%%",
-           speed->nominal.speed / 1000., speed->nominal.samplepoint * 100.);
 #if (OPTION_CAN_2_0_ONLY == 0)
-       if (speed->data.brse)
+    fprintf(stdout, "Op.-Mode: 0x%02X (fdoe=%u,brse=%u,niso=%u,shrd=%u,nxtd=%u,nrtr=%u,err=%u,mon=%u)\n",
+            mode.byte, mode.fdoe, mode.brse, mode.niso, mode.shrd, mode.nxtd, mode.nrtr, mode.err, mode.mon);
+#else
+    fprintf(stdout, "Op.-Mode: 0x%02X (shrd=%u,nxtd=%u,nrtr=%u,err=%u,mon=%u)\n",
+            mode.byte, mode.shrd, mode.nxtd, mode.nrtr, mode.err, mode.mon);
+#endif
+   if (bitrate.btr.frequency > 0) {
+        fprintf(stdout, "Baudrate: %.0fkbps@%.1f%%",
+           speed.nominal.speed / 1000., speed.nominal.samplepoint * 100.);
+#if (OPTION_CAN_2_0_ONLY == 0)
+        if(/*speed.data.brse*/mode.fdoe && mode.brse)
            fprintf(stdout, ":%.0fkbps@%.1f%%",
-               speed->data.speed / 1000., speed->data.samplepoint * 100.);
+               speed.data.speed / 1000., speed.data.samplepoint * 100.);
 #endif
        fprintf(stdout, " (f_clock=%i,nom_brp=%u,nom_tseg1=%u,nom_tseg2=%u,nom_sjw=%u,nom_sam=%u",
-           bitrate->btr.frequency,
-           bitrate->btr.nominal.brp,
-           bitrate->btr.nominal.tseg1,
-           bitrate->btr.nominal.tseg2,
-           bitrate->btr.nominal.sjw,
-           bitrate->btr.nominal.sam);
+           bitrate.btr.frequency,
+           bitrate.btr.nominal.brp,
+           bitrate.btr.nominal.tseg1,
+           bitrate.btr.nominal.tseg2,
+           bitrate.btr.nominal.sjw,
+           bitrate.btr.nominal.sam);
 #if (OPTION_CAN_2_0_ONLY == 0)
-       if (speed->data.brse)
+        if(mode.fdoe && mode.brse)
            fprintf(stdout, ",data_brp=%u,data_tseg1=%u,data_tseg2=%u,data_sjw=%u",
-               bitrate->btr.data.brp,
-               bitrate->btr.data.tseg1,
-               bitrate->btr.data.tseg2,
-               bitrate->btr.data.sjw);
+               bitrate.btr.data.brp,
+               bitrate.btr.data.tseg1,
+               bitrate.btr.data.tseg2,
+               bitrate.btr.data.sjw);
 #endif
        fprintf(stdout, ")\n");
-   } else {
-       fprintf(stdout, ">>> Bit-rate: %skbps (bit-timing index %i)\n",
-           bitrate->index == CANBDR_1000 ? "1000" :
-           bitrate->index == -CANBDR_800 ? "800" :
-           bitrate->index == -CANBDR_500 ? "500" :
-           bitrate->index == -CANBDR_250 ? "250" :
-           bitrate->index == -CANBDR_125 ? "125" :
-           bitrate->index == -CANBDR_100 ? "100" :
-           bitrate->index == -CANBDR_50 ? "50" :
-           bitrate->index == -CANBDR_20 ? "20" :
-           bitrate->index == -CANBDR_10 ? "10" : "?", -bitrate->index);
+    }
+    else {
+        fprintf(stdout, "Baudrate: %skbps (CiA index %i)\n",
+           bitrate.index == CANBDR_1000 ? "1000" :
+           bitrate.index == -CANBDR_800 ? "800" :
+           bitrate.index == -CANBDR_500 ? "500" :
+           bitrate.index == -CANBDR_250 ? "250" :
+           bitrate.index == -CANBDR_125 ? "125" :
+           bitrate.index == -CANBDR_100 ? "100" :
+           bitrate.index == -CANBDR_50 ? "50" :
+           bitrate.index == -CANBDR_20 ? "20" :
+           bitrate.index == -CANBDR_10 ? "10" : "?", -bitrate.index);
    }
 }
 
