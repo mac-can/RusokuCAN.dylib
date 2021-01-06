@@ -20,14 +20,12 @@
 #
 
 all:
+	@./build_no.sh
+	@echo "Building MacCAN-TouCAN (build "$(shell git log -1 --pretty=format:%h)")..."
 	$(MAKE) -C Trial $@
-	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	$(MAKE) -C Libraries/TouCAN $@
-	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	$(MAKE) -C Libraries/CANAPI $@
-	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	$(MAKE) -C Utilities/can_test $@
-	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	$(MAKE) -C Utilities/can_moni $@
 
 clean:
@@ -43,3 +41,7 @@ install:
 	$(MAKE) -C Libraries/CANAPI $@
 #	$(MAKE) -C Utilities/can_test $@
 #	$(MAKE) -C Utilities/can_moni $@
+
+build_no:
+	@./build_no.sh
+	@cat Sources/build_no.h
