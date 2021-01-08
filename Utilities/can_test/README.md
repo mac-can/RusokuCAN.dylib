@@ -13,8 +13,8 @@ Options for receiver test (default):
      --error-frames            allow reception of error frames
      --no-remote-frames        suppress remote frames (RTR frames)
      --no-extended-frames      suppress extended frames (29-bit identifier)
- -b, --baudrate=<baudrate>     CAN 2.0 bit timing in kbps (default=250)
-     --bitrate=<bit-rate>      CAN FD bit rate (as a string)
+ -b, --baudrate=<baudrate>     CAN bit timing in kbps (default=250)
+     --bitrate=<bit-rate>      CAN bit rate settings (as a string)
  -v, --verbose                 show detailed bit rate settings
 Options for transmitter test:
  -t, --transmit=<time>         send messages for the given time in seconds, or
@@ -27,12 +27,12 @@ Options for transmitter test:
  -n, --number=<number>         set first up-counting number (default=0)
  -m, --mode=(2.0|FDF[+BSR])    CAN operation mode: CAN 2.0 or CAN FD format
      --shared                  shared CAN controller access (when supported)
- -b, --baudrate=<baudrate>     CAN 2.0 bit timing in kbps (default=250)
-     --bitrate=<bit-rate>      CAN FD bit rate (as a string)
+ -b, --baudrate=<baudrate>     CAN bit timing in kbps (default=250)
+     --bitrate=<bit-rate>      CAN bit rate settings (as a string)
  -v, --verbose                 show detailed bit rate settings
 Options:
- -L, --list-boards[=<vendor>]  list all supported CAN interfaces and exit
- -T, --test-boards[=<vendor>]  list all available CAN interfaces and exit
+ -L, --list-boards             list all supported CAN interfaces and exit
+ -T, --test-boards             list all available CAN interfaces and exit
  -h, --help                    display this help screen and exit
      --version                 show version information and exit
 Hazard note:

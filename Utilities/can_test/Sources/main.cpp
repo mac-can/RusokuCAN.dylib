@@ -966,9 +966,7 @@ uint64_t CCanDriver::ReceiverTest(bool checkCounter, uint64_t expectedNumber, bo
 static void sigterm(int signo)
 {
     //fprintf(stderr, "%s: got signal %d\n", __FILE__, signo);
-#if defined(_WIN32) || defined(_WIN64)
-    (void)can_kill(CANKILL_ALL);
-#endif
+    //(void)canDriver.SignalChannel();
     running = 0;
     (void)signo;
 }
@@ -993,8 +991,8 @@ static void usage(FILE *stream, const char *program)
     fprintf(stream, "     --error-frames            allow reception of error frames\n");
     fprintf(stream, "     --no-remote-frames        suppress remote frames (RTR frames)\n");
     fprintf(stream, "     --no-extended-frames      suppress extended frames (29-bit identifier)\n");
-    fprintf(stream, " -b, --baudrate=<baudrate>     CAN 2.0 bit timing in kbps (default=250)\n");
-    fprintf(stream, "     --bitrate=<bit-rate>      CAN FD bit rate (as a string)\n");
+    fprintf(stream, " -b, --baudrate=<baudrate>     CAN bit timing in kbps (default=250)\n");
+    fprintf(stream, "     --bitrate=<bit-rate>      CAN bit rate settings (as a string)\n");
     fprintf(stream, " -v, --verbose                 show detailed bit rate settings\n");
     fprintf(stream, "Options for transmitter test:\n");
     fprintf(stream, " -t, --transmit=<time>         send messages for the given time in seconds, or\n");
@@ -1009,12 +1007,17 @@ static void usage(FILE *stream, const char *program)
     fprintf(stream, " -m, --mode=(2.0|FDF[+BSR])    CAN operation mode: CAN 2.0 or CAN FD format\n");
 #endif
     fprintf(stream, "     --shared                  shared CAN controller access (when supported)\n");
-    fprintf(stream, " -b, --baudrate=<baudrate>     CAN 2.0 bit timing in kbps (default=250)\n");
-    fprintf(stream, "     --bitrate=<bit-rate>      CAN FD bit rate (as a string)\n");
+    fprintf(stream, " -b, --baudrate=<baudrate>     CAN bit timing in kbps (default=250)\n");
+    fprintf(stream, "     --bitrate=<bit-rate>      CAN bit rate settings (as a string)\n");
     fprintf(stream, " -v, --verbose                 show detailed bit rate settings\n");
     fprintf(stream, "Options:\n");
+#if (OPTION_CAN_2_0_ONLY == 0)
     fprintf(stream, " -L, --list-boards[=<vendor>]  list all supported CAN interfaces and exit\n");
     fprintf(stream, " -T, --test-boards[=<vendor>]  list all available CAN interfaces and exit\n");
+#else
+    fprintf(stream, " -L, --list-boards             list all supported CAN interfaces and exit\n");
+    fprintf(stream, " -T, --test-boards             list all available CAN interfaces and exit\n");
+#endif
     fprintf(stream, " -h, --help                    display this help screen and exit\n");
     fprintf(stream, "     --version                 show version information and exit\n");
     fprintf(stream, "Hazard note:\n");
