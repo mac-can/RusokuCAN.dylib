@@ -22,7 +22,13 @@ echo " *  along with MacCAN-TouCAN.  If not, see <http://www.gnu.org/licenses/>.
 echo " */" >> Sources/build_no.h
 echo "#ifndef BUILD_NO_H_INCLUDED" >> Sources/build_no.h
 echo "#define BUILD_NO_H_INCLUDED" >> Sources/build_no.h
-echo "#define BUILD_NO 0x"$(git log -1 --pretty=format:%h) >> Sources/build_no.h
+git log -1 --pretty=format:%h > /dev/null 2> /dev/null
+if [ $? -eq 0 ]
+then
+    echo "#define BUILD_NO 0x"$(git log -1 --pretty=format:%h) >> Sources/build_no.h
+else
+    echo "#define BUILD_NO 0xDEADC0DE" >> Sources/build_no.h
+fi
 echo "#define STRINGIFY(X) #X" >> Sources/build_no.h
 echo "#define TOSTRING(X) STRINGIFY(X)" >> Sources/build_no.h
 echo "#endif" >> Sources/build_no.h

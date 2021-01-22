@@ -9,3 +9,4 @@ Trial/.objects
 Trial/tou_test
 Binaries
 Includes
+*.log

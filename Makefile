@@ -21,7 +21,7 @@
 
 all:
 	@./build_no.sh
-	@echo "Building MacCAN-TouCAN (build "$(shell git log -1 --pretty=format:%h)")..."
+	@echo "\033[1mBuilding MacCAN-TouCAN...\033[0m"
 	$(MAKE) -C Trial $@
 	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Libraries/CANAPI $@
@@ -34,6 +34,13 @@ clean:
 	$(MAKE) -C Libraries/CANAPI $@
 	$(MAKE) -C Utilities/can_test $@
 	$(MAKE) -C Utilities/can_moni $@
+
+distclean:
+	$(MAKE) -C Trial $@
+	$(MAKE) -C Libraries/TouCAN $@
+	$(MAKE) -C Libraries/CANAPI $@
+#	$(MAKE) -C Utilities/can_test $@
+#	$(MAKE) -C Utilities/can_moni $@
 
 install:
 #	$(MAKE) -C Trial $@
