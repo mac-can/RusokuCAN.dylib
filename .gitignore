@@ -1,0 +1,11 @@
+#.gitignore
+Sources/CANAPI/.svn
+Sources/build_no.h
+Libraries/CANAPI/.objects
+Libraries/CANAPI/libUVCANTOU.*
+Libraries/TouCAN/.objects
+Libraries/TouCAN/libTouCAN.*
+Trial/.objects
+Trial/tou_test
+Binaries
+Includes
