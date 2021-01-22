@@ -52,6 +52,7 @@ public:
 
     MacCAN_Return_t InitializeChannel(int32_t channel, MacCAN_OpMode_t opMode, const void *param = NULL);
     MacCAN_Return_t TeardownChannel();
+    MacCAN_Return_t SignalChannel();
 
     MacCAN_Return_t StartController(MacCAN_Bitrate_t bitrate);
     MacCAN_Return_t ResetController();
@@ -82,7 +83,7 @@ public:
 
 _Important note_: To build any of the following build targets run the `build_no.sh` script to generate a pseudo build number.
 ```
-uv-pc013mac:~ eris$ cd ~/Projects/MacCAN/TouCAN/Sources/
+uv-pc013mac:~ eris$ cd ~/Projects/MacCAN/TouCAN
 uv-pc013mac:Sources eris$ ./build_no.sh
 ```
 Repeat this step after each `git commit`, `git pull`, `git clone`, etc.
@@ -95,7 +96,7 @@ uv-pc013mac:CANAPI eris$ make all
 uv-pc013mac:CANAPI eris$ sudo make install
 uv-pc013mac:CANAPI eris$
 ```
-_(The version number of the library can be adapted by editing the appropriated `Makefile` and changing the variable `VERSION` accordingly. Don´t forget to set the version number also in the source files)_
+_(The version number of the library can be adapted by editing the appropriated `Makefile` and changing the variable `VERSION` accordingly. Don´t forget to set the version number also in the source files.)_
 
 #### libTouCAN
 
@@ -152,8 +153,9 @@ Type `can_test --help` to display all program options.
 
 ## This and That
 
-For reasons unknown to me, the Xcode targets recognize the TouCAN USB adapter only under macOS 10.15 (Catalina) and higher.
-The Makefile targets also recognize the adapter under macOS 10.13 (High Sierra). So I hope that the Makefile targets are backward compatible up to version 10.6 (Mountain Lion) of the world´s mostest advanced OS.
+For reasons unknown to me, the artifacts build with Xcode detect the TouCAN USB adapter only under macOS 10.15 (Catalina) and higher.
+The artifacts build by Makefile also detect the adapter under macOS 10.13 (High Sierra).
+So I hope that the artifacts build by Makefile are backward compatible up to version 10.6 (Mountain Lion) of the world´s mostest advanced OS.
 
 ### MacCAN-Core Repo
 
