@@ -18,6 +18,26 @@
 //  You should have received a copy of the GNU General Public License
 //  along with MacCAN-TouCAN.  If not, see <http://www.gnu.org/licenses/>.
 //
+#include "build_no.h"
+#define VERSION_MAJOR    0
+#define VERSION_MINOR    2
+#define VERSION_PATCH    0
+#define VERSION_BUILD    BUILD_NO
+#define VERSION_STRING   TOSTRING(VERSION_MAJOR) "." TOSTRING(VERSION_MINOR) "." TOSTRING(VERSION_PATCH) " (" TOSTRING(BUILD_NO) ")"
+#if defined(_WIN64)
+#define PLATFORM        "x64"
+#elif defined(_WIN32)
+#define PLATFORM        "x86"
+#elif defined(__linux__)
+#define PLATFORM        "Linux"
+#elif defined(__APPLE__)
+#define PLATFORM        "macOS"
+#else
+#error Unsupported architecture
+#endif
+static const char version[] = "CAN API V3 for Rusoku TouCAN USB Interfaces, Version " VERSION_STRING;
+
+#include "can_defs.h"
 #include "can_api.h"
 
 #include "MacCAN.h"
@@ -26,31 +46,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
-
-#include "build_no.h"
-#define VERSION_MAJOR     0
-#define VERSION_MINOR     2
-#define VERSION_PATCH     0
-#define VERSION_BUILD     BUILD_NO
-#define VERSION_STRING    TOSTRING(VERSION_MAJOR) "." TOSTRING(VERSION_MINOR) "." TOSTRING(VERSION_PATCH) "-" TOSTRING(BUILD_NO)
-#if defined(_WIN64)
-#define PLATFORM    "x64"
-#elif defined(_WIN32)
-#define PLATFORM    "x86"
-#elif defined(__linux__)
-#define PLATFORM    "Linux"
-#elif defined(__APPLE__)
-#define PLATFORM    "macOS"
-#elif defined(__MINGW32__)
-#define PLATFORM    "MinGW"
-#else
-#error Unsupported architecture
-#endif
-#ifdef _DEBUG
-    static const char version[] = "CAN API V3 for Rusoku TouCAN USB Interfaces, Version " VERSION_STRING " (" PLATFORM ") _DEBUG";
-#else
-    static const char version[] = "CAN API V3 for Rusoku TouCAN USB Interfaces, Version " VERSION_STRING " (" PLATFORM ")";
-#endif
 
 #if (OPTION_CANAPI_TOUCAN_DYLIB != 0)
 __attribute__((constructor))
@@ -85,14 +80,14 @@ static void _finalizer() {
  EXPORT
  can_board_t can_boards[8+1] = {  // list of supported CAN Interfaces
      // TODO: rework this (either by an own can_defs.h or by a json file)
-     {0, (char *)"TouCAN-USB1"},
-     {1, (char *)"TouCAN-USB2"},
-     {2, (char *)"TouCAN-USB3"},
-     {3, (char *)"TouCAN-USB4"},
-     {4, (char *)"TouCAN-USB5"},
-     {5, (char *)"TouCAN-USB6"},
-     {6, (char *)"TouCAN-USB7"},
-     {7, (char *)"TouCAN-USB8"},
+     {TOUCAN_USB_CHANNEL0, (char *)"TouCAN-USB1"},
+     {TOUCAN_USB_CHANNEL1, (char *)"TouCAN-USB2"},
+     {TOUCAN_USB_CHANNEL2, (char *)"TouCAN-USB3"},
+     {TOUCAN_USB_CHANNEL3, (char *)"TouCAN-USB4"},
+     {TOUCAN_USB_CHANNEL4, (char *)"TouCAN-USB5"},
+     {TOUCAN_USB_CHANNEL5, (char *)"TouCAN-USB6"},
+     {TOUCAN_USB_CHANNEL6, (char *)"TouCAN-USB7"},
+     {TOUCAN_USB_CHANNEL7, (char *)"TouCAN-USB8"},
      {EOF, NULL}
  };
 static CTouCAN canDevices[CAN_MAX_HANDLES];  // list of TouCAN device driver
@@ -429,7 +424,7 @@ char *can_software(int handle)
 }
 
 EXPORT
-char *can_version()
+char *can_version(void)
 {
     // get module version (zero-terminated string)
     return (char *)version;

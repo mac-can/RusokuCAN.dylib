@@ -18,6 +18,25 @@
 //  You should have received a copy of the GNU General Public License
 //  along with MacCAN-TouCAN.  If not, see <https://www.gnu.org/licenses/>.
 //
+#include "build_no.h"
+#define VERSION_MAJOR    0
+#define VERSION_MINOR    2
+#define VERSION_PATCH    0
+#define VERSION_BUILD    BUILD_NO
+#define VERSION_STRING   TOSTRING(VERSION_MAJOR) "." TOSTRING(VERSION_MINOR) "." TOSTRING(VERSION_PATCH) " (" TOSTRING(BUILD_NO) ")"
+#if defined(_WIN64)
+#define PLATFORM        "x64"
+#elif defined(_WIN32)
+#define PLATFORM        "x86"
+#elif defined(__linux__)
+#define PLATFORM        "Linux"
+#elif defined(__APPLE__)
+#define PLATFORM        "macOS"
+#else
+#error Unsupported architecture
+#endif
+static const char version[] = PLATFORM " Driver for Rusoku TouCAN USB Interfaces, Version " VERSION_STRING;
+
 #include "TouCAN.h"
 #include "TouCAN_USB.h"
 
@@ -26,27 +45,6 @@
 #include <assert.h>
 #include <unistd.h>
 #include <time.h>
-
-#include "build_no.h"
-#define VERSION_MAJOR     0
-#define VERSION_MINOR     2
-#define VERSION_PATCH     0
-#define VERSION_BUILD     BUILD_NO
-#define VERSION_STRING    TOSTRING(VERSION_MAJOR) "." TOSTRING(VERSION_MINOR) "." TOSTRING(VERSION_PATCH) " (" TOSTRING(BUILD_NO) ")"
-#if defined(_WIN64)
-#define PLATFORM    "x64"
-#elif defined(_WIN32)
-#define PLATFORM    "x86"
-#elif defined(__linux__)
-#define PLATFORM    "Linux"
-#elif defined(__APPLE__)
-#define PLATFORM    "macOS"
-#elif defined(__MINGW32__)
-#define PLATFORM    "MinGW"
-#else
-#error Unsupported architecture
-#endif
-static const char version[] = PLATFORM " Driver for Rusoku TouCAN USB Interfaces, Version " VERSION_STRING;
 
 #if (OPTION_TOUCAN_DYLIB != 0)
 __attribute__((constructor))

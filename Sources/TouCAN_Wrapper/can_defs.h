@@ -3,20 +3,20 @@
  *
  *  Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
- *  This file is part of CAN API V3.
+ *  This file is part of MacCAN-TouCAN.
  *
- *  CAN API V3 is free software: you can redistribute it and/or modify
+ *  MacCAN-TouCAN is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  CAN API V3 is distributed in the hope that it will be useful,
+ *  MacCAN-TouCAN is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU Lesser General Public License for more details.
  *
  *  You should have received a copy of the GNU Lesser General Public License
- *  along with CAN API V3.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with MacCAN-TouCAN.  If not, see <http://www.gnu.org/licenses/>.
  */
 /** @addtogroup  can_api
  *  @{
