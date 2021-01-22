@@ -29,6 +29,7 @@ SOURCE_DIR = $(HOME_DIR)/Sources
 CANAPI_DIR = $(HOME_DIR)/Sources/CANAPI
 MACCAN_DIR = $(HOME_DIR)/Sources/MacCAN_Core
 TOUCAN_DIR = $(HOME_DIR)/Sources/TouCAN_Driver
+WRAPPER_DIR = $(HOME_DIR)/Sources/TouCAN_Wrapper
 
 OBJECTS = $(OUTDIR)/TouCAN.o $(OUTDIR)/TouCAN_USB.o \
 	$(OUTDIR)/MacCAN.o $(OUTDIR)/MacCAN_Debug.o $(OUTDIR)/MacCAN_Devices.o \
@@ -127,7 +128,7 @@ bindir:
 
 incdir:
 	@mkdir -p $(INCDIR)
-#	@cp $(SOURCE_DIR)/*_Defines.h $(INCDIR)
+	@cp $(SOURCE_DIR)/*_Defines.h $(INCDIR)
 	@cp $(CANAPI_DIR)/can_api.h $(INCDIR)
 	@cp $(CANAPI_DIR)/CANAPI_Types.h $(INCDIR)
 	@cp $(CANAPI_DIR)/CANAPI_Defines.h $(INCDIR)
@@ -171,8 +172,9 @@ $(OUTDIR)/MacCAN_MsgQueue.o: $(MACCAN_DIR)/MacCAN_MsgQueue.c
 $(OUTDIR)/can_btr.o: $(CANAPI_DIR)/can_btr.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
-$(OUTDIR)/can_api.o: ./can_api.cpp
+$(OUTDIR)/can_api.o: $(WRAPPER_DIR)/can_api.cpp
 	$(CXX) $(CXXFLAGS) -MMD -MF $*.d -o $@ -c $<
+
 
 $(STATIC): $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS) $(LIBRARIES)
@@ -181,5 +183,5 @@ $(STATIC): $(OBJECTS)
 $(TARGET): $(OBJECTS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBRARIES)
 	$(CP) $(TARGET) $(BINDIR)
-	$(LN) $(BINDIR)/$(TARGET) $(BINDIR)/$(LIBRARY).dylib
+	$(RM) $(BINDIR)/$(LIBRARY).dylib ; $(LN) $(BINDIR)/$(TARGET) $(BINDIR)/$(LIBRARY).dylib
 	@echo "\033[1mTarget '"$@"' successfully build\033[0m"

@@ -125,7 +125,7 @@ bindir:
 
 incdir:
 	@mkdir -p $(INCDIR)
-#	@cp $(SOURCE_DIR)/*_Defines.h $(INCDIR)
+	@cp $(SOURCE_DIR)/*_Defines.h $(INCDIR)
 	@cp $(SOURCE_DIR)/TouCAN.h $(INCDIR)
 	@cp $(MACCAN_DIR)/MacCAN.h $(INCDIR)
 	@cp $(CANAPI_DIR)/CANAPI_Types.h $(INCDIR)
@@ -178,5 +178,5 @@ $(STATIC): $(OBJECTS)
 $(TARGET): $(OBJECTS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBRARIES)
 	$(CP) $(TARGET) $(BINDIR)
-	$(LN) $(BINDIR)/$(TARGET) $(BINDIR)/$(LIBRARY).dylib
+	$(RM) $(BINDIR)/$(LIBRARY).dylib ; $(LN) $(BINDIR)/$(TARGET) $(BINDIR)/$(LIBRARY).dylib
 	@echo "\033[1mTarget '"$@"' successfully build\033[0m"
