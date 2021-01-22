@@ -39,8 +39,8 @@ distclean:
 	$(MAKE) -C Trial $@
 	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Libraries/CANAPI $@
-#	$(MAKE) -C Utilities/can_test $@
-#	$(MAKE) -C Utilities/can_moni $@
+	$(MAKE) -C Utilities/can_test $@
+	$(MAKE) -C Utilities/can_moni $@
 
 install:
 #	$(MAKE) -C Trial $@

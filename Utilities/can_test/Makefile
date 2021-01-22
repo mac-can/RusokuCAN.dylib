@@ -91,7 +91,7 @@ clean:
 
 distclean:
 	$(RM) $(TARGET) $(OUTDIR)/*.o $(OUTDIR)/*.d
-	$(RM) $(BINDIT)/$(TARGET)
+	$(RM) $(BINDIR)/$(TARGET)
 
 install:
 	@echo "Copying binary file..."
