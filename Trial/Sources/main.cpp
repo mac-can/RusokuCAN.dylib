@@ -2,7 +2,7 @@
 //  main.c
 //  TouCAN
 //
-#include "MacCAN.h"
+#include "TouCAN_Defines.h"
 #include "TouCAN.h"
 
 #include <stdio.h>
@@ -11,48 +11,52 @@
 #include <signal.h>
 #include <errno.h>
 #include <time.h>
-#include <inttypes.h>
 
+#include <inttypes.h>
 #include "MacCAN_Debug.h"
+
+//#define SECOND_CHANNEL
+
 #define OPTION_NO   (0)
 #define OPTION_YES  (1)
 #define OPTION_TIME_DRIVER  (0)
 #define OPTION_TIME_ZERO    (1)
 #define OPTION_TIME_ABS     (2)
 #define OPTION_TIME_REL     (3)
+
 static void sigterm(int signo);
 
 static void verbose(const can_mode_t mode, const can_bitrate_t bitrate, const can_speed_t speed);
 
 static volatile int running = 1;
 
+static CTouCAN myDriver = CTouCAN();
+#ifdef SECOND_CHANNEL
+ static CTouCAN mySecond = CTouCAN();
+#endif
+
 int main(int argc, const char * argv[]) {
-    CTouCAN myTouCAN = CTouCAN();
-    MacCAN_OpMode_t opMode = {
-        .byte = CANMODE_DEFAULT
-    };
-    MacCAN_Status_t status = {
-        .byte = CANSTAT_RESET
-    };
-    MacCAN_Bitrate_t bitrate = {
-        .index = CANBTR_INDEX_250K
-    };
-    MacCAN_Message_t message = {
-        .id = 0x55AU,
-        .xtd = 0,
-        .rtr = 0,
-        .dlc = CAN_MAX_DLC,
-        .data[0] = 0x11,
-        .data[1] = 0x22,
-        .data[2] = 0x33,
-        .data[3] = 0x44,
-        .data[4] = 0x55,
-        .data[5] = 0x66,
-        .data[6] = 0x77,
-        .data[7] = 0x88,
-        .timestamp.tv_sec = 0,
-        .timestamp.tv_nsec = 0
-    };
+    MacCAN_OpMode_t opMode = {};
+    opMode.byte = CANMODE_DEFAULT;
+    MacCAN_Status_t status = {};
+    status.byte = CANSTAT_RESET;
+    MacCAN_Bitrate_t bitrate = {};
+    bitrate.index = CANBTR_INDEX_250K;
+    MacCAN_Message_t message = {};
+    message.id = 0x55AU;
+    message.xtd = 0;
+    message.rtr = 0;
+    message.dlc = CAN_MAX_DLC;
+    message.data[0] = 0x11;
+    message.data[1] = 0x22;
+    message.data[2] = 0x33;
+    message.data[3] = 0x44;
+    message.data[4] = 0x55;
+    message.data[5] = 0x66;
+    message.data[6] = 0x77;
+    message.data[7] = 0x88;
+    message.timestamp.tv_sec = 0;
+    message.timestamp.tv_nsec = 0;
     MacCAN_Return_t retVal = 0;
     int32_t channel = 0;
     uint16_t timeout = CANREAD_INFINITE;
@@ -67,21 +71,21 @@ int main(int argc, const char * argv[]) {
     int frames = 0;
     int option_info = OPTION_NO;
     int option_test = OPTION_NO;
-    int option_stop = OPTION_NO;
+//    int option_stop = OPTION_NO;
     int option_echo = OPTION_YES;
     int option_repeat = OPTION_NO;
     int option_transmit = OPTION_NO;
 
     for (int i = 1, opt = 0; i < argc; i++) {
         /* TouCAN-USB channel */
-        if(!strcmp(argv[i], "TouCAN-USB1") || !strcmp(argv[i], "CH:0")) channel = 0;
-        if(!strcmp(argv[i], "TouCAN-USB2") || !strcmp(argv[i], "CH:1")) channel = 1;
-        if(!strcmp(argv[i], "TouCAN-USB3") || !strcmp(argv[i], "CH:2")) channel = 2;
-        if(!strcmp(argv[i], "TouCAN-USB4") || !strcmp(argv[i], "CH:3")) channel = 3;
-        if(!strcmp(argv[i], "TouCAN-USB5") || !strcmp(argv[i], "CH:4")) channel = 4;
-        if(!strcmp(argv[i], "TouCAN-USB6") || !strcmp(argv[i], "CH:5")) channel = 5;
-        if(!strcmp(argv[i], "TouCAN-USB7") || !strcmp(argv[i], "CH:6")) channel = 6;
-        if(!strcmp(argv[i], "TouCAN-USB8") || !strcmp(argv[i], "CH:7")) channel = 7;
+        if(!strcmp(argv[i], "TouCAN-USB1") || !strcmp(argv[i], "CH:0")) channel = TOUCAN_USB_CHANNEL0;
+        if(!strcmp(argv[i], "TouCAN-USB2") || !strcmp(argv[i], "CH:1")) channel = TOUCAN_USB_CHANNEL1;
+        if(!strcmp(argv[i], "TouCAN-USB3") || !strcmp(argv[i], "CH:2")) channel = TOUCAN_USB_CHANNEL2;
+        if(!strcmp(argv[i], "TouCAN-USB4") || !strcmp(argv[i], "CH:3")) channel = TOUCAN_USB_CHANNEL3;
+        if(!strcmp(argv[i], "TouCAN-USB5") || !strcmp(argv[i], "CH:4")) channel = TOUCAN_USB_CHANNEL4;
+        if(!strcmp(argv[i], "TouCAN-USB6") || !strcmp(argv[i], "CH:5")) channel = TOUCAN_USB_CHANNEL5;
+        if(!strcmp(argv[i], "TouCAN-USB7") || !strcmp(argv[i], "CH:6")) channel = TOUCAN_USB_CHANNEL6;
+        if(!strcmp(argv[i], "TouCAN-USB8") || !strcmp(argv[i], "CH:7")) channel = TOUCAN_USB_CHANNEL7;
         /* baud rate (CAN 2.0) */
         if (!strcmp(argv[i], "BD:0") || !strcmp(argv[i], "BD:1000")) bitrate.index = CANBTR_INDEX_1M;
         if (!strcmp(argv[i], "BD:1") || !strcmp(argv[i], "BD:800")) bitrate.index = CANBTR_INDEX_800K;
@@ -100,7 +104,7 @@ int main(int argc, const char * argv[]) {
         if (!strncmp(argv[i], "C:", 2) && sscanf(argv[i], "C:%i", &opt) == 1) delay = (useconds_t)opt * 1000U;
         if (!strncmp(argv[i], "U:", 2) && sscanf(argv[i], "U:%i", &opt) == 1) delay = (useconds_t)opt;
         /* receive messages */
-        if (!strcmp(argv[i], "STOP")) option_stop = OPTION_YES;
+//        if (!strcmp(argv[i], "STOP")) option_stop = OPTION_YES;
 //        if (!strcmp(argv[i], "IGNORE")) option_check = OPTION_NO;
         if (!strcmp(argv[i], "REPEAT")) option_repeat = OPTION_YES;
         if (!strcmp(argv[i], "SILENT")) option_echo = OPTION_NO;
@@ -141,145 +145,162 @@ int main(int argc, const char * argv[]) {
         return retVal;
     }
     if (option_info) {
-        retVal = myTouCAN.GetProperty(TOUCAN_PROPERTY_CANAPI, (void *)&u16Val, sizeof(uint16_t));
+        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_CANAPI, (void *)&u16Val, sizeof(uint16_t));
         if (retVal == CMacCAN::NoError)
-            fprintf(stdout, ">>> TouCAN.GetProperty(TOUCAN_PROPERTY_CANAPI): value = %u.%u\n", (uint8_t)(u16Val >> 8), (uint8_t)u16Val);
+            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_CANAPI): value = %u.%u\n", (uint8_t)(u16Val >> 8), (uint8_t)u16Val);
         else
-            fprintf(stderr, "+++ error: myTouCAN.GetProperty(TOUCAN_PROPERTY_CANAPI) returned %i\n", retVal);
-        retVal = myTouCAN.GetProperty(TOUCAN_PROPERTY_VERSION, (void *)&u16Val, sizeof(uint16_t));
+            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_CANAPI) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_VERSION, (void *)&u16Val, sizeof(uint16_t));
         if (retVal == CMacCAN::NoError)
-            fprintf(stdout, ">>> TouCAN.GetProperty(TOUCAN_PROPERTY_VERSION): value = %u.%u\n", (uint8_t)(u16Val >> 8), (uint8_t)u16Val);
+            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_VERSION): value = %u.%u\n", (uint8_t)(u16Val >> 8), (uint8_t)u16Val);
         else
-            fprintf(stderr, "+++ error: myTouCAN.GetProperty(TOUCAN_PROPERTY_VERSION) returned %i\n", retVal);
-        retVal = myTouCAN.GetProperty(TOUCAN_PROPERTY_PATCH_NO, (void *)&u8Val, sizeof(uint8_t));
+            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_VERSION) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_PATCH_NO, (void *)&u8Val, sizeof(uint8_t));
         if (retVal == CMacCAN::NoError)
-            fprintf(stdout, ">>> TouCAN.GetProperty(TOUCAN_PROPERTY_PATCH_NO): value = %u\n", (uint8_t)u8Val);
+            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_PATCH_NO): value = %u\n", (uint8_t)u8Val);
         else
-            fprintf(stderr, "+++ error: myTouCAN.GetProperty(TOUCAN_PROPERTY_PATCH_NO) returned %i\n", retVal);
-        retVal = myTouCAN.GetProperty(TOUCAN_PROPERTY_BUILD_NO, (void *)&u32Val, sizeof(uint32_t));
+            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_PATCH_NO) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_BUILD_NO, (void *)&u32Val, sizeof(uint32_t));
         if (retVal == CMacCAN::NoError)
-            fprintf(stdout, ">>> TouCAN.GetProperty(TOUCAN_PROPERTY_BUILD_NO): value = %" PRIx32 "\n", (uint32_t)u32Val);
+            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_BUILD_NO): value = %" PRIx32 "\n", (uint32_t)u32Val);
         else
-            fprintf(stderr, "+++ error: myTouCAN.GetProperty(TOUCAN_PROPERTY_BUILD_NO) returned %i\n", retVal);
-        retVal = myTouCAN.GetProperty(TOUCAN_PROPERTY_LIBRARY_ID, (void *)&i32Val, sizeof(int32_t));
+            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_BUILD_NO) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_LIBRARY_ID, (void *)&i32Val, sizeof(int32_t));
         if (retVal == CMacCAN::NoError)
-            fprintf(stdout, ">>> TouCAN.GetProperty(TOUCAN_PROPERTY_LIBRARY_ID): value = %d\n", i32Val);
+            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_LIBRARY_ID): value = %d\n", i32Val);
         else
-            fprintf(stderr, "+++ error: myTouCAN.GetProperty(TOUCAN_PROPERTY_LIBRARY_ID) returned %i\n", retVal);
-        retVal = myTouCAN.GetProperty(TOUCAN_PROPERTY_LIBRARY_NAME, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
+            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_LIBRARY_ID) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_LIBRARY_NAME, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
         if (retVal == CMacCAN::NoError)
-            fprintf(stdout, ">>> TouCAN.GetProperty(TOUCAN_PROPERTY_LIBRARY_NAME): value = '%s'\n", szVal);
+            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_LIBRARY_NAME): value = '%s'\n", szVal);
         else
-            fprintf(stderr, "+++ error: myTouCAN.GetProperty(TOUCAN_PROPERTY_LIBRARY_NAME) returned %i\n", retVal);
-        retVal = myTouCAN.GetProperty(TOUCAN_PROPERTY_LIBRARY_VENDOR, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
+            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_LIBRARY_NAME) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_LIBRARY_VENDOR, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
         if (retVal == CMacCAN::NoError)
-            fprintf(stdout, ">>> TouCAN.GetProperty(TOUCAN_PROPERTY_LIBRARY_VENDOR): value = '%s'\n", szVal);
+            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_LIBRARY_VENDOR): value = '%s'\n", szVal);
         else
-            fprintf(stderr, "+++ error: myTouCAN.GetProperty(TOUCAN_PROPERTY_LIBRARY_VENDOR) returned %i\n", retVal);
+            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_LIBRARY_VENDOR) returned %i\n", retVal);
     }
     if (option_test) {
         for (int32_t ch = 0; ch < 8; ch++) {
             retVal = CTouCAN::ProbeChannel(ch, opMode, state);
-            fprintf(stdout, ">>> TouCAN.ProbeChannel(%i): state = %s", ch,
+            fprintf(stdout, ">>> myDriver.ProbeChannel(%i): state = %s", ch,
                             (state == CTouCAN::ChannelOccupied) ? "occupied" :
                             (state == CTouCAN::ChannelAvailable) ? "available" :
                             (state == CTouCAN::ChannelNotAvailable) ? "not available" : "not testable");
             fprintf(stdout, "%s", (retVal == CMacCAN::IllegalParameter) ? " (waring: Op.-Mode not supported)\n" : "\n");
         }
     }
-    retVal = myTouCAN.InitializeChannel(channel, opMode);
+    retVal = myDriver.InitializeChannel(channel, opMode);
     if (retVal != CMacCAN::NoError) {
-        fprintf(stderr, "+++ error: myTouCAN.InitializeChannel(%i) returned %i\n", channel, retVal);
+        fprintf(stderr, "+++ error: myDriver.InitializeChannel(%i) returned %i\n", channel, retVal);
         goto end;
     }
-    else if (myTouCAN.GetStatus(status) == CMacCAN::NoError) {
-        fprintf(stdout, ">>> TouCAN.InitializeChannel(%i): status = 0x%02X\n", channel, status.byte);
+    else if (myDriver.GetStatus(status) == CMacCAN::NoError) {
+        fprintf(stdout, ">>> myDriver.InitializeChannel(%i): status = 0x%02X\n", channel, status.byte);
     }
     if (option_test) {
-        retVal = myTouCAN.ProbeChannel(channel, opMode, state);
-        fprintf(stdout, ">>> TouCAN.ProbeChannel(%i): state = %s", channel,
+        retVal = myDriver.ProbeChannel(channel, opMode, state);
+        fprintf(stdout, ">>> myDriver.ProbeChannel(%i): state = %s", channel,
                         (state == CTouCAN::ChannelOccupied) ? "now occupied" :
                         (state == CTouCAN::ChannelAvailable) ? "available" :
                         (state == CTouCAN::ChannelNotAvailable) ? "not available" : "not testable");
         fprintf(stdout, "%s", (retVal == CMacCAN::IllegalParameter) ? " (waring: Op.-Mode not supported)\n" : "\n");
     }
     if (option_info) {
-        retVal = myTouCAN.GetProperty(TOUCAN_PROPERTY_DEVICE_TYPE, (void *)&i32Val, sizeof(int32_t));
+        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_TYPE, (void *)&i32Val, sizeof(int32_t));
         if (retVal == CMacCAN::NoError)
-            fprintf(stdout, ">>> TouCAN.GetProperty(TOUCAN_PROPERTY_DEVICE_TYPE): value = %d\n", i32Val);
+            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_TYPE): value = %d\n", i32Val);
         else
-            fprintf(stderr, "+++ error: myTouCAN.GetProperty(TOUCAN_PROPERTY_DEVICE_TYPE) returned %i\n", retVal);
-        retVal = myTouCAN.GetProperty(TOUCAN_PROPERTY_DEVICE_NAME, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
+            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_TYPE) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_NAME, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
         if (retVal == CMacCAN::NoError)
-            fprintf(stdout, ">>> TouCAN.GetProperty(TOUCAN_PROPERTY_DEVICE_NAME): value = '%s'\n", szVal);
+            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_NAME): value = '%s'\n", szVal);
         else
-            fprintf(stderr, "+++ error: myTouCAN.GetProperty(TOUCAN_PROPERTY_DEVICE_NAME) returned %i\n", retVal);
-        retVal = myTouCAN.GetProperty(TOUCAN_PROPERTY_DEVICE_VENDOR, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
+            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_NAME) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_DRIVER, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
         if (retVal == CMacCAN::NoError)
-            fprintf(stdout, ">>> TouCAN.GetProperty(TOUCAN_PROPERTY_DEVICE_VENDOR): value = '%s'\n", szVal);
+            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_DRIVER): value = '%s'\n", szVal);
         else
-            fprintf(stderr, "+++ error: myTouCAN.GetProperty(TOUCAN_PROPERTY_DEVICE_VENDOR) returned %i\n", retVal);
-        retVal = myTouCAN.GetProperty(TOUCAN_PROPERTY_VENDOR_URL, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
+            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_DRIVER) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_VENDOR, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
         if (retVal == CMacCAN::NoError)
-            fprintf(stdout, ">>> TouCAN.GetProperty(TOUCAN_PROPERTY_VENDOR_URL): value = '%s'\n", szVal);
+            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_VENDOR): value = '%s'\n", szVal);
         else
-            fprintf(stderr, "+++ error: myTouCAN.GetProperty(TOUCAN_PROPERTY_VENDOR_URL) returned %i\n", retVal);
+            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_VENDOR) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_VENDOR_URL, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
+        if (retVal == CMacCAN::NoError)
+            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_VENDOR_URL): value = '%s'\n", szVal);
+        else
+            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_VENDOR_URL) returned %i\n", retVal);
 		// TODO: get device id.
-        retVal = myTouCAN.GetProperty(TOUCAN_PROPERTY_CLOCK_DOMAIN, (void *)&i32Val, sizeof(int32_t));
+        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_CLOCK_DOMAIN, (void *)&i32Val, sizeof(int32_t));
         if (retVal == CMacCAN::NoError)
-            fprintf(stdout, ">>> TouCAN.GetProperty(TOUCAN_PROPERTY_CLOCK_DOMAIN): value = %d\n", i32Val);
+            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_CLOCK_DOMAIN): value = %d\n", i32Val);
         else
-            fprintf(stderr, "+++ error: myTouCAN.GetProperty(TOUCAN_PROPERTY_CLOCK_DOMAIN) returned %i\n", retVal);
-        retVal = myTouCAN.GetProperty(TOUCAN_PROPERTY_OP_CAPABILITY, (void *)&u8Val, sizeof(uint8_t));
+            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_CLOCK_DOMAIN) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_OP_CAPABILITY, (void *)&u8Val, sizeof(uint8_t));
         if (retVal == CMacCAN::NoError)
-            fprintf(stdout, ">>> TouCAN.GetProperty(TOUCAN_PROPERTY_OP_CAPABILITY): value = 0x%02X\n", (uint8_t)u8Val);
+            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_OP_CAPABILITY): value = 0x%02X\n", (uint8_t)u8Val);
         else
-            fprintf(stderr, "+++ error: myTouCAN.GetProperty(TOUCAN_PROPERTY_OP_CAPABILITY) returned %i\n", retVal);
-        if (myTouCAN.GetProperty(TOUCAN_PROPERTY_OP_MODE, (void *)&opMode.byte, sizeof(uint8_t)) == CMacCAN::NoError)
-            fprintf(stdout, ">>> Op.-Mode: 0x%02X\n", (uint8_t)opMode.byte);
+            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_OP_CAPABILITY) returned %i\n", retVal);
+        if (myDriver.GetProperty(TOUCAN_PROPERTY_OP_MODE, (void *)&opMode.byte, sizeof(uint8_t)) == CMacCAN::NoError)
+            fprintf(stdout, ">>> myDriver.Op.-Mode: 0x%02X\n", (uint8_t)opMode.byte);
     }
-    retVal = myTouCAN.StartController(bitrate);
+    retVal = myDriver.StartController(bitrate);
     if (retVal != CMacCAN::NoError) {
-        fprintf(stderr, "+++ error: myTouCAN.StartController returned %i\n", retVal);
+        fprintf(stderr, "+++ error: myDriver.StartController returned %i\n", retVal);
         goto teardown;
     }
-    else if (myTouCAN.GetStatus(status) == CMacCAN::NoError) {
-        fprintf(stdout, ">>> TouCAN.StartController: status = 0x%02X\n", status.byte);
+    else if (myDriver.GetStatus(status) == CMacCAN::NoError) {
+        fprintf(stdout, ">>> myDriver.StartController: status = 0x%02X\n", status.byte);
     }
     if (option_info) {
         MacCAN_BusSpeed_t speed;
-        if ((myTouCAN.GetBitrate(bitrate) == CMacCAN::NoError) &&
-            (myTouCAN.GetBusSpeed(speed) == CMacCAN::NoError))
+        if ((myDriver.GetBitrate(bitrate) == CMacCAN::NoError) &&
+            (myDriver.GetBusSpeed(speed) == CMacCAN::NoError))
             verbose(opMode, bitrate, speed);
     }
+#ifdef SECOND_CHANNEL
+    retVal = mySecond.InitializeChannel(channel+1U, opMode);
+    if (retVal != CMacCAN::NoError)
+        fprintf(stderr, "+++ error: mySecond.InitializeChannel(%i) returned %i\n", channel+1U, retVal);
+    retVal = mySecond.StartController(bitrate);
+    if (retVal != CMacCAN::NoError)
+        fprintf(stderr, "+++ error: mySecond.StartController returned %i\n", retVal);
+    retVal = mySecond.WriteMessage(message);
+    if (retVal != CMacCAN::NoError)
+        fprintf(stderr, "+++ error: mySecond.WriteMessage returned %i\n", retVal);
+#endif
     fprintf(stdout, "Press Ctrl+C to abort...\n");
     while (running && (option_transmit-- > 0)) {
-        retVal = myTouCAN.WriteMessage(message);
+        retVal = myDriver.WriteMessage(message);
         if (retVal != CMacCAN::NoError) {
-            fprintf(stderr, "+++ error: TouCAN.WriteMessage returned %i\n", retVal);
+            fprintf(stderr, "+++ error: myDriver.WriteMessage returned %i\n", retVal);
             goto teardown;
         }
         if (delay)
             usleep(delay);
     }
     while (running) {
-        if ((retVal = myTouCAN.ReadMessage(message, timeout)) == CMacCAN::NoError) {
+        if ((retVal = myDriver.ReadMessage(message, timeout)) == CMacCAN::NoError) {
             if (option_echo) {
-	            fprintf(stdout, "%i\t%7li.%04li\t%03x\t%c%c [%i]", frames++,
-	                             message.timestamp.tv_sec, message.timestamp.tv_nsec / 100000,
-	                             message.id, message.xtd? 'X' : 'S', message.rtr? 'R' : ' ', message.dlc);
-	            for (int i = 0; i < message.dlc; i++)
-	                fprintf(stdout, " %02x", message.data[i]);
-	            if (message.sts)
-	                fprintf(stdout, " <<< status frame");
-	            else if (option_repeat) {
-	                retVal = myTouCAN.WriteMessage(message);
-	                if (retVal != CMacCAN::NoError) {
-	                    fprintf(stderr, "+++ error: TouCAN.WriteMessage returned %i\n", retVal);
-	                    goto teardown;
-	                }
-	            }
-	            fprintf(stdout, "\n");
+                fprintf(stdout, ">>> %i\t", frames++);
+                fprintf(stdout, "%7li.%04li\t%03x\t%c%c [%i]",
+                                 message.timestamp.tv_sec, message.timestamp.tv_nsec / 100000,
+                                 message.id, message.xtd? 'X' : 'S', message.rtr? 'R' : ' ', message.dlc);
+                for (int i = 0; i < message.dlc; i++)
+                    fprintf(stdout, " %02x", message.data[i]);
+                if (message.sts)
+                    fprintf(stdout, " <<< status frame");
+                else if (option_repeat) {
+                    retVal = myDriver.WriteMessage(message);
+                    if (retVal != CMacCAN::NoError) {
+                        fprintf(stderr, "+++ error: myDriver.WriteMessage returned %i\n", retVal);
+                        goto teardown;
+                    }
+                }
+                fprintf(stdout, "\n");
             } else {
                 if(!(frames++ % 2048)) {
                     fprintf(stdout, ".");
@@ -290,31 +311,71 @@ int main(int argc, const char * argv[]) {
         else if (retVal != CMacCAN::ReceiverEmpty) {
             goto teardown;
         }
+#ifdef SECOND_CHANNEL
+        if ((retVal = mySecond.ReadMessage(message, 0U)) == CMacCAN::NoError) {
+            if (option_echo) {
+                fprintf(stdout, ">2> %i\t", frames++);
+                fprintf(stdout, "%7li.%04li\t%03x\t%c%c [%i]",
+                                 message.timestamp.tv_sec, message.timestamp.tv_nsec / 100000,
+                                 message.id, message.xtd? 'X' : 'S', message.rtr? 'R' : ' ', message.dlc);
+                for (int i = 0; i < message.dlc; i++)
+                    fprintf(stdout, " %02x", message.data[i]);
+                if (message.sts)
+                    fprintf(stdout, " <<< status frame");
+                else if (option_repeat) {
+                    retVal = myDriver.WriteMessage(message);
+                    if (retVal != CMacCAN::NoError) {
+                        fprintf(stderr, "+++ error: mySecond.WriteMessage returned %i\n", retVal);
+                        goto teardown;
+                    }
+                }
+                fprintf(stdout, "\n");
+            }
+            else {
+                if (!(frames++ % 2048)) {
+                    fprintf(stdout, ".");
+                    fflush(stdout);
+                }
+            }
+        }
+        else if (retVal != CMacCAN::ReceiverEmpty) {
+            fprintf(stderr, "+++ error: mySecond.ReadMessage returned %i\n", retVal);
+            goto teardown;
+        }
+#endif
     }
-    if (myTouCAN.GetStatus(status) == CMacCAN::NoError) {
-        fprintf(stdout, "\n>>> TouCAN.ReadMessage: status = 0x%02X\n", status.byte);
+    if (myDriver.GetStatus(status) == CMacCAN::NoError) {
+        fprintf(stdout, "\n>>> myDriver.ReadMessage: status = 0x%02X\n", status.byte);
     }
     if (option_info) {
         uint64_t u64TxCnt, u64RxCnt, u64ErrCnt;
-        if ((myTouCAN.GetProperty(TOUCAN_PROPERTY_TX_COUNTER, (void *)&u64TxCnt, sizeof(uint64_t)) == CMacCAN::NoError) &&
-            (myTouCAN.GetProperty(TOUCAN_PROPERTY_RX_COUNTER, (void *)&u64RxCnt, sizeof(uint64_t)) == CMacCAN::NoError) &&
-            (myTouCAN.GetProperty(TOUCAN_PROPERTY_ERR_COUNTER, (void *)&u64ErrCnt, sizeof(uint64_t)) == CMacCAN::NoError))
-            fprintf(stdout, ">>> TouCAN.GetProperty(TOUCAN_PROPERTY_*_COUNTER): TX = %" PRIi64 " RX = %" PRIi64 " ERR = %" PRIi64 "\n", u64TxCnt, u64RxCnt, u64ErrCnt);
-        char *hardware = myTouCAN.GetHardwareVersion();
+        if ((myDriver.GetProperty(TOUCAN_PROPERTY_TX_COUNTER, (void *)&u64TxCnt, sizeof(uint64_t)) == CMacCAN::NoError) &&
+            (myDriver.GetProperty(TOUCAN_PROPERTY_RX_COUNTER, (void *)&u64RxCnt, sizeof(uint64_t)) == CMacCAN::NoError) &&
+            (myDriver.GetProperty(TOUCAN_PROPERTY_ERR_COUNTER, (void *)&u64ErrCnt, sizeof(uint64_t)) == CMacCAN::NoError))
+            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_*_COUNTER): TX = %" PRIi64 " RX = %" PRIi64 " ERR = %" PRIi64 "\n", u64TxCnt, u64RxCnt, u64ErrCnt);
+        char *hardware = myDriver.GetHardwareVersion();
         if (hardware)
-            fprintf(stdout, ">>> TouCAN.GetHardwareVersion: '%s'\n", hardware);
-        char *firmware = myTouCAN.GetFirmwareVersion();
+            fprintf(stdout, ">>> myDriver.GetHardwareVersion: '%s'\n", hardware);
+        char *firmware = myDriver.GetFirmwareVersion();
         if (firmware)
-            fprintf(stdout, ">>> TouCAN.GetFirmwareVersion: '%s'\n", firmware);
+            fprintf(stdout, ">>> myDriver.GetFirmwareVersion: '%s'\n", firmware);
     }
 teardown:
-    retVal = myTouCAN.TeardownChannel();
+#ifdef SECOND_CHANNEL
+    retVal = mySecond.ResetController();
+    if (retVal != CMacCAN::NoError)
+        fprintf(stderr, "+++ error: mySecond.ResetController returned %i\n", retVal);
+    retVal = mySecond.TeardownChannel();
+    if (retVal != CMacCAN::NoError)
+        fprintf(stderr, "+++ error: mySecond.TeardownChannel returned %i\n", retVal);
+#endif
+    retVal = myDriver.TeardownChannel();
     if (retVal != CMacCAN::NoError) {
-        fprintf(stderr, "+++ error: myTouCAN.TeardownChannel returned %i\n", retVal);
+        fprintf(stderr, "+++ error: myDriver.TeardownChannel returned %i\n", retVal);
         goto end;
     }
-    else if (myTouCAN.GetStatus(status) == CMacCAN::NoError) {
-        fprintf(stdout, ">>> TouCAN.TeardownChannel: status = 0x%02X\n", status.byte);
+    else if (myDriver.GetStatus(status) == CMacCAN::NoError) {
+        fprintf(stdout, ">>> myDriver.TeardownChannel: status = 0x%02X\n", status.byte);
     }
     else {
         fprintf(stdout, "@@@ Resistance is futile!\n");
@@ -381,7 +442,12 @@ static void verbose(const can_mode_t mode, const can_bitrate_t bitrate, const ca
 }
 
 static void sigterm(int signo) {
-     //fprintf(stderr, "%s: got signal %d\n", __FILE__, signo);
-     running = 0;
-     (void)signo;
+    //fprintf(stderr, "%s: got signal %d\n", __FILE__, signo);
+    // FIXME: leads into a deadlock
+//    (void)myDriver.SignalChannel();
+//#ifdef SECOND_CHANNEL
+//    (void)mySecond.SignalChannel();
+//#endif
+    running = 0;
+    (void)signo;
 }

@@ -564,6 +564,12 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                             retVal = CMacCAN::NoError;
                         }
                         break;
+                    case TOUCAN_PROPERTY_DEVICE_DRIVER:
+                        if ((nbytes > strlen("(none)")) && (nbytes <= CANPROP_MAX_BUFFER_SIZE)) {
+                            strcpy((char*)value, "(none)");  // note: there is no kernel driver!
+                            retVal = CMacCAN::NoError;
+                        }
+                        break;
                     case TOUCAN_PROPERTY_DEVICE_VENDOR:
                         if ((nbytes > strlen(TOUCAN_USB_VENDOR_NAME)) && (nbytes <= CANPROP_MAX_BUFFER_SIZE)) {
                             strcpy((char*)value, TOUCAN_USB_VENDOR_NAME);
