@@ -54,25 +54,25 @@ DEFINES = -DOPTION_CAN_2_0_ONLY=1 \
 	-DOPTION_MACCAN_DEBUG_LEVEL=4 \
 	-DOPTION_MACCAN_INSTRUMENTATION=0
 
-INCLUDE = -I$(MAIN_DIR) \
-	-I$(SOURCE_DIR) \
+HEADERS = -I$(SOURCE_DIR) \
 	-I$(CANAPI_DIR) \
 	-I$(MACCAN_DIR) \
-	-I$(TOUCAN_DIR)
+	-I$(TOUCAN_DIR) \
+	-I$(MAIN_DIR)
 
 CFLAGS += -O2 -Wall -Wno-parentheses \
 	-fno-strict-aliasing \
 	$(DEFINES) \
-	$(INCLUDE)
+	$(HEADERS)
 
 CXXFLAGS += -g -Wall -Wextra -pthread \
 	$(DEFINES) \
-	$(INCLUDE)
+	$(HEADERS)
 
 LIBRARIES =
 
-LDFLAGS  += -Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation \
-	-lpthread
+LDFLAGS  += -lpthread \
+	-Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation
 
 endif
 

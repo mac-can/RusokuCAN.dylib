@@ -128,7 +128,7 @@ bindir:
 
 incdir:
 	@mkdir -p $(INCDIR)
-	@cp $(SOURCE_DIR)/*_Defines.h $(INCDIR)
+	@cp $(SOURCE_DIR)/TouCAN_Defines.h $(INCDIR)
 	@cp $(CANAPI_DIR)/can_api.h $(INCDIR)
 	@cp $(CANAPI_DIR)/CANAPI_Types.h $(INCDIR)
 	@cp $(CANAPI_DIR)/CANAPI_Defines.h $(INCDIR)

@@ -21,10 +21,6 @@ current_OS := $(patsubst CYGWIN%,Cygwin,$(current_OS))
 current_OS := $(patsubst MINGW%,MinGW,$(current_OS))
 current_OS := $(patsubst MSYS%,MinGW,$(current_OS))
 
-TARGET  = can_moni
-
-INSTALL = ~/bin
-
 HOME_DIR = ../..
 MAIN_DIR = ./Sources
 
@@ -36,10 +32,19 @@ TOUCAN_DIR = $(HOME_DIR)/Sources/TouCAN_Driver
 OBJECTS = $(OUTDIR)/main.o $(OUTDIR)/Timer.o  $(BINDIR)/libTouCAN.a \
 	$(OUTDIR)/Message.o $(OUTDIR)/can_msg.o
 
+
+ifeq ($(current_OS),Darwin) # macOS - libTouCAN.dylib
+
+VERSION = 0
+
+TARGET  = can_moni
+
+INSTALL = ~/bin
+
 DEFINES = -DOPTION_CANAPI_DRIVER=1 \
 	-DOPTION_CANAPI_COMPANIONS=1
 
-INCLUDE = -I$(MAIN_DIR) \
+HEADERS = -I$(MAIN_DIR) \
 	-I$(SOURCE_DIR) \
 	-I$(CANAPI_DIR) \
 	-I$(MACCAN_DIR) \
@@ -48,16 +53,19 @@ INCLUDE = -I$(MAIN_DIR) \
 CFLAGS += -O2 -Wall -Wno-parentheses \
 	-fno-strict-aliasing \
 	$(DEFINES) \
-	$(INCLUDE)
+	$(HEADERS)
 
 CXXFLAGS += -g -Wall -Wextra -pthread \
 	$(DEFINES) \
-	$(INCLUDE)
+	$(HEADERS)
 
 LIBRARIES =
 
 LDFLAGS  += -lpthread \
 	-Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation
+
+endif
+
 
 CXX = g++
 CC = gcc
@@ -76,7 +84,7 @@ all: info outdir bindir incdir $(TARGET)
 
 info:
 	@echo $(CXX)" on "$(current_OS)
-	@echo "Target: "$(TARGET)
+	@echo "target: "$(TARGET)
 	@echo "install: "$(INSTALL)
 
 outdir:
