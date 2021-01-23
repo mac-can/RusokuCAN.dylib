@@ -70,9 +70,11 @@ int main(int argc, const char * argv[]) {
     int32_t i32Val;
     int frames = 0;
     int option_info = OPTION_NO;
+    int option_stat = OPTION_NO;
     int option_test = OPTION_NO;
-//    int option_stop = OPTION_NO;
     int option_echo = OPTION_YES;
+//    int option_stop = OPTION_NO;
+//    int option_check = OPTION_NO;
     int option_repeat = OPTION_NO;
     int option_transmit = OPTION_NO;
 
@@ -105,7 +107,7 @@ int main(int argc, const char * argv[]) {
         if (!strncmp(argv[i], "U:", 2) && sscanf(argv[i], "U:%i", &opt) == 1) delay = (useconds_t)opt;
         /* receive messages */
 //        if (!strcmp(argv[i], "STOP")) option_stop = OPTION_YES;
-//        if (!strcmp(argv[i], "IGNORE")) option_check = OPTION_NO;
+//        if (!strcmp(argv[i], "CHECK")) option_check = OPTION_YES;
         if (!strcmp(argv[i], "REPEAT")) option_repeat = OPTION_YES;
         if (!strcmp(argv[i], "SILENT")) option_echo = OPTION_NO;
         /* time-stamps */
@@ -117,8 +119,9 @@ int main(int argc, const char * argv[]) {
 //        if (!strcmp(argv[i], "LOG")) option_log = OPTION_YES;
         /* query some informations: hw, sw, etc. */
         if (!strcmp(argv[i], "INFO")) option_info = OPTION_YES;
+        if (!strcmp(argv[i], "STAT")) option_stat = OPTION_YES;
         if (!strcmp(argv[i], "TEST")) option_test = OPTION_YES;
-        /* additional operation modes */
+        /* additional operation modes (bit field) */
         if (!strcmp(argv[i], "SHARED")) opMode.shrd = 1;
         if (!strcmp(argv[i], "MONITOR")) opMode.mon = 1;
         if (!strcmp(argv[i], "MON:ON")) opMode.mon = 1;
@@ -347,12 +350,14 @@ int main(int argc, const char * argv[]) {
     if (myDriver.GetStatus(status) == CMacCAN::NoError) {
         fprintf(stdout, "\n>>> myDriver.ReadMessage: status = 0x%02X\n", status.byte);
     }
-    if (option_info) {
+    if (option_stat || option_info) {
         uint64_t u64TxCnt, u64RxCnt, u64ErrCnt;
         if ((myDriver.GetProperty(TOUCAN_PROPERTY_TX_COUNTER, (void *)&u64TxCnt, sizeof(uint64_t)) == CMacCAN::NoError) &&
             (myDriver.GetProperty(TOUCAN_PROPERTY_RX_COUNTER, (void *)&u64RxCnt, sizeof(uint64_t)) == CMacCAN::NoError) &&
             (myDriver.GetProperty(TOUCAN_PROPERTY_ERR_COUNTER, (void *)&u64ErrCnt, sizeof(uint64_t)) == CMacCAN::NoError))
             fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_*_COUNTER): TX = %" PRIi64 " RX = %" PRIi64 " ERR = %" PRIi64 "\n", u64TxCnt, u64RxCnt, u64ErrCnt);
+    }
+    if (option_info) {
         char *hardware = myDriver.GetHardwareVersion();
         if (hardware)
             fprintf(stdout, ">>> myDriver.GetHardwareVersion: '%s'\n", hardware);

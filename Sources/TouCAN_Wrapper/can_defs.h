@@ -27,6 +27,7 @@
 /*  -----------  includes  ------------------------------------------------
  */
 
+#include "CANAPI_Defines.h"
 #include "TouCAN_Defines.h"
 
 

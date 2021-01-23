@@ -31,7 +31,7 @@
 #define RUSOKU_VENDOR_ID  (UInt16)0x16D0
 #define RUSOKU_TOUCAN_USB_ID  (UInt16)0x0EAC
 
-#define TOUCAN_USB_VENDOR_NAME  "Rusoku technologijos UAB"
+#define TOUCAN_USB_VENDOR_NAME  "Rusoku technologijos UAB, Lithuania"
 #define TOUCAN_USB_VENDOR_URL   "www.rusoku.com"
 #define TOUCAN_USB_DEVICE_NAME  "TouCAN USB"
 #define TOUCAN_USB_DEVICE_TYPE  (SInt32)1
@@ -181,7 +181,7 @@ typedef CANUSB_AsyncPipe_t TouCAN_ReceivePipe_t;
 #define CANAL_ERROR_INTERNAL                    36         // Some kind of internal program error
 #define CANAL_ERROR_COMMUNICATION                37         // Some kind of communication error
 #define CANAL_ERROR_USER                        38      // Login error
- 
+
 /*!
     CanalStatistics
 

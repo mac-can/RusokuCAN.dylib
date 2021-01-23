@@ -96,6 +96,15 @@ extern "C" {
 #endif
 /** @} */
 
+/** @name  Miscellaneous
+ *  @brief More or less useful stuff
+ *  @{ */
+#define TOUCAN_LIB_VENDOR       "Rusoku technologijos UAB, Lithuania"
+#define TOUCAN_LIB_WEBSITE      "www.rusoku.com"
+#define TOUCAN_LIB_HAZARD_NOTE  "Do not connect your CAN device to a real CAN network when using this program.\n" \
+                                "This can damage your application."
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
