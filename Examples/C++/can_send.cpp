@@ -13,12 +13,12 @@
 #define FRAMES  (CAN_MAX_STD_ID+1)
 
 int main(int argc, const char * argv[]) {
-    int handle, result;
+    int handle, result, i;
     can_bitrate_t bitrate;
     can_message_t message;
 
     std::cout << can_version() << std::endl;
-    if ((handle = can_init(CAN_BOARD(CANLIB_RUSOKU_LT, CHANNEL), CANMODE_DEFAULT, NULL)) < 0) {
+    if ((handle = can_init(CHANNEL, CANMODE_DEFAULT, NULL)) < 0) {
         std::cerr << "+++ error: interface could not be initialized" << std::endl;
         return -1;
     }
@@ -27,8 +27,9 @@ int main(int argc, const char * argv[]) {
         std::cerr << "+++ error: interface could not be started" << std::endl;
         goto end;
     }
+    std::cout << ">>> Be patient..." << std::flush;
     message.xtd = message.rtr = message.sts = 0;
-    for (uint64_t i = 0; i < FRAMES; i++) {
+    for (i = 0; i < FRAMES; i++) {
         message.id = (uint32_t)i & CAN_MAX_STD_ID;
         message.dlc = 8U;
         message.data[0] = (uint8_t)((uint64_t)i >> 0);
@@ -46,6 +47,7 @@ int main(int argc, const char * argv[]) {
     }
     usleep(1000000);  // afterburner
 reset:
+    std::cout << i << " frame(s) sent" << std::endl;
     if ((result = can_reset(handle)) < 0)
         std::cerr << "+++ error: interface could not be stopped" << std::endl;
 end:
