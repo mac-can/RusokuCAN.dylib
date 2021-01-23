@@ -2,7 +2,7 @@
 
 _Copyright &copy; 2004-2021  Uwe Vogt, UV Software, Berlin (info@uv-software.com)_
 
-Version $Rev: 918 $
+Version $Rev: 970 $
 
 # A CAN Interface Wrapper Specification
 
@@ -31,11 +31,11 @@ In case of doubt the source code:
 
 ```C
 #if (OPTION_CANAPI_LIBRARY != 0)
-extern int can_test(int32_t library, int32_t board, uint8_t mode, const void *param, int *result);
-extern int can_init(int32_t library, int32_t board, uint8_t mode, const void *param);
+extern int can_test(int32_t library, int32_t channel, uint8_t mode, const void *param, int *result);
+extern int can_init(int32_t library, int32_t channel, uint8_t mode, const void *param);
 #else
-extern int can_test(int32_t board, uint8_t mode, const void *param, int *result);
-extern int can_init(int32_t board, uint8_t mode, const void *param);
+extern int can_test(int32_t channel, uint8_t mode, const void *param, int *result);
+extern int can_init(int32_t channel, uint8_t mode, const void *param);
 #endif
 extern int can_exit(int handle);
 extern int can_kill(int handle);
@@ -58,7 +58,7 @@ extern char *can_software(int handle);
 #if (OPTION_CANAPI_LIBRARY != 0)
 extern char *can_library(int handle);
 #endif
-extern char* can_version();
+extern char* can_version(void);
 ```
 See header file `can_api.h` for a description of the provided functions.
 
@@ -83,14 +83,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with CAN API V3.  If not, see <http://www.gnu.org/licenses/>.
 
-
 ### Contact
-
-Uwe Vogt \
-UV Software \
-Chausseestrasse 33a \
-10115 Berlin \
-Germany
 
 E-Mail: mailto://info@uv-software.com \
 Internet: https://www.uv-software.com
