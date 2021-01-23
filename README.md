@@ -151,6 +151,9 @@ Type `can_test --help` to display all program options.
 
 - TouCAN USB (Model F4FS1, Hardware 1.0.0, Firmware 1.0.1)
 
+## Known Bugs and Caveats
+
+- For a list of bugs and caveats see [issues](https://github.com/mac-can/RusokuCAN/issues) tracked in the GitHub repo.
 ## This and That
 
 For reasons unknown to me, the artifacts build with Xcode detect the TouCAN USB adapter only under macOS 10.15 (Catalina) and higher.
@@ -202,12 +205,6 @@ Mac and macOS are trademarks of Apple Inc., registered in the U.S. and other cou
 _If you connect your CAN device to a real CAN network when using this library, you might damage your application._
 
 ### Contact
-
-Uwe Vogt \
-UV Software \
-Chausseestrasse 33a \
-10115 Berlin \
-Germany
 
 E-Mail: mailto://info@mac.can.com \
 Internet: https://www.mac-can.com
