@@ -1,3 +1,4 @@
 .svn/
 CANAPI.h
-CANAPI_SerialCAN.h
+# we don't use the JSON files yet
+can_dev.?

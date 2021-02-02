@@ -377,7 +377,7 @@ int can_bitrate(int handle, can_bitrate_t *bitrate, can_speed_t *speed)
 }
 
 EXPORT
-int can_property(int handle, uint16_t param, void *value, uint32_t nbytes)
+int can_property(int handle, uint16_t param, void *value, uint32_t nbyte)
 {
     MacCAN_Return_t retVal = CMacCAN::FatalError;
 
@@ -388,7 +388,7 @@ int can_property(int handle, uint16_t param, void *value, uint32_t nbytes)
         return CANERR_HANDLE;
 
     // read a property value
-    retVal = canDevices[handle].GetProperty(param, value, nbytes);
+    retVal = canDevices[handle].GetProperty(param, value, nbyte);
 #if (OPTION_CANAPI_DEBUG_LEVEL != 0)
     fprintf(stdout, "CTouCAN[%i].GetProperty: returned %i\n", handle, retVal);
 #endif

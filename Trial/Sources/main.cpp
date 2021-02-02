@@ -72,6 +72,7 @@ int main(int argc, const char * argv[]) {
     int option_info = OPTION_NO;
     int option_stat = OPTION_NO;
     int option_test = OPTION_NO;
+    int option_exit = OPTION_NO;
     int option_echo = OPTION_YES;
 //    int option_stop = OPTION_NO;
 //    int option_check = OPTION_NO;
@@ -121,6 +122,7 @@ int main(int argc, const char * argv[]) {
         if (!strcmp(argv[i], "INFO")) option_info = OPTION_YES;
         if (!strcmp(argv[i], "STAT")) option_stat = OPTION_YES;
         if (!strcmp(argv[i], "TEST")) option_test = OPTION_YES;
+        if (!strcmp(argv[i], "EXIT")) option_exit = OPTION_YES;
         /* additional operation modes (bit field) */
         if (!strcmp(argv[i], "SHARED")) opMode.shrd = 1;
         if (!strcmp(argv[i], "MONITOR")) opMode.mon = 1;
@@ -183,6 +185,8 @@ int main(int argc, const char * argv[]) {
             fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_LIBRARY_VENDOR): value = '%s'\n", szVal);
         else
             fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_LIBRARY_VENDOR) returned %i\n", retVal);
+        if (option_exit && !option_test)
+            return 0;
     }
     if (option_test) {
         for (int32_t ch = 0; ch < 8; ch++) {
@@ -193,6 +197,8 @@ int main(int argc, const char * argv[]) {
                             (state == CTouCAN::ChannelNotAvailable) ? "not available" : "not testable");
             fprintf(stdout, "%s", (retVal == CMacCAN::IllegalParameter) ? " (waring: Op.-Mode not supported)\n" : "\n");
         }
+        if (option_exit)
+            return 0;
     }
     retVal = myDriver.InitializeChannel(channel, opMode);
     if (retVal != CMacCAN::NoError) {
