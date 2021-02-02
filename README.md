@@ -48,8 +48,8 @@ public:
     MacCAN_Return_t GetBitrate(MacCAN_Bitrate_t &bitrate);
     MacCAN_Return_t GetBusSpeed(MacCAN_BusSpeed_t &speed);
 
-    MacCAN_Return_t GetProperty(uint16_t param, void *value, uint32_t nbytes);
-    MacCAN_Return_t SetProperty(uint16_t param, const void *value, uint32_t nbytes);
+    MacCAN_Return_t GetProperty(uint16_t param, void *value, uint32_t nbyte);
+    MacCAN_Return_t SetProperty(uint16_t param, const void *value, uint32_t nbyte);
 
     char *GetHardwareVersion();  // (for compatibility reasons)
     char *GetFirmwareVersion();  // (for compatibility reasons)
