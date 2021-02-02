@@ -24,7 +24,7 @@
 ///
 /// \author      $Author: eris $
 ///
-/// \version     $Rev: 977 $
+/// \version     $Rev: 981 $
 ///
 /// \addtogroup  mac_can
 /// \{
@@ -67,7 +67,7 @@ MacCAN_Return_t CMacCAN::MapString2Bitrate(const char *string, MacCAN_Bitrate_t 
 
 EXPORT
 MacCAN_Return_t CMacCAN::MapBitrate2String(MacCAN_Bitrate_t bitrate, char *string, size_t length) {
-    (void) length;
+    (void)length;
     // TODO: rework function 'btr_bitrate2string'
     return (MacCAN_Return_t)btr_bitrate2string(&bitrate, false, (btr_string_t)string);
 }
