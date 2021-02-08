@@ -16,22 +16,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#include "TouCAN_Defines.h"
-#include "TouCAN.h"
-#include "Timer.h"
-
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <getopt.h>
-#include <signal.h>
-#include <errno.h>
-#include <time.h>
-
-#include <inttypes.h>
-
 #include "build_no.h"
 #define VERSION_MAJOR    0
 #define VERSION_MINOR    2
@@ -49,11 +33,7 @@
 #else
 #error Unsupported architecture
 #endif
-#ifdef _DEBUG
-static const char APPLICATION[] = "CAN Tester for Rusoku TouCAN USB Interfaces, Version " VERSION_STRING " _DEBUG";
-#else
 static const char APPLICATION[] = "CAN Tester for Rusoku TouCAN USB Interfaces, Version " VERSION_STRING;
-#endif
 static const char COPYRIGHT[]   = "Copyright (C) 2007,2020-2021 by Uwe Vogt, UV Software, Berlin";
 static const char WARRANTY[]    = "This program comes with ABSOLUTELY NO WARRANTY!\n\n" \
                                   "This is free software, and you are welcome to redistribute it\n" \
@@ -69,6 +49,28 @@ static const char LICENSE[]     = "This program is free software: you can redist
                                   "You should have received a copy of the GNU General Public License\n" \
                                   "along with this program.  If not, see <http://www.gnu.org/licenses/>.";
 #define basename(x)  "can_test" // FIXME: Where is my `basename' function?
+
+#include "TouCAN_Defines.h"
+#include "TouCAN.h"
+#include "Timer.h"
+
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <getopt.h>
+#include <signal.h>
+#include <errno.h>
+#include <time.h>
+
+#include <inttypes.h>
+
+#ifdef _MSC_VER
+//not #if defined(_WIN32) || defined(_WIN64) because we have strncasecmp in mingw
+#define strncasecmp _strnicmp
+#define strcasecmp _stricmp
+#endif
 
 #define RxMODE  (0)
 #define TxMODE  (1)
@@ -118,6 +120,8 @@ static void version(FILE *stream, const char *program);
 static const char *prompt[4] = {"-\b", "/\b", "|\b", "\\\b"};
 static volatile int running = 1;
 
+static CCanDriver canDriver = CCanDriver();
+
 // TODO: this code could be made more C++ alike
 int main(int argc, const char * argv[]) {
     int opt;
@@ -162,7 +166,6 @@ int main(int argc, const char * argv[]) {
         {"version", no_argument, &show_version, 1},
         {0, 0, 0, 0}
     };
-    CCanDriver canDriver = CCanDriver();
     MacCAN_Bitrate_t bitrate = {};
     bitrate.index = CANBTR_INDEX_250K;
     MacCAN_OpMode_t opMode = {};
@@ -176,7 +179,7 @@ int main(int argc, const char * argv[]) {
     (void)op;
 
     /* signal handler */
-    if((signal(SIGINT, sigterm) == SIG_ERR) ||
+    if ((signal(SIGINT, sigterm) == SIG_ERR) ||
 #if !defined(_WIN32) && !defined(_WIN64)
        (signal(SIGHUP, sigterm) == SIG_ERR) ||
 #endif
@@ -513,6 +516,11 @@ int main(int argc, const char * argv[]) {
         else if (dlc > 16) dlc = 0xB;
         else if (dlc > 12) dlc = 0xA;
         else if (dlc > 8) dlc = 0x9;
+    }
+    /* - check bit-timing index (n/a for CAN FD) */
+    if (opMode.fdoe && (bitrate.btr.frequency <= 0)) {
+        fprintf(stderr, "%s: illegal combination of options `--mode' (m) and `--bitrate'\n", basename(argv[0]));
+        return 1;
     }
 #endif
     /* - check operation mode flags */
@@ -977,7 +985,7 @@ uint64_t CCanDriver::ReceiverTest(bool checkCounter, uint64_t expectedNumber, bo
 static void sigterm(int signo)
 {
     //fprintf(stderr, "%s: got signal %d\n", __FILE__, signo);
-    //(void)canDriver.SignalChannel();
+    (void)canDriver.SignalChannel();
     running = 0;
     (void)signo;
 }

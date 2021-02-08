@@ -16,23 +16,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#include "TouCAN_Defines.h"
-#include "TouCAN.h"
-#include "Timer.h"
-#include "Message.h"
-
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <getopt.h>
-#include <signal.h>
-#include <errno.h>
-#include <time.h>
-
-#include <inttypes.h>
-
 #include "build_no.h"
 #define VERSION_MAJOR    0
 #define VERSION_MINOR    2
@@ -50,11 +33,7 @@
 #else
 #error Unsupported architecture
 #endif
-#ifdef _DEBUG
-static const char APPLICATION[] = "CAN Monitor for Rusoku TouCAN USB Interfaces, Version " VERSION_STRING " _DEBUG";
-#else
 static const char APPLICATION[] = "CAN Monitor for Rusoku TouCAN USB Interfaces, Version " VERSION_STRING;
-#endif
 static const char COPYRIGHT[]   = "Copyright (C) 2007,2020-2021 by Uwe Vogt, UV Software, Berlin";
 static const char WARRANTY[]    = "This program comes with ABSOLUTELY NO WARRANTY!\n\n" \
                                   "This is free software, and you are welcome to redistribute it\n" \
@@ -71,7 +50,30 @@ static const char LICENSE[]     = "This program is free software: you can redist
                                   "along with this program.  If not, see <http://www.gnu.org/licenses/>.";
 #define basename(x)  "can_moni" // FIXME: Where is my `basename' function?
 
-#define MAX_ID      (CAN_MAX_STD_ID + 1)
+#include "TouCAN_Defines.h"
+#include "TouCAN.h"
+#include "Timer.h"
+#include "Message.h"
+
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <getopt.h>
+#include <signal.h>
+#include <errno.h>
+#include <time.h>
+
+#include <inttypes.h>
+
+#ifdef _MSC_VER
+//not #if defined(_WIN32) || defined(_WIN64) because we have strncasecmp in mingw
+#define strncasecmp _strnicmp
+#define strcasecmp _stricmp
+#endif
+
+#define MAX_ID  (CAN_MAX_STD_ID + 1)
 
 static int get_exclusion(const char *arg);  // TODO: make it a member function
 
@@ -113,10 +115,11 @@ static void sigterm(int signo);
 static void usage(FILE *stream, const char *program);
 static void version(FILE *stream, const char *program);
 
-static volatile int running = 1;
-
 static int can_id[MAX_ID];
 static int can_id_xtd = 1;
+static volatile int running = 1;
+
+static CCanDriver canDriver = CCanDriver();
 
 // TODO: this code could be made more C++ alike
 int main(int argc, const char * argv[]) {
@@ -132,7 +135,7 @@ int main(int argc, const char * argv[]) {
     int exclude = 0;
 //    char *script_file = NULL;
     int verbose = 0;
-    int num_boards;
+    int num_boards = 0;
     int show_version = 0;
     char *device, *firmware, *software, *library;
     struct option long_options[] = {
@@ -159,7 +162,6 @@ int main(int argc, const char * argv[]) {
         {"version", no_argument, &show_version, 1},
         {0, 0, 0, 0}
     };
-    CCanDriver canDriver = CCanDriver();
     MacCAN_Bitrate_t bitrate = {};
     bitrate.index = CANBTR_INDEX_250K;
     MacCAN_OpMode_t opMode = {};
@@ -184,7 +186,7 @@ int main(int argc, const char * argv[]) {
         can_id[i] = 1;
     }
     /* signal handler */
-    if((signal(SIGINT, sigterm) == SIG_ERR) ||
+    if ((signal(SIGINT, sigterm) == SIG_ERR) ||
 #if !defined(_WIN32) && !defined(_WIN64)
        (signal(SIGHUP, sigterm) == SIG_ERR) ||
 #endif
@@ -511,6 +513,13 @@ int main(int argc, const char * argv[]) {
         fprintf(stderr, "%s: illegal argument `%s'\n", basename(argv[0]), argv[optind]);
         return 1;
     }
+#if (OPTION_CAN_2_0_ONLY == 0)
+    /* - check bit-timing index (n/a for CAN FD) */
+    if (opMode.fdoe && (bitrate.btr.frequency <= 0)) {
+        fprintf(stderr, "%s: illegal combination of options `--mode' (m) and `--bitrate'\n", basename(argv[0]));
+        return 1;
+    }
+#endif
     /* CAN Monitor for Rusoku TouCAN interfaces */
     fprintf(stdout, "%s\n%s\n\n%s\n\n", APPLICATION, COPYRIGHT, WARRANTY);
     /* - load the MacCAN driver */
@@ -810,7 +819,7 @@ static int get_exclusion(const char *arg)
 static void sigterm(int signo)
 {
     //fprintf(stderr, "%s: got signal %d\n", __FILE__, signo);
-    //(void)canDriver.SignalChannel();
+    (void)canDriver.SignalChannel();
     running = 0;
     (void)signo;
 }
