@@ -247,7 +247,7 @@ MacCAN_Return_t CTouCAN::SignalChannel() {
     // (§) CAN interface must be initialized
     if (m_hDevice != CANUSB_INVALID_HANDLE) {
         // TODO: signal all waitable objects
-        retVal = CMacCAN::NotSupported;
+        retVal = CANQUE_Signal(m_pTouCAN->m_ReceiveData.m_MsgQueue);
     }
     return retVal;
 }

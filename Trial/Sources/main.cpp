@@ -455,10 +455,10 @@ static void verbose(const can_mode_t mode, const can_bitrate_t bitrate, const ca
 static void sigterm(int signo) {
     //fprintf(stderr, "%s: got signal %d\n", __FILE__, signo);
     // FIXME: leads into a deadlock
-//    (void)myDriver.SignalChannel();
-//#ifdef SECOND_CHANNEL
-//    (void)mySecond.SignalChannel();
-//#endif
+    (void)myDriver.SignalChannel();
+#ifdef SECOND_CHANNEL
+    (void)mySecond.SignalChannel();
+#endif
     running = 0;
     (void)signo;
 }

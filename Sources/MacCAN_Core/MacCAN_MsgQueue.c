@@ -1,7 +1,7 @@
 /*
  *  MacCAN - macOS User-Space Driver for USB-to-CAN Interfaces
  *
- *  Copyright (C) 2012-2020  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+ *  Copyright (C) 2012-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
  *  This file is part of MacCAN-Core.
  *
@@ -39,8 +39,8 @@
 #define ENTER_CRITICAL_SECTION(queue)  assert(0 == pthread_mutex_lock(&queue->wait.mutex))
 #define LEAVE_CRITICAL_SECTION(queue)  assert(0 == pthread_mutex_unlock(&queue->wait.mutex))
 
-#define SIGNAL_WAIT_CONDITION(queue)  do{ queue->wait.flag = true; \
-                                          assert(0 == pthread_cond_signal(&queue->wait.cond)); } while(0)
+#define SIGNAL_WAIT_CONDITION(queue,flg)  do{ queue->wait.flag = flg; \
+                                               assert(0 == pthread_cond_signal(&queue->wait.cond)); } while(0)
 #define WAIT_CONDITION_INFINITE(queue,res)  do{ queue->wait.flag = false; \
                                                 res = pthread_cond_wait(&queue->wait.cond, &queue->wait.mutex); } while(0)
 #define WAIT_CONDITION_TIMEOUT(queue,abstime,res)  do{ queue->wait.flag = false; \
@@ -99,7 +99,7 @@ CANQUE_Return_t CANQUE_Signal(CANQUE_MsgQueue_t msgQueue) {
     
     if (msgQueue) {
         ENTER_CRITICAL_SECTION(msgQueue);
-        SIGNAL_WAIT_CONDITION(msgQueue);
+        SIGNAL_WAIT_CONDITION(msgQueue, false);
         LEAVE_CRITICAL_SECTION(msgQueue);
         retVal = CANUSB_SUCCESS;
     } else {
@@ -114,7 +114,7 @@ CANQUE_Return_t CANQUE_Enqueue(CANQUE_MsgQueue_t msgQueue, void const *message/*
     if (message && msgQueue) {
         ENTER_CRITICAL_SECTION(msgQueue);
         if (EnqueueElement(msgQueue, message)) {
-            SIGNAL_WAIT_CONDITION(msgQueue);
+            SIGNAL_WAIT_CONDITION(msgQueue, true);
             retVal = CANUSB_SUCCESS;
         } else {
             retVal = CANUSB_ERROR_FULL;
@@ -237,5 +237,5 @@ static Boolean DequeueElement(CANQUE_MsgQueue_t queue, void *element) {
         return false;
 }
 
-/* * $Id: MacCAN_MsgQueue.c 979 2021-01-04 20:16:55Z eris $ *** (C) UV Software, Berlin ***
+/* * $Id: MacCAN_MsgQueue.c 983 2021-02-08 09:45:23Z eris $ *** (C) UV Software, Berlin ***
  */
