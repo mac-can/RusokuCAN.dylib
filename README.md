@@ -132,6 +132,7 @@ Type `can_test --help` to display all program options.
 ### CAN Hardware
 
 - TouCAN USB (Model F4FS1, Hardware 1.0.0, Firmware 1.0.1)
+- TouCAN USB (Model F4FS1, Hardware 1.0.0, Firmware 1.0.4)
 
 ## Known Bugs and Caveats
 
