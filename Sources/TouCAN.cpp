@@ -507,31 +507,31 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
 
     switch (param) {
         case TOUCAN_PROPERTY_CANAPI:
-            if ((size_t)nbyte == sizeof(uint16_t)) {
+            if ((size_t)nbyte >= sizeof(uint16_t)) {
                 *(uint16_t*)value = (uint16_t)CAN_API_SPEC;
                 retVal = CMacCAN::NoError;
             }
             break;
         case TOUCAN_PROPERTY_VERSION:
-            if ((size_t)nbyte == sizeof(uint16_t)) {
+            if ((size_t)nbyte >= sizeof(uint16_t)) {
                 *(uint16_t*)value = ((uint16_t)VERSION_MAJOR << 8) | (uint16_t)VERSION_MINOR;
                 retVal = CMacCAN::NoError;
             }
             break;
         case TOUCAN_PROPERTY_PATCH_NO:
-            if ((size_t)nbyte == sizeof(uint8_t)) {
+            if ((size_t)nbyte >= sizeof(uint8_t)) {
                 *(uint8_t*)value = (uint8_t)VERSION_PATCH;
                 retVal = CMacCAN::NoError;
             }
             break;
         case TOUCAN_PROPERTY_BUILD_NO:
-            if ((size_t)nbyte == sizeof(uint32_t)) {
+            if ((size_t)nbyte >= sizeof(uint32_t)) {
                 *(uint32_t*)value = (uint32_t)VERSION_BUILD;
                 retVal = CMacCAN::NoError;
             }
             break;
         case TOUCAN_PROPERTY_LIBRARY_ID:
-            if ((size_t)nbyte == sizeof(int32_t)) {
+            if ((size_t)nbyte >= sizeof(int32_t)) {
                 *(int32_t*)value = (int32_t)TOUCAN_LIBRARY_ID;
                 retVal = CMacCAN::NoError;
             }
@@ -553,7 +553,7 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
             if (m_hDevice != CANUSB_INVALID_HANDLE) {
                 switch (param) {
                     case TOUCAN_PROPERTY_DEVICE_TYPE:
-                        if ((size_t)nbyte == sizeof(int32_t)) {
+                        if ((size_t)nbyte >= sizeof(int32_t)) {
                             *(int32_t*)value = (int32_t)TOUCAN_USB_DEVICE_TYPE;
                             retVal = CMacCAN::NoError;
                         }
@@ -577,13 +577,13 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                         }
                         break;
                     case TOUCAN_PROPERTY_OP_CAPABILITY:
-                        if ((size_t)nbyte == sizeof(uint8_t)) {
+                        if ((size_t)nbyte >= sizeof(uint8_t)) {
                             *(uint8_t*)value = (uint8_t)SUPPORTED_OP_MODE;
                             retVal = CMacCAN::NoError;
                         }
                         break;
                     case TOUCAN_PROPERTY_OP_MODE:
-                        if ((size_t)nbyte == sizeof(uint8_t)) {
+                        if ((size_t)nbyte >= sizeof(uint8_t)) {
                             *(uint8_t*)value = (uint8_t)m_OpMode.byte;
                             retVal = CMacCAN::NoError;
                         }
@@ -591,7 +591,7 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                     case TOUCAN_PROPERTY_BITRATE:
                         MacCAN_Bitrate_t bitrate;
                         if ((retVal = GetBitrate(bitrate)) == CANERR_NOERROR) {
-                            if (nbyte == sizeof(MacCAN_Bitrate_t)) {
+                            if ((size_t)nbyte >= sizeof(MacCAN_Bitrate_t)) {
                                 memcpy(value, &bitrate, sizeof(MacCAN_Bitrate_t));
                                 retVal = CMacCAN::NoError;
                             }
@@ -600,7 +600,7 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                     case TOUCAN_PROPERTY_SPEED:
                         MacCAN_BusSpeed_t speed;
                         if ((retVal = GetBusSpeed(speed)) == CANERR_NOERROR) {
-                            if (nbyte == sizeof(MacCAN_BusSpeed_t)) {
+                            if ((size_t)nbyte >= sizeof(MacCAN_BusSpeed_t)) {
                                 memcpy(value, &speed, sizeof(MacCAN_BusSpeed_t));
                                 retVal = CMacCAN::NoError;
                             }
@@ -609,7 +609,7 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                     case TOUCAN_PROPERTY_STATUS:
                         MacCAN_Status_t status;
                         if ((retVal = GetStatus(status)) == CANERR_NOERROR) {
-                            if ((size_t)nbyte == sizeof(uint8_t)) {
+                            if ((size_t)nbyte >= sizeof(uint8_t)) {
                                 *(uint8_t*)value = (uint8_t)status.byte;
                                 retVal = CMacCAN::NoError;
                             }
@@ -618,32 +618,32 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                     case TOUCAN_PROPERTY_BUSLOAD:
                         uint8_t load;
                         if ((retVal = GetBusLoad(load)) == CANERR_NOERROR) {
-                            if ((size_t)nbyte == sizeof(uint8_t)) {
+                            if ((size_t)nbyte >= sizeof(uint8_t)) {
                                 *(uint8_t*)value = (uint8_t)load;
                                 retVal = CMacCAN::NoError;
                             }
                         }
                         break;
                     case TOUCAN_PROPERTY_TX_COUNTER:
-                        if ((size_t)nbyte == sizeof(uint64_t)) {
+                        if ((size_t)nbyte >= sizeof(uint64_t)) {
                             *(uint64_t*)value = (uint64_t)m_Counter.u64TxMessages;
                             retVal = CMacCAN::NoError;
                         }
                         break;
                     case TOUCAN_PROPERTY_RX_COUNTER:
-                        if ((size_t)nbyte == sizeof(uint64_t)) {
+                        if ((size_t)nbyte >= sizeof(uint64_t)) {
                             *(uint64_t*)value = (uint64_t)m_Counter.u64RxMessages;
                             retVal = CMacCAN::NoError;
                         }
                         break;
                     case TOUCAN_PROPERTY_ERR_COUNTER:
-                        if ((size_t)nbyte == sizeof(uint64_t)) {
+                        if ((size_t)nbyte >= sizeof(uint64_t)) {
                             *(uint64_t*)value = (uint64_t)m_Counter.u64ErrorFrames;
                             retVal = CMacCAN::NoError;
                         }
                         break;
                     case TOUCAN_PROPERTY_CLOCK_DOMAIN:
-                        if ((size_t)nbyte == sizeof(int32_t)) {
+                        if ((size_t)nbyte >= sizeof(int32_t)) {
                             *(int32_t*)value = (int32_t)TOUCAN_USB_CLOCK_DOMAIN;
                             retVal = CMacCAN::NoError;
                         }
@@ -651,7 +651,7 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                     case TOUCAN_PROPERTY_HARDWARE_VERSION:
                         uint32_t hardware;
                         if ((retVal = TouCAN_get_hardware_version(m_hDevice, &hardware)) == CANERR_NOERROR) {
-                            if ((size_t)nbyte == sizeof(uint32_t)) {
+                            if ((size_t)nbyte >= sizeof(uint32_t)) {
                                 *(uint32_t*)value = (uint32_t)hardware;
                                 retVal = CMacCAN::NoError;
                             }
@@ -660,7 +660,7 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                     case TOUCAN_PROPERTY_FIRMWARE_VERSION:
                         uint32_t firmware;
                         if ((retVal = TouCAN_get_firmware_version(m_hDevice, &firmware)) == CANERR_NOERROR) {
-                            if ((size_t)nbyte == sizeof(uint32_t)) {
+                            if ((size_t)nbyte >= sizeof(uint32_t)) {
                                 *(uint32_t*)value = (uint32_t)firmware;
                                 retVal = CMacCAN::NoError;
                             }
@@ -669,7 +669,7 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                     case TOUCAN_PROPERTY_BOOTLOADER_VERSION:
                         uint32_t bootloader;
                         if ((retVal = TouCAN_get_bootloader_version(m_hDevice, &bootloader)) == CANERR_NOERROR) {
-                            if ((size_t)nbyte == sizeof(uint32_t)) {
+                            if ((size_t)nbyte >= sizeof(uint32_t)) {
                                 *(uint32_t*)value = (uint32_t)bootloader;
                                 retVal = CMacCAN::NoError;
                             }
@@ -678,7 +678,7 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                     case TOUCAN_PROPERTY_SERIAL_NUMBER:
                         uint32_t serial_no;
                         if ((retVal = TouCAN_get_serial_number(m_hDevice, &serial_no)) == CANERR_NOERROR) {
-                            if ((size_t)nbyte == sizeof(uint32_t)) {
+                            if ((size_t)nbyte >= sizeof(uint32_t)) {
                                 *(uint32_t*)value = (uint32_t)serial_no;
                                 retVal = CMacCAN::NoError;
                             }
@@ -687,7 +687,7 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                     case TOUCAN_PROPERTY_VID_PID:
                         uint32_t vid_pid;
                         if ((retVal = TouCAN_get_vid_pid(m_hDevice, &vid_pid)) == CANERR_NOERROR) {
-                            if ((size_t)nbyte == sizeof(uint32_t)) {
+                            if ((size_t)nbyte >= sizeof(uint32_t)) {
                                 *(uint32_t*)value = (uint32_t)vid_pid;
                                 retVal = CMacCAN::NoError;
                             }
@@ -696,7 +696,7 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                     case TOUCAN_PROPERTY_DEVICE_ID:
                         uint32_t device_id;
                         if ((retVal = TouCAN_get_device_id(m_hDevice, &device_id)) == CANERR_NOERROR) {
-                            if ((size_t)nbyte == sizeof(uint32_t)) {
+                            if ((size_t)nbyte >= sizeof(uint32_t)) {
                                 *(uint32_t*)value = (uint32_t)device_id;
                                 retVal = CMacCAN::NoError;
                             }
