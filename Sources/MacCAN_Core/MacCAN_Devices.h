@@ -1,5 +1,5 @@
 /*
- *  MacCAN - macOS User-Space Driver for CAN to USB Interfaces
+ *  MacCAN - macOS User-Space Driver for USB-to-CAN Interfaces
  *
  *  Copyright (C) 2012-2020  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
@@ -21,19 +21,15 @@
 #ifndef MACCAN_DEVICES_H_INCLUDED
 #define MACCAN_DEVICES_H_INCLUDED
 
-#include "MacCAN.h"
+#include "MacCAN_Common.h"
 
-#include <MacTypes.h>
+#define CANDEV_LAST_ENTRY_IN_DEVICE_LIST  {0xFFFFU, 0xFFFFU, 0U}
 
-#ifndef MACCAN_H_INCLUDED
-/* Hmm, that's pretty fragile! */
 typedef struct can_device_t_ {
     UInt16 vendorId;
     UInt16 productId;
-} CANDEV_Device_t;
-#else
-typedef MacCAN_Device_t CANDEV_Device_t;
-#endif
+    UInt8 numChannels;
+} CANDEV_Device_t, MacCAN_Device_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,3 +45,6 @@ extern const CANDEV_Device_t *CANDEV_GetDeviceById(UInt16 vendorId, UInt16 produ
 }
 #endif
 #endif /* MACCAN_DEVICES_H_INCLUDED */
+
+/* * $Id: MacCAN_Devices.h 969 2020-12-27 15:56:48Z eris $ *** (C) UV Software, Berlin ***
+ */

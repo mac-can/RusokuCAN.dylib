@@ -1,7 +1,7 @@
 //
 //  TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Interfaces
 //
-//  Copyright (C) 2020  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+//  Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
 //
 //  This file is part of MacCAN-TouCAN.
 //
@@ -26,11 +26,15 @@
 /// \name   TouCAN
 /// \brief  TouCAN dynamic library
 /// \{
-#define TOUCAN_LIBRARY_ID  (int32_t)500
+#define TOUCAN_LIBRARY_ID  CANLIB_RUSOKU_LT
+#if (OPTION_CANAPI_TOUCAN_DYLIB != 0)
+#define TOUCAN_LIBRARY_NAME  CANDLL_RUSOKU_LT
+#else
 #define TOUCAN_LIBRARY_NAME  "libTouCAN.dylib"
+#endif
 #define TOUCAN_LIBRARY_VENDOR  "UV Software, Berlin"
 #define TOUCAN_LIBRARY_LICENSE  "GNU General Public License, Version 3"
-#define TOUCAN_LIBRARY_COPYRIGHT  "Copyright (C) 2020  Uwe Vogt, UV Software, Berlin"
+#define TOUCAN_LIBRARY_COPYRIGHT  "Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin"
 #define TOUCAN_LIBRARY_HAZARD_NOTE  "If you connect your CAN device to a real CAN network when using this library,\n" \
                                     "you might damage your application."
 /// \}
@@ -68,6 +72,7 @@ public:
 
     MacCAN_Return_t InitializeChannel(int32_t channel, MacCAN_OpMode_t opMode, const void *param = NULL);
     MacCAN_Return_t TeardownChannel();
+    MacCAN_Return_t SignalChannel();
 
     MacCAN_Return_t StartController(MacCAN_Bitrate_t bitrate);
     MacCAN_Return_t ResetController();
@@ -81,13 +86,13 @@ public:
     MacCAN_Return_t GetBitrate(MacCAN_Bitrate_t &bitrate);
     MacCAN_Return_t GetBusSpeed(MacCAN_BusSpeed_t &speed);
 
-    MacCAN_Return_t GetProperty(uint16_t param, void *value, uint32_t nbytes);
-    MacCAN_Return_t SetProperty(uint16_t param, const void *value, uint32_t nbytes);
+    MacCAN_Return_t GetProperty(uint16_t param, void *value, uint32_t nbyte);
+    MacCAN_Return_t SetProperty(uint16_t param, const void *value, uint32_t nbyte);
 
     char *GetHardwareVersion();  // (for compatibility reasons)
     char *GetFirmwareVersion();  // (for compatibility reasons)
     static char *GetVersion();  // (for compatibility reasons)
-    
+
     // note: we have vendor-specific bit-timing (clock domain is 50MHz)
     static MacCAN_Return_t MapIndex2Bitrate(int32_t index, MacCAN_Bitrate_t &bitrate);
 };
@@ -105,6 +110,7 @@ public:
 #define TOUCAN_PROPERTY_LIBRARY_VENDOR      (CANPROP_GET_LIBRARY_VENDOR)
 #define TOUCAN_PROPERTY_DEVICE_TYPE         (CANPROP_GET_DEVICE_TYPE)
 #define TOUCAN_PROPERTY_DEVICE_NAME         (CANPROP_GET_DEVICE_NAME)
+#define TOUCAN_PROPERTY_DEVICE_DRIVER       (CANPROP_GET_DEVICE_DLLNAME)
 #define TOUCAN_PROPERTY_DEVICE_VENDOR       (CANPROP_GET_DEVICE_VENDOR)
 #define TOUCAN_PROPERTY_OP_CAPABILITY       (CANPROP_GET_OP_CAPABILITY)
 #define TOUCAN_PROPERTY_OP_MODE             (CANPROP_GET_OP_MODE)

@@ -1,7 +1,7 @@
 //
 //  TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Interfaces
 //
-//  Copyright (C) 2020  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+//  Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
 //
 //  This file is part of MacCAN-TouCAN.
 //
@@ -18,36 +18,33 @@
 //  You should have received a copy of the GNU General Public License
 //  along with MacCAN-TouCAN.  If not, see <https://www.gnu.org/licenses/>.
 //
+#include "build_no.h"
+#define VERSION_MAJOR    0
+#define VERSION_MINOR    2
+#define VERSION_PATCH    0
+#define VERSION_BUILD    BUILD_NO
+#define VERSION_STRING   TOSTRING(VERSION_MAJOR) "." TOSTRING(VERSION_MINOR) "." TOSTRING(VERSION_PATCH) " (" TOSTRING(BUILD_NO) ")"
+#if defined(_WIN64)
+#define PLATFORM        "x64"
+#elif defined(_WIN32)
+#define PLATFORM        "x86"
+#elif defined(__linux__)
+#define PLATFORM        "Linux"
+#elif defined(__APPLE__)
+#define PLATFORM        "macOS"
+#else
+#error Unsupported architecture
+#endif
+static const char version[] = PLATFORM " Driver for Rusoku TouCAN USB Interfaces, Version " VERSION_STRING;
+
 #include "TouCAN.h"
 #include "TouCAN_USB.h"
-#include "MacCAN_Debug.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
 #include <unistd.h>
 #include <time.h>
-
-#include "build_no.h"
-#define VERSION_MAJOR     0
-#define VERSION_MINOR     1
-#define VERSION_PATCH     1
-#define VERSION_BUILD     BUILD_NO
-#define VERSION_STRING    TOSTRING(VERSION_MAJOR) "." TOSTRING(VERSION_MINOR) "." TOSTRING(VERSION_PATCH) " (" TOSTRING(BUILD_NO) ")"
-#if defined(_WIN64)
-#define PLATFORM    "x64"
-#elif defined(_WIN32)
-#define PLATFORM    "x86"
-#elif defined(__linux__)
-#define PLATFORM    "Linux"
-#elif defined(__APPLE__)
-#define PLATFORM    "macOS"
-#elif defined(__MINGW32__)
-#define PLATFORM    "MinGW"
-#else
-#error Unsupported architecture
-#endif
-static const char version[] = PLATFORM " Driver for Rusoku TouCAN USB Interfaces, Version " VERSION_STRING;
 
 #if (OPTION_TOUCAN_DYLIB != 0)
 __attribute__((constructor))
@@ -71,25 +68,18 @@ static void _finalizer() {
 #define SUPPORTED_OP_MODE  (CANMODE_DEFAULT | CANMODE_MON | CANMODE_ERR /* TODO: | CANMODE_NXTD | CANMODE_NRTR*/)
 #define ASYNCHRONOUS_READ
 
-const MacCAN_Device_t MacCAN_Devices[] = {
-    {RUSOKU_VENDOR_ID, RUSOKU_TOUCAN_USB_ID},
-    {0xFFFFU, 0xFFFFU}
-};
-
 struct CTouCAN::STouCAN {
     // attributes
     uint16_t m_u16VendorId;  ///< vendor id.
     uint16_t m_u16ProductId;  ///< product id.
-    TouCAN_MsgParam_t m_MsgParam;  ///< time synchronization
-    CANUSB_UsbPipe_t m_ReceivePipe;  ///< USB reception pipe
-//    CANUSB_UsbPipe_t m_TransmitPipe;  ///< USB transmission pipe
+    TouCAN_ReceiveData_t m_ReceiveData;  ///< CAN reception data
+    TouCAN_ReceivePipe_t m_ReceivePipe;  ///< USB reception pipe
     // constructor
     STouCAN() {
         m_u16VendorId = RUSOKU_VENDOR_ID;
         m_u16ProductId = RUSOKU_TOUCAN_USB_ID;
-        bzero(&m_MsgParam, sizeof(TouCAN_MsgParam_t));
-        bzero(&m_ReceivePipe, sizeof(CANUSB_UsbPipe_t));
-//        bzero(&m_TransmitPipe, sizeof(CANUSB_UsbPipe_t));
+        bzero(&m_ReceiveData, sizeof(TouCAN_ReceiveData_t));
+        m_ReceivePipe = NULL;
     }
 };
 
@@ -126,8 +116,8 @@ EXPORT
 MacCAN_Return_t CTouCAN::ProbeChannel(int32_t channel, MacCAN_OpMode_t opMode, const void *param, EChannelState &state) {
     MacCAN_Return_t retVal = CMacCAN::NoError;
 
-    if (CANUSB_IsDevicePresent((MacCAN_Handle_t)channel)) {
-        if (CANUSB_IsDeviceOpened((MacCAN_Handle_t)channel))
+    if (CANUSB_IsDevicePresent((CANUSB_Index_t)channel)) {
+        if (CANUSB_IsDeviceOpened((CANUSB_Index_t)channel))
             state = CMacCAN::ChannelOccupied;
         else
             state = CMacCAN::ChannelAvailable;
@@ -150,60 +140,55 @@ MacCAN_Return_t CTouCAN::InitializeChannel(int32_t channel, MacCAN_OpMode_t opMo
 
     // (§) CAN interface must not be initialized
     if (m_hDevice == CANUSB_INVALID_HANDLE) {
-        // (1) range limitation (channel is UInt8 on MacCAN IOUsbKit)
-        if ((channel < 0) || (255 < channel)) {
-            MACCAN_DEBUG_ERROR("+++ TouCAN: invalid channel number (%i)\n", channel);
-            retVal = CMacCAN::IllegalParameter;
-            goto error_initialize;
-        }
-        // (2) check if requested operation mode is supported
+        // (1) check if requested operation mode is supported
         if ((opMode.byte & (uint8_t)(~SUPPORTED_OP_MODE)) != 0) {
             MACCAN_DEBUG_ERROR("+++ TouCAN: unsupported operation mode (%02x)\n", opMode);
             retVal = CMacCAN::NotSupported;
             goto error_initialize;
         }
-        // (3) open a MacCAN device (returns a device handle on success)
-        m_hDevice = CANUSB_OpenDevice(m_pTouCAN->m_u16VendorId, m_pTouCAN->m_u16ProductId, (uint8_t)channel);
+        // (2) open a MacCAN device (returns a device handle on success)
+        m_hDevice = CANUSB_OpenDevice((CANUSB_Index_t)channel, m_pTouCAN->m_u16VendorId, m_pTouCAN->m_u16ProductId);
         if (m_hDevice == CANUSB_INVALID_HANDLE) {
             retVal = CMacCAN::NotInitialized;
             goto error_initialize;
         }
-        // (4.a) create a MacCAN pipe context for reception
-        retVal = CANUSB_CreatePipe(&m_pTouCAN->m_ReceivePipe, TOUCAN_USB_RX_DATA_PIPE_SIZE, TOUCAN_USB_RCV_QUEUE_SIZE, sizeof(MacCAN_Message_t));
-        if (retVal != CANERR_NOERROR) {
+        // (3.a) create a MacCAN pipe context for reception
+        m_pTouCAN->m_ReceivePipe = CANUSB_CreatePipeAsync(m_hDevice, TOUCAN_USB_RX_DATA_PIPE_REF, TOUCAN_USB_RX_DATA_PIPE_SIZE);
+        if (m_pTouCAN->m_ReceivePipe == NULL) {
             (void) CANUSB_CloseDevice(m_hDevice);
             m_hDevice = CANUSB_INVALID_HANDLE;
+            retVal = CMacCAN::ResourceError;
             goto error_initialize;
         }
-        // (4.b) create a MacCAN pipe context for transmission
-#if (0)
-        retVal = CANUSB_CreatePipe(&m_pTouCAN->m_TransmitPipe, TOUCAN_USB_TX_DATA_PIPE_SIZE, TOUCAN_USB_TRM_QUEUE_SIZE, sizeof(MacCAN_Message_t));
-        if (retVal != CANERR_NOERROR) {
-            (void) CANUSB_DestroyPipe(&m_pTouCAN->m_ReceivePipe);
+        // (3.b) create a MacCAN message queue for reception
+        m_pTouCAN->m_ReceiveData.m_MsgQueue = CANQUE_Create(TOUCAN_USB_RCV_QUEUE_SIZE, sizeof(MacCAN_Message_t));
+        if (m_pTouCAN->m_ReceiveData.m_MsgQueue == NULL) {
+            (void) CANUSB_DestroyPipeAsync(m_pTouCAN->m_ReceivePipe);
             (void) CANUSB_CloseDevice(m_hDevice);
             m_hDevice = CANUSB_INVALID_HANDLE;
+            retVal = CMacCAN::ResourceError;
             goto error_initialize;
         }
-#endif
-        // (5) initialize the CAN controller
+        // (4) initialize the CAN controller
         MACCAN_DEBUG_DRIVER("    Initializing Rusoku TouCAN USB driver...\n");
         // (!) initialize the TouCAN device (reset it before)
         m_Status.byte = CANSTAT_RESET;
         retVal = TouCAN_InitializeInterface(m_hDevice);
         if (retVal != CANERR_NOERROR) {
-//            (void) CANUSB_DestroyPipe(&m_pTouCAN->m_TransmitPipe);
-            (void) CANUSB_DestroyPipe(&m_pTouCAN->m_ReceivePipe);
+            (void) CANQUE_Destroy(m_pTouCAN->m_ReceiveData.m_MsgQueue);
+            (void) CANUSB_DestroyPipeAsync(m_pTouCAN->m_ReceivePipe);
             (void) CANUSB_CloseDevice(m_hDevice);
             m_hDevice = CANUSB_INVALID_HANDLE;
             goto error_initialize;
         }
-        // (6) start the MacCAN reception loop
+        // (5) start the MacCAN reception loop
 #ifndef SYNCHRONOUS_READ
-        retVal = TouCAN_StartReception(m_hDevice, &m_pTouCAN->m_ReceivePipe, &m_pTouCAN->m_MsgParam);
+        retVal = TouCAN_StartReception(m_pTouCAN->m_ReceivePipe, &m_pTouCAN->m_ReceiveData);
         if (retVal != CANERR_NOERROR) {
             (void) TouCAN_deinit(m_hDevice);
-//            (void) CANUSB_DestroyPipe(&m_pTouCAN->m_TransmitPipe);
-            (void) CANUSB_DestroyPipe(&m_pTouCAN->m_ReceivePipe);
+            (void) CANQUE_Destroy(m_pTouCAN->m_ReceiveData.m_MsgQueue);
+            (void) CANUSB_DestroyPipeAsync(m_pTouCAN->m_ReceivePipe);
+            (void) CANUSB_CloseDevice(m_hDevice);
             (void) CANUSB_CloseDevice(m_hDevice);
             m_hDevice = CANUSB_INVALID_HANDLE;
             goto error_initialize;
@@ -226,34 +211,44 @@ MacCAN_Return_t CTouCAN::TeardownChannel() {
     if (m_hDevice != CANUSB_INVALID_HANDLE) {
         (void) ResetController(); // m_Status.can_stopped := 1
         MACCAN_DEBUG_DRIVER("    Teardown Rusoku TouCAN USB driver...\n");
-        // (6) stop the MacCAN reception loop
-        retVal = TouCAN_AbortReception(m_hDevice);
+        // (5) stop the MacCAN reception loop
+        retVal = TouCAN_AbortReception(m_pTouCAN->m_ReceivePipe);
         if (retVal != CANERR_NOERROR)
             goto error_teardown;
         // (!) wait a minute!
         usleep(54945U);
-        // (5) de-initialize the CAN controller
+        // (4) de-initialize the CAN controller
         retVal = TouCAN_TeardownInterface(m_hDevice);
         if (retVal != CANERR_NOERROR)
             goto error_teardown;
-        // (4.b) destroy the MacCAN pipe context for transmission
-#if (0)
-        retVal = CANUSB_DestroyPipe(&m_pTouCAN->m_TransmitPipe);
+        // (3.a) destroy the MacCAN pipe context for reception
+        retVal = CANUSB_DestroyPipeAsync(m_pTouCAN->m_ReceivePipe);
         if (retVal != CANERR_NOERROR)
             goto error_teardown;
-#endif
-        // (4.a) destroy the MacCAN pipe context for transmission
-        retVal = CANUSB_DestroyPipe(&m_pTouCAN->m_ReceivePipe);
+        // (3.b) destroy the MacCAN message queue for reception
+        retVal = CANQUE_Destroy(m_pTouCAN->m_ReceiveData.m_MsgQueue);
         if (retVal != CANERR_NOERROR)
             goto error_teardown;
-        // (3) close the MacCAN device
+        // (2) close the MacCAN device
         retVal = CANUSB_CloseDevice(m_hDevice);
         if (retVal != CANERR_NOERROR)
             goto error_teardown;
-        // :-( invalidate the device handle
+        // (1) invalidate the device handle
         m_hDevice = CANUSB_INVALID_HANDLE;
     }
 error_teardown:
+    return retVal;
+}
+
+EXPORT
+MacCAN_Return_t CTouCAN::SignalChannel() {
+    MacCAN_Return_t retVal = CMacCAN::NotInitialized;
+
+    // (§) CAN interface must be initialized
+    if (m_hDevice != CANUSB_INVALID_HANDLE) {
+        // TODO: signal all waitable objects
+        retVal = CANQUE_Signal(m_pTouCAN->m_ReceiveData.m_MsgQueue);
+    }
     return retVal;
 }
 
@@ -286,9 +281,9 @@ MacCAN_Return_t CTouCAN::StartController(MacCAN_Bitrate_t bitrate) {
             m_Counter.u64TxMessages = 0U;
             m_Counter.u64RxMessages = 0U;
             m_Counter.u64ErrorFrames = 0U;
-            m_pTouCAN->m_MsgParam.m_u8StatusByte = 0x00U;
-            (void) CANUSB_ResetQueue(&m_pTouCAN->m_ReceivePipe);
-//            (void) CANUSB_ResetQueue(&m_pTouCAN->m_TransmitPipe);
+            // TODO: pipe contex
+            m_pTouCAN->m_ReceiveData.m_MsgParam.m_u8StatusByte = 0x00U;
+            (void) CANQUE_Reset(m_pTouCAN->m_ReceiveData.m_MsgQueue);
             // (3) start CAN controller
             retVal = (MacCAN_Return_t)TouCAN_start(m_hDevice);
             m_Status.can_stopped = (retVal != CANERR_NOERROR) ? 1 : 0;
@@ -344,7 +339,7 @@ MacCAN_Return_t CTouCAN::WriteMessage(MacCAN_Message_t message, uint16_t timeout
 
             int size = TouCAN_EncodeMessage(buffer, &message);
 
-            retVal = CANUSB_WritePipe(m_hDevice, TOUCAN_USB_TX_DATA_PIPE_REF, (void *)buffer, (UInt32)size);
+            retVal = CANUSB_WritePipe(m_hDevice, TOUCAN_USB_TX_DATA_PIPE_REF, buffer, (UInt32)size, timeout);
             m_Status.transmitter_busy = (retVal != CANERR_NOERROR) ? 1 : 0;
             m_Counter.u64TxMessages += (retVal == CANERR_NOERROR) ? 1U : 0U;
 
@@ -377,18 +372,18 @@ MacCAN_Return_t CTouCAN::ReadMessage(MacCAN_Message_t &message, uint16_t timeout
                 printf("{%u} ",size);fflush(stdout);
                 while (size >= TOUCAN_USB_RX_DATA_FRAME_SIZE) {
                     (void) TouCAN_DecodeMessage(&frame, &buffer[index]);
-                    (void) CANUSB_Enqueue(&m_pTouCAN->m_ReceivePipe, &frame);
+                    (void) CANQUE_Enqueue(m_pTouCAN->m_ReceiveData.m_MsgQueue, &frame);
                     index += TOUCAN_USB_RX_DATA_FRAME_SIZE;
                     size -= TOUCAN_USB_RX_DATA_FRAME_SIZE;
                 }
-                retVal = CANUSB_Dequeue(&m_pTouCAN->m_ReceivePipe, &message, 0);
+                retVal = CANQUE_Dequeue(m_pTouCAN->m_ReceiveData.m_MsgQueue, &message, 0);
             }
             else printf("[%x]\n",retVal);
 #else
-            retVal = CANUSB_Dequeue(&m_pTouCAN->m_ReceivePipe, &message, timeout);
+            retVal = CANQUE_Dequeue(m_pTouCAN->m_ReceiveData.m_MsgQueue, &message, timeout);
 #endif
             m_Status.receiver_empty = (retVal != CANERR_NOERROR) ? 1 : 0;
-            m_Status.queue_overrun = CANUSB_QUEUE_OVERFLOW(m_pTouCAN->m_ReceivePipe) ? 1 : 0;
+            m_Status.queue_overrun = CANQUE_OverflowFlag(m_pTouCAN->m_ReceiveData.m_MsgQueue) ? 1 : 0;
             m_Counter.u64RxMessages += ((retVal == CANERR_NOERROR) && !message.sts) ? 1U : 0U;
             m_Counter.u64ErrorFrames += ((retVal == CANERR_NOERROR) && message.sts) ? 1U : 0U;
         } else
@@ -404,7 +399,7 @@ MacCAN_Return_t CTouCAN::GetStatus(MacCAN_Status_t &status) {
     // (§) CAN interface must be initialized
     if (m_hDevice != CANUSB_INVALID_HANDLE) {
         // (1) get status from received status frames
-        m_Status.byte |= m_pTouCAN->m_MsgParam.m_u8StatusByte;
+        m_Status.byte |= m_pTouCAN->m_ReceiveData.m_MsgParam.m_u8StatusByte;
         // (2) get (and clear) interface error code
         UInt32 errorCode;
         retVal = TouCAN_get_interface_error_code(m_hDevice, &errorCode);
@@ -504,7 +499,7 @@ MacCAN_Return_t CTouCAN::GetBusSpeed(MacCAN_BusSpeed_t &speed) {
 }
 
 EXPORT
-MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbytes) {
+MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte) {
     MacCAN_Return_t retVal = CMacCAN::IllegalParameter;
 
     if (!value)
@@ -512,43 +507,43 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
 
     switch (param) {
         case TOUCAN_PROPERTY_CANAPI:
-            if ((size_t)nbytes == sizeof(uint16_t)) {
+            if ((size_t)nbyte >= sizeof(uint16_t)) {
                 *(uint16_t*)value = (uint16_t)CAN_API_SPEC;
                 retVal = CMacCAN::NoError;
             }
             break;
         case TOUCAN_PROPERTY_VERSION:
-            if ((size_t)nbytes == sizeof(uint16_t)) {
+            if ((size_t)nbyte >= sizeof(uint16_t)) {
                 *(uint16_t*)value = ((uint16_t)VERSION_MAJOR << 8) | (uint16_t)VERSION_MINOR;
                 retVal = CMacCAN::NoError;
             }
             break;
         case TOUCAN_PROPERTY_PATCH_NO:
-            if ((size_t)nbytes == sizeof(uint8_t)) {
+            if ((size_t)nbyte >= sizeof(uint8_t)) {
                 *(uint8_t*)value = (uint8_t)VERSION_PATCH;
                 retVal = CMacCAN::NoError;
             }
             break;
         case TOUCAN_PROPERTY_BUILD_NO:
-            if ((size_t)nbytes == sizeof(uint32_t)) {
+            if ((size_t)nbyte >= sizeof(uint32_t)) {
                 *(uint32_t*)value = (uint32_t)VERSION_BUILD;
                 retVal = CMacCAN::NoError;
             }
             break;
         case TOUCAN_PROPERTY_LIBRARY_ID:
-            if ((size_t)nbytes == sizeof(int32_t)) {
+            if ((size_t)nbyte >= sizeof(int32_t)) {
                 *(int32_t*)value = (int32_t)TOUCAN_LIBRARY_ID;
                 retVal = CMacCAN::NoError;
             }
             break;
         case TOUCAN_PROPERTY_LIBRARY_VENDOR:
-            if ((nbytes > strlen(TOUCAN_LIBRARY_VENDOR)) && (nbytes <= CANPROP_MAX_BUFFER_SIZE)) {
+            if ((nbyte > strlen(TOUCAN_LIBRARY_VENDOR)) && (nbyte <= CANPROP_MAX_BUFFER_SIZE)) {
                 strcpy((char*)value, TOUCAN_LIBRARY_VENDOR);
                 retVal = CMacCAN::NoError;
             }
             break;
         case TOUCAN_PROPERTY_LIBRARY_NAME:
-            if ((nbytes > strlen(TOUCAN_LIBRARY_NAME)) && (nbytes <= CANPROP_MAX_BUFFER_SIZE)) {
+            if ((nbyte > strlen(TOUCAN_LIBRARY_NAME)) && (nbyte <= CANPROP_MAX_BUFFER_SIZE)) {
                 strcpy((char*)value, TOUCAN_LIBRARY_NAME);
                 retVal = CMacCAN::NoError;
             }
@@ -558,31 +553,37 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
             if (m_hDevice != CANUSB_INVALID_HANDLE) {
                 switch (param) {
                     case TOUCAN_PROPERTY_DEVICE_TYPE:
-                        if ((size_t)nbytes == sizeof(int32_t)) {
+                        if ((size_t)nbyte >= sizeof(int32_t)) {
                             *(int32_t*)value = (int32_t)TOUCAN_USB_DEVICE_TYPE;
                             retVal = CMacCAN::NoError;
                         }
                         break;
                     case TOUCAN_PROPERTY_DEVICE_NAME:
-                        if ((nbytes > strlen(TOUCAN_USB_DEVICE_NAME)) && (nbytes <= CANPROP_MAX_BUFFER_SIZE)) {
+                        if ((nbyte > strlen(TOUCAN_USB_DEVICE_NAME)) && (nbyte <= CANPROP_MAX_BUFFER_SIZE)) {
                             strcpy((char*)value, TOUCAN_USB_DEVICE_NAME);
                             retVal = CMacCAN::NoError;
                         }
                         break;
+                    case TOUCAN_PROPERTY_DEVICE_DRIVER:
+                        if ((nbyte > strlen("(none)")) && (nbyte <= CANPROP_MAX_BUFFER_SIZE)) {
+                            strcpy((char*)value, "(none)");  // note: there is no kernel driver!
+                            retVal = CMacCAN::NoError;
+                        }
+                        break;
                     case TOUCAN_PROPERTY_DEVICE_VENDOR:
-                        if ((nbytes > strlen(TOUCAN_USB_VENDOR_NAME)) && (nbytes <= CANPROP_MAX_BUFFER_SIZE)) {
+                        if ((nbyte > strlen(TOUCAN_USB_VENDOR_NAME)) && (nbyte <= CANPROP_MAX_BUFFER_SIZE)) {
                             strcpy((char*)value, TOUCAN_USB_VENDOR_NAME);
                             retVal = CMacCAN::NoError;
                         }
                         break;
                     case TOUCAN_PROPERTY_OP_CAPABILITY:
-                        if ((size_t)nbytes == sizeof(uint8_t)) {
+                        if ((size_t)nbyte >= sizeof(uint8_t)) {
                             *(uint8_t*)value = (uint8_t)SUPPORTED_OP_MODE;
                             retVal = CMacCAN::NoError;
                         }
                         break;
                     case TOUCAN_PROPERTY_OP_MODE:
-                        if ((size_t)nbytes == sizeof(uint8_t)) {
+                        if ((size_t)nbyte >= sizeof(uint8_t)) {
                             *(uint8_t*)value = (uint8_t)m_OpMode.byte;
                             retVal = CMacCAN::NoError;
                         }
@@ -590,7 +591,7 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                     case TOUCAN_PROPERTY_BITRATE:
                         MacCAN_Bitrate_t bitrate;
                         if ((retVal = GetBitrate(bitrate)) == CANERR_NOERROR) {
-                            if (nbytes == sizeof(MacCAN_Bitrate_t)) {
+                            if ((size_t)nbyte >= sizeof(MacCAN_Bitrate_t)) {
                                 memcpy(value, &bitrate, sizeof(MacCAN_Bitrate_t));
                                 retVal = CMacCAN::NoError;
                             }
@@ -599,7 +600,7 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                     case TOUCAN_PROPERTY_SPEED:
                         MacCAN_BusSpeed_t speed;
                         if ((retVal = GetBusSpeed(speed)) == CANERR_NOERROR) {
-                            if (nbytes == sizeof(MacCAN_BusSpeed_t)) {
+                            if ((size_t)nbyte >= sizeof(MacCAN_BusSpeed_t)) {
                                 memcpy(value, &speed, sizeof(MacCAN_BusSpeed_t));
                                 retVal = CMacCAN::NoError;
                             }
@@ -608,7 +609,7 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                     case TOUCAN_PROPERTY_STATUS:
                         MacCAN_Status_t status;
                         if ((retVal = GetStatus(status)) == CANERR_NOERROR) {
-                            if ((size_t)nbytes == sizeof(uint8_t)) {
+                            if ((size_t)nbyte >= sizeof(uint8_t)) {
                                 *(uint8_t*)value = (uint8_t)status.byte;
                                 retVal = CMacCAN::NoError;
                             }
@@ -617,32 +618,32 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                     case TOUCAN_PROPERTY_BUSLOAD:
                         uint8_t load;
                         if ((retVal = GetBusLoad(load)) == CANERR_NOERROR) {
-                            if ((size_t)nbytes == sizeof(uint8_t)) {
+                            if ((size_t)nbyte >= sizeof(uint8_t)) {
                                 *(uint8_t*)value = (uint8_t)load;
                                 retVal = CMacCAN::NoError;
                             }
                         }
                         break;
                     case TOUCAN_PROPERTY_TX_COUNTER:
-                        if ((size_t)nbytes == sizeof(uint64_t)) {
+                        if ((size_t)nbyte >= sizeof(uint64_t)) {
                             *(uint64_t*)value = (uint64_t)m_Counter.u64TxMessages;
                             retVal = CMacCAN::NoError;
                         }
                         break;
                     case TOUCAN_PROPERTY_RX_COUNTER:
-                        if ((size_t)nbytes == sizeof(uint64_t)) {
+                        if ((size_t)nbyte >= sizeof(uint64_t)) {
                             *(uint64_t*)value = (uint64_t)m_Counter.u64RxMessages;
                             retVal = CMacCAN::NoError;
                         }
                         break;
                     case TOUCAN_PROPERTY_ERR_COUNTER:
-                        if ((size_t)nbytes == sizeof(uint64_t)) {
+                        if ((size_t)nbyte >= sizeof(uint64_t)) {
                             *(uint64_t*)value = (uint64_t)m_Counter.u64ErrorFrames;
                             retVal = CMacCAN::NoError;
                         }
                         break;
                     case TOUCAN_PROPERTY_CLOCK_DOMAIN:
-                        if ((size_t)nbytes == sizeof(int32_t)) {
+                        if ((size_t)nbyte >= sizeof(int32_t)) {
                             *(int32_t*)value = (int32_t)TOUCAN_USB_CLOCK_DOMAIN;
                             retVal = CMacCAN::NoError;
                         }
@@ -650,7 +651,7 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                     case TOUCAN_PROPERTY_HARDWARE_VERSION:
                         uint32_t hardware;
                         if ((retVal = TouCAN_get_hardware_version(m_hDevice, &hardware)) == CANERR_NOERROR) {
-                            if ((size_t)nbytes == sizeof(uint32_t)) {
+                            if ((size_t)nbyte >= sizeof(uint32_t)) {
                                 *(uint32_t*)value = (uint32_t)hardware;
                                 retVal = CMacCAN::NoError;
                             }
@@ -659,7 +660,7 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                     case TOUCAN_PROPERTY_FIRMWARE_VERSION:
                         uint32_t firmware;
                         if ((retVal = TouCAN_get_firmware_version(m_hDevice, &firmware)) == CANERR_NOERROR) {
-                            if ((size_t)nbytes == sizeof(uint32_t)) {
+                            if ((size_t)nbyte >= sizeof(uint32_t)) {
                                 *(uint32_t*)value = (uint32_t)firmware;
                                 retVal = CMacCAN::NoError;
                             }
@@ -668,7 +669,7 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                     case TOUCAN_PROPERTY_BOOTLOADER_VERSION:
                         uint32_t bootloader;
                         if ((retVal = TouCAN_get_bootloader_version(m_hDevice, &bootloader)) == CANERR_NOERROR) {
-                            if ((size_t)nbytes == sizeof(uint32_t)) {
+                            if ((size_t)nbyte >= sizeof(uint32_t)) {
                                 *(uint32_t*)value = (uint32_t)bootloader;
                                 retVal = CMacCAN::NoError;
                             }
@@ -677,7 +678,7 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                     case TOUCAN_PROPERTY_SERIAL_NUMBER:
                         uint32_t serial_no;
                         if ((retVal = TouCAN_get_serial_number(m_hDevice, &serial_no)) == CANERR_NOERROR) {
-                            if ((size_t)nbytes == sizeof(uint32_t)) {
+                            if ((size_t)nbyte >= sizeof(uint32_t)) {
                                 *(uint32_t*)value = (uint32_t)serial_no;
                                 retVal = CMacCAN::NoError;
                             }
@@ -686,7 +687,7 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                     case TOUCAN_PROPERTY_VID_PID:
                         uint32_t vid_pid;
                         if ((retVal = TouCAN_get_vid_pid(m_hDevice, &vid_pid)) == CANERR_NOERROR) {
-                            if ((size_t)nbytes == sizeof(uint32_t)) {
+                            if ((size_t)nbyte >= sizeof(uint32_t)) {
                                 *(uint32_t*)value = (uint32_t)vid_pid;
                                 retVal = CMacCAN::NoError;
                             }
@@ -695,14 +696,14 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
                     case TOUCAN_PROPERTY_DEVICE_ID:
                         uint32_t device_id;
                         if ((retVal = TouCAN_get_device_id(m_hDevice, &device_id)) == CANERR_NOERROR) {
-                            if ((size_t)nbytes == sizeof(uint32_t)) {
+                            if ((size_t)nbyte >= sizeof(uint32_t)) {
                                 *(uint32_t*)value = (uint32_t)device_id;
                                 retVal = CMacCAN::NoError;
                             }
                         }
                         break;
                     case TOUCAN_PROPERTY_VENDOR_URL:
-                        retVal = TouCAN_get_vendor(m_hDevice, (unsigned int)nbytes, (char *)value);
+                        retVal = TouCAN_get_vendor(m_hDevice, (unsigned int)nbyte, (char *)value);
                         break;
                     default:
                         retVal = CMacCAN::NotSupported;
@@ -717,7 +718,7 @@ MacCAN_Return_t CTouCAN::GetProperty(uint16_t param, void *value, uint32_t nbyte
 }
 
 EXPORT
-MacCAN_Return_t CTouCAN::SetProperty(uint16_t param, const void *value, uint32_t nbytes) {
+MacCAN_Return_t CTouCAN::SetProperty(uint16_t param, const void *value, uint32_t nbyte) {
     MacCAN_Return_t retVal = CMacCAN::IllegalParameter;
 
     if (!value)
@@ -725,7 +726,7 @@ MacCAN_Return_t CTouCAN::SetProperty(uint16_t param, const void *value, uint32_t
 
     // TODO: insert coin here
     (void) param;
-    (void) nbytes;
+    (void) nbyte;
 
     return retVal;
 }

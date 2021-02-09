@@ -1,7 +1,7 @@
 /*
- *  MacCAN - macOS User-Space Driver for CAN to USB Interfaces
+ *  MacCAN - macOS User-Space Driver for USB-to-CAN Interfaces
  *
- *  Copyright (C) 2012-2020  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+ *  Copyright (C) 2012-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
  *  This file is part of MacCAN-Core.
  *
@@ -47,7 +47,7 @@
  *
  *  @author    $Author: eris $
  *
- *  @version   $Rev: 877 $
+ *  @version   $Rev: 979 $
  *
  *  @defgroup  mac_can  macOS User-Space Driver for CAN to USB Interfaces
  *  @{
@@ -55,6 +55,7 @@
 #ifndef MACCAN_H_INCLUDED
 #define MACCAN_H_INCLUDED
 
+#include "CANAPI_Defines.h"
 #include "CANAPI_Types.h"
 
 /** @name   Aliases
@@ -94,23 +95,9 @@ typedef int MacCAN_Handle_t;
 typedef int MacCAN_Return_t;
 /** @} */
 
-/** @brief  CAN to USB Device identification:
- */
-typedef struct can_device_t_ {
-    uint16_t vendorId;   /**< USB vendor ID (16-bit) */
-    uint16_t productId;  /**< USB product ID (16-bit) */
-} MacCAN_Device_t;
-
-/** @brief  CAN to USB Device identification list
- *  @note   Each MacCAN driver implemenation has to implement
- *          an array with pairs of { <vendorId>, <productId> },
- *          terminated by a pair of { (-1), (-1) }.
- */
-extern const MacCAN_Device_t MacCAN_Devices[];
-
 #ifdef __cplusplus
 /// \name   MacCAN API
-/// \brief  MacCAN API based of CAN Interface API Version 3 (CAN API V3).
+/// \brief  MacCAN API based on CAN Interface API Version 3 (CAN API V3).
 /// \note   To implement a MacCAN driver derive a class from abstract class
 ///         CMacCAN, and override all pure virtual functions and optionally
 ///         the static function 'ProbeChannel'.
@@ -137,6 +124,7 @@ public:
         ReceiverEmpty = CANERR_RX_EMPTY,  ///< receiver empty
         ErrorFrame = CANERR_ERR_FRAME,  ///< error frame
         Timeout = CANERR_TIMEOUT,  ///< timed out
+        ResourceError = CANERR_RESOURCE,  ///< resource allocation
         InvalidBaudrate = CANERR_BAUDRATE,  ///<  illegal baudrate
         IllegalParameter = CANERR_ILLPARA,  ///< illegal parameter
         NullPointer = CANERR_NULLPTR,  ///< null-pointer assignment
@@ -176,7 +164,7 @@ public:
     ///              no communication is possible in this state.
     //
     /// \param[in]   channel - channel number of the CAN interface
-    /// \param[in]   opMode  - operation mode of the CAN controller
+    /// \param[in]   opMode  - desired operation mode of the CAN controller
     /// \param[in]   param   - pointer to channel-specific parameters
     //
     /// \returns     handle of the CAN interface if successful,
@@ -190,6 +178,23 @@ public:
     /// \returns     0 if successful, or a negative value on error.
     ///
     virtual MacCAN_Return_t TeardownChannel() = 0;
+
+    /// \brief       signals waiting event objects of the CAN interface. This can
+    ///              be used to terminate blocking operations in progress
+    ///              (e.g. by means of a Ctrl-C handler or similar).
+    //
+    /// \remarks     Some drivers are using waitable objects to realize blocking
+    ///              operations by a call to WaitForSingleObject (Windows) or
+    ///              pthread_cond_wait (POSIX), but these waitable objects are
+    ///              no cancellation points. This means that they cannot be
+    ///              terminated by Ctrl-C (SIGINT).
+    //
+    /// \note        Even though this is not the case with Darwin, we support
+    ///              this feature for compatibility reasons..
+    //
+    /// \returns     0 if successful, or a negative value on error.
+    ///
+    virtual MacCAN_Return_t SignalChannel() = 0;
 
     /// \brief       initializes the operation mode and the bit-rate settings of the
     ///              CAN interface and sets the operation state of the CAN controller
@@ -214,10 +219,10 @@ public:
     /// \brief       transmits one message over the CAN bus. The CAN controller must
     ///              be in operation state 'running'.
     //
-    /// \param[in]   message - the message to send
+    /// \param[in]   message - the message to be sent
     /// \param[in]   timeout - time to wait for the transmission of the message:
     ///                             0 means the function returns immediately,
-    ///                             65535 means blocking read, and any other
+    ///                             65535 means blocking write, and any other
     ///                             value means the time to wait im milliseconds
     //
     /// \returns     0 if successful, or a negative value on error.
@@ -280,7 +285,7 @@ public:
     //
     /// \returns     0 if successful, or a negative value on error.
     //
-    virtual MacCAN_Return_t GetProperty(uint16_t param, void *value, uint32_t nbytes) = 0;
+    virtual MacCAN_Return_t GetProperty(uint16_t param, void *value, uint32_t nbyte) = 0;
 
     /// \brief       modifies a property value of the CAN interface.
     //
@@ -290,7 +295,7 @@ public:
     //
     /// \returns     0 if successful, or a negative value on error.
     //
-    virtual MacCAN_Return_t SetProperty(uint16_t param, const void *value, uint32_t nbytes) = 0;
+    virtual MacCAN_Return_t SetProperty(uint16_t param, const void *value, uint32_t nbyte) = 0;
 
     /// \brief       retrieves the hardware version of the CAN controller
     ///              board as a zero-terminated string.
@@ -318,15 +323,23 @@ public:
     static MacCAN_Return_t MapBitrate2Speed(MacCAN_Bitrate_t bitrate, MacCAN_BusSpeed_t &speed);
 /// \}
 
+/// \name   CAN FD Data Length Code
+/// \brief  Methods for DLC conversion.
+/// \{
+public:
+    static uint8_t DLc2Len(uint8_t dlc);
+    static uint8_t Len2Dlc(uint8_t len);
+/// \}
+
 /// \name   MacCAN Core (C++ Part)
 /// \brief  Methods to initialize and release the MacCAN IOUsbKit.
 /// \{
 public:
     /// \brief       initializes the IOUsbKit to be used by a MacCAN driver.
     //
-    /// \note        A CAN device identification list of type \ref MacCAN_Device_t
-    ///              (an array with pairs of { <vendorId>, <productId> }, terminated
-    ///              by a pair of { (-1), (-1) }) has to be provide.
+    /// \note        A CAN device identification list of name \ref CANDEV_Devices
+    ///              (an array with tuples of { <vendorId>, <productId>, <numChannels> },
+    ///              terminated by a tuple of { (-1), (-1), 0 }) has to be provide.
     //
     /// \remarks     This method must be called at the beginning of a MacCAN application
     ///              or in the initializer function of a dynamic library.
@@ -368,3 +381,6 @@ extern char *MacCAN_GetVersion(void);  /**< retrieves version information. */
 /** @}
  */
 #endif /* MACCAN_H_INCLUDED */
+
+/* * $Id: MacCAN.h 979 2021-01-04 20:16:55Z eris $ *** (C) UV Software, Berlin ***
+ */

@@ -1,7 +1,7 @@
 //
-//  MacCAN - macOS User-Space Driver for CAN to USB Interfaces
+//  MacCAN - macOS User-Space Driver for USB-to-CAN Interfaces
 //
-//  Copyright (C) 2012-2020  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+//  Copyright (C) 2012-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
 //
 //  This file is part of MacCAN-Core.
 //
@@ -24,7 +24,7 @@
 ///
 /// \author      $Author: eris $
 ///
-/// \version     $Rev: 877 $
+/// \version     $Rev: 981 $
 ///
 /// \addtogroup  mac_can
 /// \{
@@ -67,7 +67,7 @@ MacCAN_Return_t CMacCAN::MapString2Bitrate(const char *string, MacCAN_Bitrate_t 
 
 EXPORT
 MacCAN_Return_t CMacCAN::MapBitrate2String(MacCAN_Bitrate_t bitrate, char *string, size_t length) {
-    (void) length;
+    (void)length;
     // TODO: rework function 'btr_bitrate2string'
     return (MacCAN_Return_t)btr_bitrate2string(&bitrate, false, (btr_string_t)string);
 }
@@ -78,13 +78,35 @@ MacCAN_Return_t CMacCAN::MapBitrate2Speed(MacCAN_Bitrate_t bitrate, MacCAN_BusSp
     return (MacCAN_Return_t)btr_bitrate2speed(&bitrate, false, false, &speed);
 }
 
+//  Methods for DLC conversion
+//
+EXPORT
+uint8_t CMacCAN::DLc2Len(uint8_t dlc) {
+    const static uint8_t dlc_table[16] = {
+        0U, 1U, 2U, 3U, 4U, 5U, 6U, 7U, 8U, 12U, 16U, 20U, 24U, 32U, 48U, 64U
+    };
+    return dlc_table[dlc & 0xFU];
+}
+
+EXPORT
+uint8_t CMacCAN::Len2Dlc(uint8_t len) {
+    if(len > 48U) return 0x0FU;
+    if(len > 32U) return 0x0EU;
+    if(len > 24U) return 0x0DU;
+    if(len > 20U) return 0x0CU;
+    if(len > 16U) return 0x0BU;
+    if(len > 12U) return 0x0AU;
+    if(len > 8U) return 0x09U;
+    return len;
+}
+
 //  Method to retrieve version information about the MacCAN Core
 //
 EXPORT
 char *CMacCAN::GetVersion() {
     static char string[CANPROP_MAX_BUFFER_SIZE] = "The torture never stops.";
     UInt32 version = CANUSB_GetVersion();
-    sprintf(string, "macOS Driver Kit for CAN to USB Interfaces (MacCAN Core %u.%u.%u)",
+    sprintf(string, "macOS Driver Kit for USB-to-CAN Interfaces (MacCAN Core %u.%u.%u)",
                     (UInt8)(version >> 24), (UInt8)(version >> 16), (UInt8)(version >> 8));
     return (char *)string;
 }

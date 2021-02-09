@@ -1,7 +1,7 @@
 /*
  *  TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Interfaces
  *
- *  Copyright (C) 2020  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+ *  Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
  *  This file is part of MacCAN-TouCAN.
  *
@@ -22,13 +22,16 @@
 #define TOUCAN_USB_H_INCLUDED
 
 #include "MacCAN.h"
+#include "MacCAN_Common.h"
+#include "MacCAN_MsgQueue.h"
 #include "MacCAN_IOUsbKit.h"
-#include "MacCAN_IOUsbPipe.h"
+#include "MacCAN_Devices.h"
+#include "MacCAN_Debug.h"
 
 #define RUSOKU_VENDOR_ID  (UInt16)0x16D0
 #define RUSOKU_TOUCAN_USB_ID  (UInt16)0x0EAC
 
-#define TOUCAN_USB_VENDOR_NAME  "Rusoku technologijos UAB"
+#define TOUCAN_USB_VENDOR_NAME  "Rusoku technologijos UAB, Lithuania"
 #define TOUCAN_USB_VENDOR_URL   "www.rusoku.com"
 #define TOUCAN_USB_DEVICE_NAME  "TouCAN USB"
 #define TOUCAN_USB_DEVICE_TYPE  (SInt32)1
@@ -57,10 +60,17 @@
 #define TOUCAN_ERROR_SUCCESS  0
 #define TOUCAN_ERROR_OFFSET  (-100)
 
-typedef struct {
-    uint64_t m_u64StartTime;
-    uint8_t m_u8StatusByte;
+typedef struct receive_param_t {  ///< - additional reception data:
+    uint64_t m_u64StartTime;  ///< - time synchronization
+    uint8_t m_u8StatusByte;  ///< - status byte from device
 } TouCAN_MsgParam_t;
+
+typedef struct receive_data_t {  ///< reception data:
+    CANQUE_MsgQueue_t m_MsgQueue;  ///< - message queue
+    TouCAN_MsgParam_t m_MsgParam;  ///< - additional data
+} TouCAN_ReceiveData_t;
+
+typedef CANUSB_AsyncPipe_t TouCAN_ReceivePipe_t;
 
 
 // The following definitions were copied from CANAL (CAN Abstraction Layer)
@@ -171,7 +181,7 @@ typedef struct {
 #define CANAL_ERROR_INTERNAL                    36         // Some kind of internal program error
 #define CANAL_ERROR_COMMUNICATION                37         // Some kind of communication error
 #define CANAL_ERROR_USER                        38      // Login error
- 
+
 /*!
     CanalStatistics
 
@@ -317,8 +327,8 @@ extern int TouCAN_set_filter_ext_list_mask(CANUSB_Handle_t hDevice, Filter_Type_
 /*
  *  That's my bullshit again;)
  */
-extern int TouCAN_StartReception(CANUSB_Handle_t hDevice, CANUSB_UsbPipe_t *usbPipe, const TouCAN_MsgParam_t *param);
-extern int TouCAN_AbortReception(CANUSB_Handle_t hDevice);
+extern int TouCAN_StartReception(TouCAN_ReceivePipe_t pipe, const TouCAN_ReceiveData_t *context);
+extern int TouCAN_AbortReception(TouCAN_ReceivePipe_t pipe);
 
 extern int TouCAN_EncodeMessage(UInt8 *buffer, const MacCAN_Message_t *message);
 extern int TouCAN_DecodeMessage(MacCAN_Message_t *message, const UInt8 *buffer, TouCAN_MsgParam_t *param);

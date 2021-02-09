@@ -1,5 +1,5 @@
 /*
- *  MacCAN - macOS User-Space Driver for CAN to USB Interfaces
+ *  MacCAN - macOS User-Space Driver for USB-to-CAN Interfaces
  *
  *  Copyright (C) 2012-2020  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
@@ -21,13 +21,30 @@
 #ifndef MACCAN_IOUSBKIT_H_INCLUDED
 #define MACCAN_IOUSBKIT_H_INCLUDED
 
-#include <MacTypes.h>
+#include "MacCAN_Common.h"
 
 #ifndef CANUSB_MAX_DEVICES
 #define CANUSB_MAX_DEVICES  42
 #endif
+#define CANUSB_INVALID_INDEX  (-1)
 #define CANUSB_INVALID_HANDLE  (-1)
 
+#define CANUSB_ANY_VENDOR_ID  0xFFFFU
+#define CANUSB_ANY_PRODUCT_ID  0xFFFFU
+
+/* USB endpoint properties */
+#define USBPIPE_DIR_OUT   0U
+#define USBPIPE_DIR_IN    1U
+#define USBPIPE_DIR_NONE  2U
+#define USBPIPE_DIR_ANY   3U
+
+#define USBPIPE_TYPE_CTRL  0U
+#define USBPIPE_TYPE_ISOC  1U
+#define USBPIPE_TYPE_BULK  2U
+#define USBPIPE_TYPE_INTR  3U
+#define USBPIPE_TYPE_ANY 0xFFU
+
+/* USB device request (setup packet) */
 #define USBREQ_HOST_TO_DEVICE  0x00U
 #define USBREQ_DEVICE_TO_HOST  0x80U
 
@@ -40,30 +57,12 @@
 #define USBREQ_RECIPIENT_ENDPOINT   0x02U
 #define USBREQ_RECIPIENT_OTHER      0x03U
 
+typedef int CANUSB_Index_t;
 typedef int CANUSB_Handle_t;
 typedef int CANUSB_Return_t;
 
-typedef void (*CANUSB_Callback_t)(void *refCon, UInt8 *buffer, UInt32 length);
-
-typedef void *CANUSB_MsgParam_t;
-
-typedef struct msg_queue_t_ {
-    UInt32 size;
-    UInt32 used;
-    UInt32 head;
-    UInt32 tail;
-    UInt8 *queueElem;
-    size_t elemSize;
-    struct cond_wait_t {
-        pthread_mutex_t mutex;
-        pthread_cond_t cond;
-        Boolean flag;
-    } wait;
-    struct overflow_t {
-        Boolean flag;
-        UInt64 counter;
-    } ovfl;
-} CANUSB_MsgQueue_t;
+typedef void *CANUSB_Context_t;
+typedef void (*CANUSB_Callback_t)(CANUSB_Context_t refCon, UInt8 *buffer, UInt32 nbyte);
 
 typedef struct usb_buffer_t_ {
     UInt8 *data[2];
@@ -76,10 +75,9 @@ typedef struct usb_pipe_t_ {
     CANUSB_Handle_t handle;
     CANUSB_Buffer_t buffer;
     CANUSB_Callback_t callback;
-    CANUSB_MsgQueue_t msgQueue;
-    CANUSB_MsgParam_t ptrParam;
+    CANUSB_Context_t context;
     Boolean running;
-} CANUSB_UsbPipe_t;
+} *CANUSB_AsyncPipe_t;
 
 typedef struct usb_setup_packet_t_ {
     UInt8  RequestType;
@@ -97,39 +95,49 @@ extern CANUSB_Return_t CANUSB_Initialize(void);
 
 extern CANUSB_Return_t CANUSB_Teardown(void);
 
-extern CANUSB_Handle_t CANUSB_OpenDevice(UInt16 vendorId, UInt16 productId, UInt8 channelNo);
+extern CANUSB_Handle_t CANUSB_OpenDevice(CANUSB_Index_t index, UInt16 vendorId, UInt16 productId);
 
 extern CANUSB_Return_t CANUSB_CloseDevice(CANUSB_Handle_t handle);
 
 extern CANUSB_Return_t CANUSB_DeviceRequest(CANUSB_Handle_t handle, CANUSB_SetupPacket_t setupPacket, void *buffer, UInt16 size, UInt32 *transferred);
 
-extern CANUSB_Return_t CANUSB_ReadPipe(CANUSB_Handle_t handle, UInt8 pipeRef, void *buffer, UInt32 *size);
+extern CANUSB_Return_t CANUSB_ReadPipe(CANUSB_Handle_t handle, UInt8 pipeRef, void *buffer, UInt32 *size, UInt16 timeout);
 
-extern CANUSB_Return_t CANUSB_ReadPipeAsyncStart(CANUSB_Handle_t handle, UInt8 pipeRef, CANUSB_UsbPipe_t *usbPipe);
+extern CANUSB_Return_t CANUSB_WritePipe(CANUSB_Handle_t handle, UInt8 pipeRef, const void *buffer, UInt32 size, UInt16 timeout);
 
-extern CANUSB_Return_t CANUSB_ReadPipeAsyncAbort(CANUSB_Handle_t handle, UInt8 pipeRef);
+extern CANUSB_AsyncPipe_t CANUSB_CreatePipeAsync(CANUSB_Handle_t handle, UInt8 pipeRef, size_t bufferSize);
 
-extern CANUSB_Return_t CANUSB_WritePipe(CANUSB_Handle_t handle, UInt8 pipeRef, void *buffer, UInt32 size);
+extern CANUSB_Return_t CANUSB_DestroyPipeAsync(CANUSB_AsyncPipe_t asyncPipe);
 
-extern CANUSB_Handle_t CANUSB_GetFirstDevice(void);
+extern CANUSB_Return_t CANUSB_ReadPipeAsyncStart(CANUSB_AsyncPipe_t asyncPipe, CANUSB_Callback_t callback, CANUSB_Context_t context);
 
-extern CANUSB_Handle_t CANUSB_GetNextDevice(void);
+extern CANUSB_Return_t CANUSB_ReadPipeAsyncAbort(CANUSB_AsyncPipe_t asyncPipe);
 
-extern Boolean CANUSB_IsDevicePresent(CANUSB_Handle_t handle);
+extern Boolean CANUSB_IsPipeAsyncRunning(CANUSB_AsyncPipe_t asyncPipe);
 
-extern Boolean CANUSB_IsDeviceOpened(CANUSB_Handle_t handle);
+extern CANUSB_Index_t CANUSB_GetFirstDevice(void);
 
-extern CANUSB_Return_t CANUSB_GetDeviceName(CANUSB_Handle_t handle, char *buffer, size_t nbytes);
+extern CANUSB_Index_t CANUSB_GetNextDevice(void);
 
-extern CANUSB_Return_t CANUSB_GetDeviceVendorId(CANUSB_Handle_t handle, UInt16 *value);
+extern Boolean CANUSB_IsDevicePresent(CANUSB_Index_t index);
 
-extern CANUSB_Return_t CANUSB_GetDeviceProductId(CANUSB_Handle_t handle, UInt16 *value);
+extern Boolean CANUSB_IsDeviceOpened(CANUSB_Index_t index);
 
-extern CANUSB_Return_t CANUSB_GetDeviceReleaseNo(CANUSB_Handle_t handle, UInt16 *value);
+extern CANUSB_Return_t CANUSB_GetDeviceName(CANUSB_Index_t index, char *buffer, size_t n);
 
-extern CANUSB_Return_t CANUSB_GetDeviceLocation(CANUSB_Handle_t handle, UInt32 *value);
+extern CANUSB_Return_t CANUSB_GetDeviceVendorId(CANUSB_Index_t index, UInt16 *value);
 
-extern CANUSB_Return_t CANUSB_GetDeviceAddress(CANUSB_Handle_t handle, UInt16 *value);
+extern CANUSB_Return_t CANUSB_GetDeviceProductId(CANUSB_Index_t index, UInt16 *value);
+
+extern CANUSB_Return_t CANUSB_GetDeviceReleaseNo(CANUSB_Index_t index, UInt16 *value);
+
+extern CANUSB_Return_t CANUSB_GetDeviceNumCanChannels(CANUSB_Index_t index, UInt8 *value);
+
+extern CANUSB_Return_t CANUSB_GetDeviceCanChannelsOpened(CANUSB_Index_t index, UInt8 *value);
+
+extern CANUSB_Return_t CANUSB_GetDeviceLocation(CANUSB_Index_t index, UInt32 *value);
+
+extern CANUSB_Return_t CANUSB_GetDeviceAddress(CANUSB_Index_t index, UInt16 *value);
 
 extern CANUSB_Return_t CANUSB_GetInterfaceClass(CANUSB_Handle_t handle, UInt8 *value);
 
@@ -139,9 +147,18 @@ extern CANUSB_Return_t CANUSB_GetInterfaceProtocol(CANUSB_Handle_t handle, UInt8
 
 extern CANUSB_Return_t CANUSB_GetInterfaceNumEndpoints(CANUSB_Handle_t handle, UInt8 *value);
 
+extern CANUSB_Return_t CANUSB_GetInterfaceEndpointDirection(CANUSB_Handle_t handle, UInt8 index, UInt8 *value);
+
+extern CANUSB_Return_t CANUSB_GetInterfaceEndpointTransferType(CANUSB_Handle_t handle, UInt8 index, UInt8 *value);
+
+extern CANUSB_Return_t CANUSB_GetInterfaceEndpointMaxPacketSize(CANUSB_Handle_t handle, UInt8 index, UInt16 *value);
+
 extern UInt32 CANUSB_GetVersion(void);
 
 #ifdef __cplusplus
 }
 #endif
 #endif /* MACCAN_IOUSBKIT_H_INCLUDED */
+
+/* * $Id: MacCAN_IOUsbKit.h 980 2021-01-04 20:50:59Z eris $ *** (C) UV Software, Berlin ***
+ */
