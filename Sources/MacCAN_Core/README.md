@@ -2,7 +2,7 @@
 
 _Copyright &copy; 2012-2021   Uwe Vogt, UV Software, Berlin (info@mac-can.com)_
 
-Version $Rev: 983 $
+Version $Rev: 985 $
 
 # Running CAN and CAN FD on a Mac&reg;
 
@@ -25,7 +25,7 @@ But that poor boy only owned a Mac.
 In the absence of a CAN driver for Mac, I started developing an OS X user space driver for my PEAK USB-to-CAN dongle.
 Many thanks to Uwe Wilhelm, CEO of PEAK-System Technik GmbH, who had supported me with technical information and several hardware.
 
-### PCBUSB Library
+### PCBUSB Library for PEAK´s PCAN-USB Interfaces
 
 The _PCBUSB_ library realizes a USB user-space driver under macOS for PCAN&reg; USB interfaces from PEAK-System Technik.
 See the [MacCAN](https://www.mac-can.com) website for further information, downloads and links.
@@ -48,6 +48,12 @@ See [Rusoku](https://www.rusoku.com)´s website for the products and the service
 The driver for TouCAN USB interfaces from Rusoku is the first driver implementation based on MacCAN-Core.
 And it is open source;
 goto https://github.com/mac-can/RusokuCAN/.
+
+### CAN Leaf Interfaces from Kvaser
+
+Welcome the MacCAN-KvaserCAN driver for CAN Leaf interfaces from [Kvaser](https://www.kvaser.com) as the next member of the MacCAN family.
+Find its source code on GitHub;
+goto https://github.com/mac-can/MacCAN-KvaserCAN/.
 
 ## HowTo
 
@@ -321,7 +327,8 @@ along with MacCAN-Core.  If not, see <http://www.gnu.org/licenses/>.
 
 Mac and macOS are trademarks of Apple Inc., registered in the U.S. and other countries. \
 PCAN is a registered trademark of PEAK-System Technik GmbH, Darmstadt, Germany. \
-Qt is a registered trademark of The Qt Company Ltd. and its subsidiaries.
+Qt is a registered trademark of The Qt Company Ltd. and its subsidiaries. \
+All other company, product and service names mentioned herein are trademarks, registered trademarks or service marks of their respective owners.
 
 ### Contact
 

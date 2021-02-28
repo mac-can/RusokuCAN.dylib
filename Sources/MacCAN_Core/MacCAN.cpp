@@ -24,7 +24,7 @@
 ///
 /// \author      $Author: eris $
 ///
-/// \version     $Rev: 981 $
+/// \version     $Rev: 986 $
 ///
 /// \addtogroup  mac_can
 /// \{
@@ -81,7 +81,7 @@ MacCAN_Return_t CMacCAN::MapBitrate2Speed(MacCAN_Bitrate_t bitrate, MacCAN_BusSp
 //  Methods for DLC conversion
 //
 EXPORT
-uint8_t CMacCAN::DLc2Len(uint8_t dlc) {
+uint8_t CMacCAN::Dlc2Len(uint8_t dlc) {
     const static uint8_t dlc_table[16] = {
         0U, 1U, 2U, 3U, 4U, 5U, 6U, 7U, 8U, 12U, 16U, 20U, 24U, 32U, 48U, 64U
     };

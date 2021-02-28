@@ -711,6 +711,8 @@ static void ReceptionCallback(void *refCon, UInt8 *buffer, UInt32 length) {
     assert(refCon);
     assert(buffer);
 
+    MACCAN_LOG_WRITE(buffer, length, "<");
+    
     while (length >= TOUCAN_USB_RX_DATA_FRAME_SIZE) {
         bzero(&message, sizeof(MacCAN_Message_t));
         (void) TouCAN_DecodeMessage(&message, &buffer[index], &context->m_MsgParam);

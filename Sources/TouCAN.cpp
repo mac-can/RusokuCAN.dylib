@@ -339,6 +339,7 @@ MacCAN_Return_t CTouCAN::WriteMessage(MacCAN_Message_t message, uint16_t timeout
 
             int size = TouCAN_EncodeMessage(buffer, &message);
 
+            MACCAN_LOG_WRITE(buffer, (UInt32)size, ">");
             retVal = CANUSB_WritePipe(m_hDevice, TOUCAN_USB_TX_DATA_PIPE_REF, buffer, (UInt32)size, timeout);
             m_Status.transmitter_busy = (retVal != CANERR_NOERROR) ? 1 : 0;
             m_Counter.u64TxMessages += (retVal == CANERR_NOERROR) ? 1U : 0U;
@@ -386,6 +387,10 @@ MacCAN_Return_t CTouCAN::ReadMessage(MacCAN_Message_t &message, uint16_t timeout
             m_Status.queue_overrun = CANQUE_OverflowFlag(m_pTouCAN->m_ReceiveData.m_MsgQueue) ? 1 : 0;
             m_Counter.u64RxMessages += ((retVal == CANERR_NOERROR) && !message.sts) ? 1U : 0U;
             m_Counter.u64ErrorFrames += ((retVal == CANERR_NOERROR) && message.sts) ? 1U : 0U;
+            
+            // issue #2: Reading asynchronous reception pipe occasionally stalls
+            if (!CANUSB_IsPipeAsyncRunning(m_pTouCAN->m_ReceivePipe))
+                MACCAN_LOG_PRINTF("! error: asynchronous reception pipe stalled\n");
         } else
             retVal = CMacCAN::ControllerOffline;
     }
