@@ -74,10 +74,15 @@ int main(int argc, const char * argv[]) {
     int option_test = OPTION_NO;
     int option_exit = OPTION_NO;
     int option_echo = OPTION_YES;
-//    int option_stop = OPTION_NO;
-//    int option_check = OPTION_NO;
+    int option_stop = OPTION_NO;
+    int option_check = OPTION_NO;
+    int option_retry = OPTION_NO;
     int option_repeat = OPTION_NO;
     int option_transmit = OPTION_NO;
+//    int option_trace = OPTION_NO;
+    int option_log = OPTION_NO;
+    uint64_t received = 0ULL;
+    uint64_t expected = 0ULL;
 
     for (int i = 1, opt = 0; i < argc; i++) {
         /* TouCAN-USB channel */
@@ -107,8 +112,9 @@ int main(int argc, const char * argv[]) {
         if (!strncmp(argv[i], "C:", 2) && sscanf(argv[i], "C:%i", &opt) == 1) delay = (useconds_t)opt * 1000U;
         if (!strncmp(argv[i], "U:", 2) && sscanf(argv[i], "U:%i", &opt) == 1) delay = (useconds_t)opt;
         /* receive messages */
-//        if (!strcmp(argv[i], "STOP")) option_stop = OPTION_YES;
-//        if (!strcmp(argv[i], "CHECK")) option_check = OPTION_YES;
+        if (!strcmp(argv[i], "STOP")) option_stop = OPTION_YES;
+        if (!strcmp(argv[i], "CHECK")) option_check = OPTION_YES;
+        if (!strcmp(argv[i], "RETRY")) option_retry = OPTION_YES;
         if (!strcmp(argv[i], "REPEAT")) option_repeat = OPTION_YES;
         if (!strcmp(argv[i], "SILENT")) option_echo = OPTION_NO;
         /* time-stamps */
@@ -117,7 +123,7 @@ int main(int argc, const char * argv[]) {
 //        if (!strcmp(argv[i], "REL") || !strcmp(argv[i], "RELATIVE")) option_time = OPTION_TIME_REL;
         /* logging and debugging */
 //        if (!strcmp(argv[i], "TRACE")) option_trace = OPTION_YES;
-//        if (!strcmp(argv[i], "LOG")) option_log = OPTION_YES;
+        if (!strcmp(argv[i], "LOG")) option_log = OPTION_YES;
         /* query some informations: hw, sw, etc. */
         if (!strcmp(argv[i], "INFO")) option_info = OPTION_YES;
         if (!strcmp(argv[i], "STAT")) option_stat = OPTION_YES;
@@ -142,7 +148,8 @@ int main(int argc, const char * argv[]) {
         perror("+++ error");
         return errno;
     }
-    MACCAN_LOG_OPEN();
+    if (option_log)
+        MACCAN_LOG_OPEN();
     MACCAN_LOG_PRINTF("# MacCAN-PeakCAN - %s", ctime(&now));
     retVal = CMacCAN::Initializer();
     if (retVal != CMacCAN::NoError) {
@@ -283,8 +290,11 @@ int main(int argc, const char * argv[]) {
 #endif
     fprintf(stdout, "Press Ctrl+C to abort...\n");
     while (running && (option_transmit-- > 0)) {
+retry:
         retVal = myDriver.WriteMessage(message);
-        if (retVal != CMacCAN::NoError) {
+        if ((retVal == CMacCAN::TransmitterBusy) && option_retry)
+            goto retry;
+        else if (retVal != CMacCAN::NoError) {
             fprintf(stderr, "+++ error: myDriver.WriteMessage returned %i\n", retVal);
             goto teardown;
         }
@@ -294,8 +304,8 @@ int main(int argc, const char * argv[]) {
     while (running) {
         if ((retVal = myDriver.ReadMessage(message, timeout)) == CMacCAN::NoError) {
             if (option_echo) {
-                fprintf(stdout, ">>> %i\t", frames++);
-                fprintf(stdout, "%7li.%04li\t%03x\t%c%c [%i]",
+                fprintf(stdout, ">>> %-6i  ", frames++);
+                fprintf(stdout, "%7li.%04li  %03x %c%c [%i]",
                                  message.timestamp.tv_sec, message.timestamp.tv_nsec / 100000,
                                  message.id, message.xtd? 'X' : 'S', message.rtr? 'R' : ' ', message.dlc);
                 for (int i = 0; i < message.dlc; i++)
@@ -316,6 +326,25 @@ int main(int argc, const char * argv[]) {
                     fflush(stdout);
                 }
             }
+            if (option_check && !message.sts) {
+                received = 0;
+                if(message.dlc > 0) received |= (uint64_t)message.data[0] << 0;
+                if(message.dlc > 1) received |= (uint64_t)message.data[1] << 8;
+                if(message.dlc > 2) received |= (uint64_t)message.data[2] << 16;
+                if(message.dlc > 3) received |= (uint64_t)message.data[3] << 24;
+                if(message.dlc > 4) received |= (uint64_t)message.data[4] << 32;
+                if(message.dlc > 5) received |= (uint64_t)message.data[5] << 40;
+                if(message.dlc > 6) received |= (uint64_t)message.data[6] << 48;
+                if(message.dlc > 7) received |= (uint64_t)message.data[7] << 56;
+                if(received != expected) {
+                    fprintf(stderr, "+++ error: received data is not equal to expected data (%" PRIu64 " : %" PRIu64 ")\n", received, expected);
+                    if(expected > received)
+                        fprintf(stderr, "           issue #198: old messages read again (offset -%" PRIu64 ")\a\n", expected - received);
+                    if(option_stop)
+                        goto teardown;
+                }
+                expected = received + 1;
+            }
         }
         else if (retVal != CMacCAN::ReceiverEmpty) {
             goto teardown;
@@ -323,8 +352,8 @@ int main(int argc, const char * argv[]) {
 #ifdef SECOND_CHANNEL
         if ((retVal = mySecond.ReadMessage(message, 0U)) == CMacCAN::NoError) {
             if (option_echo) {
-                fprintf(stdout, ">2> %i\t", frames++);
-                fprintf(stdout, "%7li.%04li\t%03x\t%c%c [%i]",
+                fprintf(stdout, ">2> %-6i  ", frames++);
+                fprintf(stdout, "%7li.%04li  %03x %c%c [%i]",
                                  message.timestamp.tv_sec, message.timestamp.tv_nsec / 100000,
                                  message.id, message.xtd? 'X' : 'S', message.rtr? 'R' : ' ', message.dlc);
                 for (int i = 0; i < message.dlc; i++)
@@ -399,7 +428,8 @@ end:
     }
     now = time(NULL);
     MACCAN_LOG_PRINTF("# MacCAN-PeakCAN - %s", ctime(&now));
-    MACCAN_LOG_CLOSE();
+    if (option_log)
+        MACCAN_LOG_CLOSE();
     fprintf(stdout, "Cheers!\n");
     return retVal;
 }
