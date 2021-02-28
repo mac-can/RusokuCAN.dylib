@@ -134,7 +134,7 @@ incdir:
 clean:
 	$(RM) $(TARGET) $(OUTDIR)/*.o $(OUTDIR)/*.d
 
-distclean:
+pristine:
 	$(RM) $(TARGET) $(OUTDIR)/*.o $(OUTDIR)/*.d
 	$(RM) $(BINDIR)/$(TARGET) $(BINDIR)/$(STATIC) $(BINDIR)/$(LIBRARY).dylib
 
