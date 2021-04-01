@@ -1,0 +1,4 @@
+module CTouCAN {
+    header "can_api.h"
+    export *
+}
