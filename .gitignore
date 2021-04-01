@@ -15,3 +15,6 @@ Binaries
 Includes
 Testing
 *.log
+.build
+.swiftpm
+Package.resolved
