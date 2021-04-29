@@ -59,22 +59,22 @@ public class TouCAN {
     public struct Message: Codable, Equatable {
 
         /// CAN Identifier (aka Arbitration ID aka Header)
-        let id: UInt32
-        let xtd: Bool
-        let rtr: Bool
+        public let id: UInt32
+        public let xtd: Bool
+        public let rtr: Bool
         /// CANFD format
-        let fdf: Bool
+        public let fdf: Bool
         /// CANFD Bitrate Switching
-        let brs: Bool
+        public let brs: Bool
         /// CANFD Error State Indicator
-        let esi: Bool
+        public let esi: Bool
         /// Status Message
-        let sts: Bool
+        public let sts: Bool
         /// DLC or, for CANFD, length-code
-        let dlc: UInt8
-        let data: [UInt8]
+        public let dlc: UInt8
+        public let data: [UInt8]
         /// Time since booting the micro controller on the hardware
-        let timestamp: TimeInterval
+        public let timestamp: TimeInterval
 
         public var length: UInt8 {
             guard self.fdf else { return self.dlc }
@@ -90,7 +90,7 @@ public class TouCAN {
             }
         }
 
-        init(id: UInt32, data: [UInt8]) {
+        public init(id: UInt32, data: [UInt8]) {
             precondition(data.count > 0 && data.count < 9, "Unsupported data length. Data length should be between 1 and 8")
             self.id = id
             self.xtd = false
@@ -168,9 +168,7 @@ public class TouCAN {
 
     private lazy var handle: Int32 = Self.InvalidHandle
 
-    init() {
-
-    }
+    public init() { }
 
     /// Connect to the (first) CAN adapter with the given `mode` and `baudrate`.
     public func connect(channel: UInt8 = 0, mode: Mode = .DEFAULT, baudrate: Int) throws {
