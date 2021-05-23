@@ -24,7 +24,7 @@
 ///
 /// \author      $Author: eris $
 ///
-/// \version     $Rev: 986 $
+/// \version     $Rev: 999 $
 ///
 /// \addtogroup  mac_can
 /// \{
@@ -111,4 +111,19 @@ char *CMacCAN::GetVersion() {
     return (char *)string;
 }
 
+// Default implementation for static method ProbeChannel (when not overridden)
+//
+EXPORT
+MacCAN_Return_t CMacCAN::ProbeChannel(int32_t channel, MacCAN_OpMode_t opMode, const void *param, EChannelState &state) {
+    (void)channel;
+    (void)opMode;
+    (void)param;
+    state = CMacCAN::ChannelNotTestable;
+    return (MacCAN_Return_t)CMacCAN::NotSupported;
+}
+
+EXPORT
+MacCAN_Return_t CMacCAN::ProbeChannel(int32_t channel, MacCAN_OpMode_t opMode, EChannelState &state) {
+    return ProbeChannel(channel, opMode, NULL, state);
+}
 /// \}
