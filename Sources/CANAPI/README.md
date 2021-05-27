@@ -1,8 +1,8 @@
 ### CAN Interface API, Version 3
 
-_Copyright &copy; 2004-2021   Uwe Vogt, UV Software, Berlin (info@uv-software.com)_
+_Copyright &copy; 2004-2021 Uwe Vogt, UV Software, Berlin (info@uv-software.com)_
 
-Version $Rev: 987 $
+Version $Rev: 994 $
 
 # A CAN Interface Wrapper Specification
 
@@ -68,20 +68,12 @@ See header file `can_api.h` for a description of the provided functions.
 
 The CAN API V3 sources are maintained in a SVN repo to synchronized them between the different CAN API V3 wrapper repos.
 
-### License
+### Dual-License
 
-CAN API V3 is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This work is dual-licensed under the terms of the BSD 2-Clause "Simplified" License and under the terms of the GNU General Public License v3.0 (or any later version).
+You can choose between one of them if you use this work in whole or in part.
 
-CAN API V3 is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with CAN API V3.  If not, see <http://www.gnu.org/licenses/>.
+`SPDX-License-Identifier: BSD-2-Clause OR GPL-3.0-or-later`
 
 ### Contact
 
