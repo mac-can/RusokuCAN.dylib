@@ -21,7 +21,7 @@
 #include "build_no.h"
 #define VERSION_MAJOR    0
 #define VERSION_MINOR    2
-#define VERSION_PATCH    0
+#define VERSION_PATCH    1
 #define VERSION_BUILD    BUILD_NO
 #define VERSION_STRING   TOSTRING(VERSION_MAJOR) "." TOSTRING(VERSION_MINOR) "." TOSTRING(VERSION_PATCH) " (" TOSTRING(BUILD_NO) ")"
 #if defined(_WIN64)
@@ -387,7 +387,7 @@ MacCAN_Return_t CTouCAN::ReadMessage(MacCAN_Message_t &message, uint16_t timeout
             m_Status.queue_overrun = CANQUE_OverflowFlag(m_pTouCAN->m_ReceiveData.m_MsgQueue) ? 1 : 0;
             m_Counter.u64RxMessages += ((retVal == CANERR_NOERROR) && !message.sts) ? 1U : 0U;
             m_Counter.u64ErrorFrames += ((retVal == CANERR_NOERROR) && message.sts) ? 1U : 0U;
-            
+
             // issue #2: Reading asynchronous reception pipe occasionally stalls
             if (!CANUSB_IsPipeAsyncRunning(m_pTouCAN->m_ReceivePipe))
                 MACCAN_LOG_PRINTF("! error: asynchronous reception pipe stalled\n");
