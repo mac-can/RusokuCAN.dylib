@@ -143,7 +143,7 @@ MacCAN_Return_t CTouCAN::InitializeChannel(int32_t channel, MacCAN_OpMode_t opMo
         // (1) check if requested operation mode is supported
         if ((opMode.byte & (uint8_t)(~SUPPORTED_OP_MODE)) != 0) {
             MACCAN_DEBUG_ERROR("+++ TouCAN: unsupported operation mode (%02x)\n", opMode);
-            retVal = CMacCAN::NotSupported;
+            retVal = CMacCAN::IllegalParameter;  // [2021-05-30]: cf. CAN API V3 function 'can_test'
             goto error_initialize;
         }
         // (2) open a MacCAN device (returns a device handle on success)
