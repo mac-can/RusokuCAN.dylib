@@ -329,6 +329,9 @@ MacCAN_Return_t CTouCAN::WriteMessage(MacCAN_Message_t message, uint16_t timeout
         // (b) check data length code
         if (message.dlc > TOUCAN_USB_MAX_FRAME_DLC)
             return CMacCAN::IllegalParameter;
+        // (c) error frames cannot be sent
+        if (message.sts)
+            return CMacCAN::IllegalParameter;
         // (§) CAN controller must not be in INIT state!
         if (!m_Status.can_stopped) {
             UInt8 buffer[TOUCAN_USB_TX_DATA_PIPE_SIZE];
