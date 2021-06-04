@@ -1,16 +1,21 @@
 //
-//  main.c
-//  TouCAN
+//  main.cpp
+//  MacCAN-TouCAN
+//  Bart Simpson didn´t do it
 //
 #include "TouCAN_Defines.h"
 #include "TouCAN.h"
 
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 #include <signal.h>
 #include <errno.h>
 #include <time.h>
+#if !defined(_WIN32) && !defined(_WIN64)
+ #include <unistd.h>
+#else
+ #include <windows.h>
+#endif
 
 #include <inttypes.h>
 #include "MacCAN_Debug.h"
@@ -19,11 +24,15 @@
 
 #define OPTION_NO   (0)
 #define OPTION_YES  (1)
+
 #define OPTION_TIME_DRIVER  (0)
 #define OPTION_TIME_ZERO    (1)
 #define OPTION_TIME_ABS     (2)
 #define OPTION_TIME_REL     (3)
 
+#if defined(_WIN32) || defined(_WIN64)
+ static void usleep(unsigned int usec);
+#endif
 static void sigterm(int signo);
 
 static void verbose(const can_mode_t mode, const can_bitrate_t bitrate, const can_speed_t speed);
@@ -58,10 +67,9 @@ int main(int argc, const char * argv[]) {
     message.timestamp.tv_sec = 0;
     message.timestamp.tv_nsec = 0;
     MacCAN_Return_t retVal = 0;
-    int32_t channel = 0;
+    int32_t channel = (int32_t)TOUCAN_USB_CHANNEL0;
     uint16_t timeout = CANREAD_INFINITE;
     useconds_t delay = 0U;
-    time_t now = time(NULL);
     CMacCAN::EChannelState state;
     char szVal[CANPROP_MAX_BUFFER_SIZE];
     uint16_t u16Val;
@@ -83,17 +91,18 @@ int main(int argc, const char * argv[]) {
     int option_log = OPTION_NO;
     uint64_t received = 0ULL;
     uint64_t expected = 0ULL;
+    time_t now = time(NULL);
 
     for (int i = 1, opt = 0; i < argc; i++) {
         /* TouCAN-USB channel */
-        if(!strcmp(argv[i], "TouCAN-USB1") || !strcmp(argv[i], "CH:0")) channel = TOUCAN_USB_CHANNEL0;
-        if(!strcmp(argv[i], "TouCAN-USB2") || !strcmp(argv[i], "CH:1")) channel = TOUCAN_USB_CHANNEL1;
-        if(!strcmp(argv[i], "TouCAN-USB3") || !strcmp(argv[i], "CH:2")) channel = TOUCAN_USB_CHANNEL2;
-        if(!strcmp(argv[i], "TouCAN-USB4") || !strcmp(argv[i], "CH:3")) channel = TOUCAN_USB_CHANNEL3;
-        if(!strcmp(argv[i], "TouCAN-USB5") || !strcmp(argv[i], "CH:4")) channel = TOUCAN_USB_CHANNEL4;
-        if(!strcmp(argv[i], "TouCAN-USB6") || !strcmp(argv[i], "CH:5")) channel = TOUCAN_USB_CHANNEL5;
-        if(!strcmp(argv[i], "TouCAN-USB7") || !strcmp(argv[i], "CH:6")) channel = TOUCAN_USB_CHANNEL6;
-        if(!strcmp(argv[i], "TouCAN-USB8") || !strcmp(argv[i], "CH:7")) channel = TOUCAN_USB_CHANNEL7;
+        if(!strcmp(argv[i], "TouCAN-USB1") || !strcmp(argv[i], "CH:0")) channel = (int32_t)TOUCAN_USB_CHANNEL0;
+        if(!strcmp(argv[i], "TouCAN-USB2") || !strcmp(argv[i], "CH:1")) channel = (int32_t)TOUCAN_USB_CHANNEL1;
+        if(!strcmp(argv[i], "TouCAN-USB3") || !strcmp(argv[i], "CH:2")) channel = (int32_t)TOUCAN_USB_CHANNEL2;
+        if(!strcmp(argv[i], "TouCAN-USB4") || !strcmp(argv[i], "CH:3")) channel = (int32_t)TOUCAN_USB_CHANNEL3;
+        if(!strcmp(argv[i], "TouCAN-USB5") || !strcmp(argv[i], "CH:4")) channel = (int32_t)TOUCAN_USB_CHANNEL4;
+        if(!strcmp(argv[i], "TouCAN-USB6") || !strcmp(argv[i], "CH:5")) channel = (int32_t)TOUCAN_USB_CHANNEL5;
+        if(!strcmp(argv[i], "TouCAN-USB7") || !strcmp(argv[i], "CH:6")) channel = (int32_t)TOUCAN_USB_CHANNEL6;
+        if(!strcmp(argv[i], "TouCAN-USB8") || !strcmp(argv[i], "CH:7")) channel = (int32_t)TOUCAN_USB_CHANNEL7;
         /* baud rate (CAN 2.0) */
         if (!strcmp(argv[i], "BD:0") || !strcmp(argv[i], "BD:1000")) bitrate.index = CANBTR_INDEX_1M;
         if (!strcmp(argv[i], "BD:1") || !strcmp(argv[i], "BD:800")) bitrate.index = CANBTR_INDEX_800K;
@@ -150,7 +159,7 @@ int main(int argc, const char * argv[]) {
     }
     if (option_log)
         MACCAN_LOG_OPEN();
-    MACCAN_LOG_PRINTF("# MacCAN-PeakCAN - %s", ctime(&now));
+    MACCAN_LOG_PRINTF("# MacCAN-TouCAN - %s", ctime(&now));
     retVal = CMacCAN::Initializer();
     if (retVal != CMacCAN::NoError) {
         fprintf(stderr, "+++ error: CMacCAN::Initializer returned %i\n", retVal);
@@ -244,6 +253,7 @@ int main(int argc, const char * argv[]) {
             fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_VENDOR): value = '%s'\n", szVal);
         else
             fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_VENDOR) returned %i\n", retVal);
+        // vendor-specific properties
         retVal = myDriver.GetProperty(TOUCAN_PROPERTY_VENDOR_URL, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
         if (retVal == CMacCAN::NoError)
             fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_VENDOR_URL): value = '%s'\n", szVal);
@@ -427,7 +437,7 @@ end:
         return retVal;
     }
     now = time(NULL);
-    MACCAN_LOG_PRINTF("# MacCAN-PeakCAN - %s", ctime(&now));
+    MACCAN_LOG_PRINTF("# MacCAN-TouCAN - %s", ctime(&now));
     if (option_log)
         MACCAN_LOG_CLOSE();
     fprintf(stdout, "Cheers!\n");
