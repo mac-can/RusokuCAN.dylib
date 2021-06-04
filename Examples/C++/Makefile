@@ -12,8 +12,8 @@ DEFINES2 = -DCHANNEL=1 -DBAUDRATE=CANBTR_INDEX_250K
 CXXFLAGS =
 LDFLAGS = -Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation
 
-CXX = g++
-LD = g++
+CXX = clang++
+LD = clang++
 RM = rm -f
 
 all: $(TARGET1) $(TARGET2)
