@@ -274,7 +274,7 @@ int TouCAN_get_last_error_code(CANUSB_Handle_t hDevice, UInt8 *res) {
     if (retVal < 0)
         return (int)retVal;
     
-    if ((wLenDone != 1) && (LastErrorCode != HAL_OK))
+    if ((wLenDone != 1) && (LastErrorCode != HAL_OK))  // FIXME: OR?
         return (int)TOUCAN_ERROR_OFFSET;
     
     if (res)
@@ -875,7 +875,33 @@ static int TouCAN_ResetDevice(CANUSB_Handle_t hDevice) {
         return retVal;
     /* clear pending error(s) */
     if (error != (UInt32)HAL_CAN_ERROR_NONE) {
+        /* Hibernation Issue
+         * ~~~~~~~~~~~~~~~~~
+         * When the Mac wakes up from hibernation then the interface is in state
+         * RESET but the CAN controller is in an error state. We have first to
+         * initialize the interface to reset the error and then to clear it.
+         */
+        retVal = TouCAN_init(hDevice, 10U, 14U, 5U, 4U, 0x00000000U);
+        //fprintf(stderr, "!!! TouCAN_init returned %i\n", retVal);
+        if (retVal < 0)
+            return retVal;
         retVal = TouCAN_clear_interface_error_code(hDevice);
+        //fprintf(stderr, "!!! TouCAN_clear_interface_error_code returned %i\n", retVal);
+        if (retVal < 0)
+            return retVal;
+        /* again get interface error code, but in any case return an error */
+        retVal = TouCAN_get_interface_error_code(hDevice, &error);
+        //fprintf(stderr, "!!! TouCAN_get_interface_error_code returned %i\n", retVal);
+        if (retVal < 0)
+            return retVal;
+        //fprintf(stderr, "    interface error code is 0x%x\n", error);
+        if (error != (UInt32)HAL_CAN_ERROR_NONE)
+            retVal = (int)TOUCAN_ERROR_OFFSET - (int)99;  // FATAL_ERROR;
+        else
+            retVal = (int)TOUCAN_ERROR_OFFSET - (int)TouCAN_RETVAL_ERROR;
+        /* finally tear off all the crap */
+        (void)TouCAN_stop(hDevice);
+        (void)TouCAN_deinit(hDevice);
     }
     return retVal;
 }
