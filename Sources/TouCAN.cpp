@@ -21,7 +21,7 @@
 #include "build_no.h"
 #define VERSION_MAJOR    0
 #define VERSION_MINOR    2
-#define VERSION_PATCH    0
+#define VERSION_PATCH    1
 #define VERSION_BUILD    BUILD_NO
 #define VERSION_STRING   TOSTRING(VERSION_MAJOR) "." TOSTRING(VERSION_MINOR) "." TOSTRING(VERSION_PATCH) " (" TOSTRING(BUILD_NO) ")"
 #if defined(_WIN64)
@@ -143,7 +143,7 @@ MacCAN_Return_t CTouCAN::InitializeChannel(int32_t channel, MacCAN_OpMode_t opMo
         // (1) check if requested operation mode is supported
         if ((opMode.byte & (uint8_t)(~SUPPORTED_OP_MODE)) != 0) {
             MACCAN_DEBUG_ERROR("+++ TouCAN: unsupported operation mode (%02x)\n", opMode);
-            retVal = CMacCAN::NotSupported;
+            retVal = CMacCAN::IllegalParameter;  // [2021-05-30]: cf. CAN API V3 function 'can_test'
             goto error_initialize;
         }
         // (2) open a MacCAN device (returns a device handle on success)
@@ -329,6 +329,9 @@ MacCAN_Return_t CTouCAN::WriteMessage(MacCAN_Message_t message, uint16_t timeout
         // (b) check data length code
         if (message.dlc > TOUCAN_USB_MAX_FRAME_DLC)
             return CMacCAN::IllegalParameter;
+        // (c) error frames cannot be sent
+        if (message.sts)
+            return CMacCAN::IllegalParameter;
         // (§) CAN controller must not be in INIT state!
         if (!m_Status.can_stopped) {
             UInt8 buffer[TOUCAN_USB_TX_DATA_PIPE_SIZE];
@@ -387,7 +390,7 @@ MacCAN_Return_t CTouCAN::ReadMessage(MacCAN_Message_t &message, uint16_t timeout
             m_Status.queue_overrun = CANQUE_OverflowFlag(m_pTouCAN->m_ReceiveData.m_MsgQueue) ? 1 : 0;
             m_Counter.u64RxMessages += ((retVal == CANERR_NOERROR) && !message.sts) ? 1U : 0U;
             m_Counter.u64ErrorFrames += ((retVal == CANERR_NOERROR) && message.sts) ? 1U : 0U;
-            
+
             // issue #2: Reading asynchronous reception pipe occasionally stalls
             if (!CANUSB_IsPipeAsyncRunning(m_pTouCAN->m_ReceivePipe))
                 MACCAN_LOG_PRINTF("! error: asynchronous reception pipe stalled\n");

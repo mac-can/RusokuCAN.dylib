@@ -23,7 +23,15 @@ def sigterm(signo, frame):
 
 
 # CAN API V3 driver library
-lib = 'libUVCANTOU.dylib'
+if platform.system() == 'Darwin':
+    # macOS dynamic library
+    lib = 'libUVCANTOU.dylib'
+elif platform.system() != 'Windows':
+    # shared object library
+    lib = 'libuvcantou.so.1'
+else:
+    # Windows DLL
+    lib = 'u3cantou.dll'
 chn = 1
 num = 1 + CAN_MAX_STD_ID
 
@@ -104,7 +112,10 @@ for i in range(num):
     for j in range(len(data)):
         message.data[j] = data[j]
     message.dlc = 8
-    res = can.write(message)
+    while True:
+        res = can.write(message)
+        if res != CANERR_TX_BUSY:
+            break
     if res < CANERR_NOERROR:
         print('+++ error: can.write returned {}'.format(res))
         break

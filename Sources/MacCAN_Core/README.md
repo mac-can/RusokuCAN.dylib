@@ -2,7 +2,7 @@
 
 _Copyright &copy; 2012-2021   Uwe Vogt, UV Software, Berlin (info@mac-can.com)_
 
-Version $Rev: 985 $
+Version $Rev: 1003 $
 
 # Running CAN and CAN FD on a Mac&reg;
 
@@ -42,16 +42,21 @@ The PCBUSB library is closed source, please note the copyright and license agree
 
 ### TouCAN USB Interfaces from Rusoku
 
-In 2020 I´ve received the request from Gediminas Simanskis, CEO of Rusoku technologijos UAB, Lithuania, if it is possible to roll out the MacCAN project to their TouCAN USB devices.
+Rusoku Technologies is an innovative engineering team based in Lithuania, Europe.
+They offer CAN adapter at a reasonable price.
+Drivers and utilities for Windows and Linux are available as open-source.
 See [Rusoku](https://www.rusoku.com)´s website for the products and the services they offer.
 
-The driver for TouCAN USB interfaces from Rusoku is the first driver implementation based on MacCAN-Core.
+The [MacCAN-TouCAN driver](https://mac-can.github.io/drivers/RusokuCAN/) for TouCAN USB interfaces from Rusoku is the first driver implementation based on MacCAN-Core.
 And it is open source;
 goto https://github.com/mac-can/RusokuCAN/.
 
 ### CAN Leaf Interfaces from Kvaser
 
-Welcome the MacCAN-KvaserCAN driver for CAN Leaf interfaces from [Kvaser](https://www.kvaser.com) as the next member of the MacCAN family.
+The Swedish company [Kvaser AB](https://www.kvaser.com) supplies advanced CAN solutions to engineers designing and deploying systems for manifold areas of applications.
+They offer a wide range of CAN hardware and CAN software, mainly for applications under Windows but also under Linux.
+
+Welcome the [MacCAN-KvaserCAN driver](https://mac-can.github.io/drivers/KvaserCAN/) for CAN Leaf interfaces from Kvaser as the next member of the MacCAN family.
 Find its source code on GitHub;
 goto https://github.com/mac-can/MacCAN-KvaserCAN/.
 
@@ -187,7 +192,7 @@ public:
     /// \param[in]   timeout - time to wait for the transmission of the message:
     ///                             0 means the function returns immediately,
     ///                             65535 means blocking read, and any other
-    ///                             value means the time to wait im milliseconds
+    ///                             value means the time to wait in milliseconds
     //
     /// \returns     0 if successful, or a negative value on error.
     //
@@ -201,7 +206,7 @@ public:
     /// \param[in]   timeout - time to wait for the reception of a message:
     ///                             0 means the function returns immediately,
     ///                             65535 means blocking read, and any other
-    ///                             value means the time to wait im milliseconds
+    ///                             value means the time to wait in milliseconds
     //
     /// \returns     0 if successful, or a negative value on error.
     //
@@ -291,7 +296,7 @@ public:
 /// \brief  Methods for DLC conversion.
 /// \{
 public:
-    static uint8_t DLc2Len(uint8_t dlc);
+    static uint8_t Dlc2Len(uint8_t dlc);
     static uint8_t Len2Dlc(uint8_t len);
 /// \}
 };
@@ -308,20 +313,12 @@ public:
 
 The MacCAN-Core sources are maintained in a SVN repo to synchronized them between the different MacCAN driver repos.
 
-### License
+### Dual-License
 
-MacCAN-Core is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This work is dual-licensed under the terms of the BSD 2-Clause "Simplified" License and under the terms of the GNU General Public License v3.0 (or any later version).
+You can choose between one of them if you use this work in whole or in part.
 
-MacCAN-Core is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with MacCAN-Core.  If not, see <http://www.gnu.org/licenses/>.
+`SPDX-License-Identifier: BSD-2-Clause OR GPL-3.0-or-later`
 
 ### Trademarks
 

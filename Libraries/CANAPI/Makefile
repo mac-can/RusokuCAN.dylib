@@ -43,14 +43,14 @@ LIBRARY = libUVCANTOU
 
 MAJOR = 0
 MINOR = 2
-PATCH = 0
+PATCH = 1
 
-VERSION = $(MAJOR).$(MINOR)
+VERSION = $(MAJOR).$(MINOR).$(PATCH)
 TARGET  = $(LIBRARY).$(VERSION).dylib
 STATIC  = $(LIBRARY).a
 
 INSTALL_NAME = $(TARGET)
-CURRENT_VERSION = $(MAJOR).$(MINOR).0
+CURRENT_VERSION = $(MAJOR).$(MINOR).$(PATCH)
 COMPATIBILITY_VERSION = $(MAJOR).1.0
 
 INSTALL = /usr/local/lib
@@ -134,11 +134,12 @@ incdir:
 	@cp $(CANAPI_DIR)/CANAPI_Defines.h $(INCDIR)
 
 clean:
-	$(RM) $(TARGET) $(OUTDIR)/*.o $(OUTDIR)/*.d
+	$(RM) $(TARGET) $(STATIC) $(OUTDIR)/*.o $(OUTDIR)/*.d
 
 pristine:
-	$(RM) $(TARGET) $(OUTDIR)/*.o $(OUTDIR)/*.d
-	$(RM) $(BINDIR)/$(TARGET) $(BINDIR)/$(STATIC) $(BINDIR)/$(LIBRARY).dylib
+	$(RM) $(TARGET) $(STATIC) $(OUTDIR)/*.o $(OUTDIR)/*.d
+	$(RM) $(BINDIR)/*.dylib $(BINDIR)/*.a
+	$(RM) $(INCDIR)/*.h
 
 install:
 	@echo "Copying library file..."
@@ -183,5 +184,4 @@ $(STATIC): $(OBJECTS)
 $(TARGET): $(OBJECTS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBRARIES)
 	$(CP) $(TARGET) $(BINDIR)
-	$(RM) $(BINDIR)/$(LIBRARY).dylib ; $(LN) $(BINDIR)/$(TARGET) $(BINDIR)/$(LIBRARY).dylib
 	@echo "\033[1mTarget '"$@"' successfully build\033[0m"
