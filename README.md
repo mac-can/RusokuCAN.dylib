@@ -13,7 +13,8 @@ This repo contains the source code for the _MacCAN-TouCAN_ driver and several al
 either as a C++ class library ([_libTouCAN_](#libTouCAN)),
 or as a _CAN API V3_ driver library ([_libUVCANTOU_](#libUVCANTOU)),
 or as a _VSCP CANAL_ compatible library ([_libCANAL_](#libCANAL)),
-as well as my beloved CAN utilities [`can_moni`](#can_moni) and [`can_test`](#can_test), and some C/C++ example programs.
+as well as my beloved CAN utilities [`can_moni`](#can_moni) and [`can_test`](#can_test),
+and some C/C++, Swift, and Python example programs.
 
 
 ### TouCAN API
