@@ -2,9 +2,9 @@
 
 _Copyright &copy; 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)_
 
-# Running CAN on a Mac&reg;
+# Running CAN on Mac&reg;
 
-_Running CAN on a Mac_ is the mission of the MacCAN project.
+_Running CAN on Mac_ is the mission of the MacCAN project.
 The macOS driver for TouCAN USB interfaces from [Rusoku](https://www.rusoku.com) is based on _MacCAN-Core_ which is an abstraction (or rather a wrapper) of Apple´s IOUsbKit to create USB user-space drivers for CAN interfaces from various vendors under macOS.
 
 ## MacCAN-TouCAN
@@ -143,7 +143,7 @@ Type `can_test --help` to display all program options.
 
 For reasons unknown to me, the artifacts build with Xcode detect the TouCAN USB adapter only under macOS 10.15 (Catalina) and higher.
 The artifacts build by Makefile also detect the adapter under macOS 10.13 (High Sierra).
-So I hope that the artifacts build by Makefile are backward compatible up to version 10.6 (Mountain Lion) of the world´s mostest advanced OS.
+So I hope that the artifacts build by Makefile are backward compatible down to version 10.6 (Mountain Lion) of the world´s mostest advanced OS.
 
 ### MacCAN-Core Repo
 
@@ -164,7 +164,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with MacCAN-TouCAN.  If not, see <http://www.gnu.org/licenses/>.
+along with MacCAN-TouCAN.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
 
 #### MacCAN-Core License
 
@@ -175,6 +175,8 @@ The terms of the GNU General Public License v3.0 (or any later version) apply to
 ### Trademarks
 
 Mac and macOS are trademarks of Apple Inc., registered in the U.S. and other countries. \
+Windows is a registered trademark of Microsoft Corporation in the United States and/or other countries. \
+Linux is a registered trademark of Linus Torvalds. \
 All other company, product and service names mentioned herein are trademarks, registered trademarks or service marks of their respective owners.
 
 ### Hazard Note
