@@ -26,8 +26,8 @@ MAIN_DIR = ./Sources
 
 SOURCE_DIR = $(HOME_DIR)/Sources
 CANAPI_DIR = $(HOME_DIR)/Sources/CANAPI
-MACCAN_DIR = $(HOME_DIR)/Sources/MacCAN_Core
-TOUCAN_DIR = $(HOME_DIR)/Sources/TouCAN_Driver
+MACCAN_DIR = $(HOME_DIR)/Sources/MacCAN
+TOUCAN_DIR = $(HOME_DIR)/Sources/Driver
 
 OBJECTS = $(OUTDIR)/main.o $(OUTDIR)/Timer.o  $(BINDIR)/libTouCAN.a \
 	$(OUTDIR)/Message.o $(OUTDIR)/can_msg.o
