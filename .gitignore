@@ -1,4 +1,5 @@
 #.gitignore
+Sources/MACCAN/.svn
 Sources/CANAPI/.svn
 Sources/build_no.h
 Trial/.objects
@@ -15,4 +16,6 @@ Deployment.pdf
 Binaries
 Includes
 Testing
+.vscode
+null.d
 *.log
