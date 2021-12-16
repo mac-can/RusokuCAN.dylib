@@ -3,23 +3,30 @@
  *
  * Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
- * The following source code was copied from CANAL-DLL for Windows
- * and modified to run under macOS 10.15 and later (x86_64 architecture)
+ * The following source code was copied from Rusoku's CANAL-DLL for Windows
+ * and modified to run under macOS 10.13 and later.
  *
- * Copyright (C) 2018 Gediminas Simanskis (gediminas@rusoku.com)
+ * source https://github.com/rusoku/CANAL-DLL/blob/master/CTouCANobjCmdMsg.cpp
+ * commit 0e7510019561157ac2ee4199ddbf39652b146451
+ */
+/*
+ * CANAL interface DLL for RUSOKU technologies for TouCAN, TouCAN Marine, TouCAN Duo USB to CAN bus converter
  *
- * The original CANAL interface DLL for RUSOKU technologies for TouCAN,
- * TouCAN Marine, TouCAN Duo USB to CAN bus converter is licensed
+ * Copyright (C) 2000-2008 Ake Hedman, eurosource, <akhe@eurosource.se>
+ * Copyright (C) 2020 Gediminas Simanskis (gediminas@rusoku.com)
+ *
+ * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published
  * by the Free Software Foundation; version 3.0 of the License.
  *
- * CANAL-DLL is distributed in the hope that it will be useful, but
+ * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along
- * with CANAL-DLL.
+ * with this program.
+ *
  */
 #include "TouCAN_USB.h"
 
@@ -28,98 +35,11 @@
 #include <stdlib.h>
 #include <assert.h>
 
-/////////////////////////////////////////////////////
-// USB request types & mask defines
-
-#define        USB_HOST_TO_DEVICE                          0x00
-#define        USB_DEVICE_TO_HOST                          0x80
-
-#define        USB_REQ_TYPE_STANDARD                       0x00
-#define        USB_REQ_TYPE_CLASS                          0x20
-#define        USB_REQ_TYPE_VENDOR                         0x40
-#define        USB_REQ_TYPE_MASK                           0x60
-
-#define        USB_REQ_RECIPIENT_DEVICE                    0x00
-#define        USB_REQ_RECIPIENT_INTERFACE                 0x01
-#define        USB_REQ_RECIPIENT_ENDPOINT                  0x02
-#define        USB_REQ_RECIPIENT_MASK                      0x03
-
-/////////////////////////////////////////////////////
-// TouCAN requests types (Command)
-
-#define        TouCAN_RESET                                0x00 // OK
-#define        TouCAN_CAN_INTERFACE_INIT                   0x01 // OK
-#define        TouCAN_CAN_INTERFACE_DEINIT                 0x02 // OK
-#define        TouCAN_CAN_INTERFACE_START                  0x03 // OK
-#define        TouCAN_CAN_INTERFACE_STOP                   0x04 // OK
-
-#define        TouCAN_FILTER_STD_ACCEPT_ALL                0x05
-#define        TouCAN_FILTER_STD_REJECT_ALL                0x06
-
-#define        TouCAN_FILTER_EXT_ACCEPT_ALL                0x07
-#define        TouCAN_FILTER_EXT_REJECT_ALL                0x08
-
-#define        TouCAN_SET_FILTER_STD_LIST_MASK             0x09
-#define        TouCAN_SET_FILTER_EXT_LIST_MASK             0x0A
-#define        TouCAN_GET_FILTER_STD_LIST_MASK             0x0B
-#define        TouCAN_GET_FILTER_EXT_LIST_MASK             0x0C
-
-#define        TouCAN_GET_CAN_ERROR_STATUS                 0x0D  // OK   - CAN_Error_Status(&hcan1)
-#define        TouCAN_CLEAR_CAN_ERROR_STATUS               0x0D  // NOK  - CAN_Error_Status(&hcan1) // nenusistato
-#define        TouCAN_GET_STATISTICS                       0x0E  // OK (VSCP CAN state)
-#define        TouCAN_CLEAR_STATISTICS                     0x0F  // OK (VSCP CAN state)
-#define        TouCAN_GET_HARDWARE_VERSION                 0x10  // OK
-#define        TouCAN_GET_FIRMWARE_VERSION                 0x11  // OK
-#define        TouCAN_GET_BOOTLOADER_VERSION               0x12  // OK
-#define        TouCAN_GET_SERIAL_NUMBER                    0x13  // OK
-//#define        TouCAN_SET_SERIAL_NUMBER                    0x14
-//#define        TouCAN_RESET_SERIAL_NUMBER                  0x15
-#define        TouCAN_GET_VID_PID                          0x16  // OK
-#define        TouCAN_GET_DEVICE_ID                        0x17  // OK
-#define        TouCAN_GET_VENDOR                           0x18  // OK
-
-#define        TouCAN_GET_LAST_ERROR_CODE                  0x20  // HAL return error code    8bit // OK
-#define        TouCAN_CLEAR_LAST_ERROR_CODE                0x21  // HAL return error code  8bit // OK
-#define        TouCAN_GET_CAN_INTERFACE_STATE              0x22  // HAL_CAN_GetState(&hcan1)        8bit   // OK
-#define        TouCAN_CLEAR_CAN_INTERFACE_STATE            0x23  // HAL_CAN_GetState(&hcan1); ----------------------------- NOK
-#define        TouCAN_GET_CAN_INTERFACE_ERROR_CODE         0x24  // hcan->ErrorCode;    32bit    // OK  HAL_CAN_GetError(&hcan1);
-#define        TouCAN_CLEAR_CAN_INTERFACE_ERROR_CODE       0x25  // hcan->ErrorCode;    32bit    // OK HAL_CAN_GetError(&hcan1);
-
-#define        TouCAN_SET_CAN_INTERFACE_DELAY              0x26  // OK
-#define        TouCAN_GET_CAN_INTERFACE_DELAY              0x27  // OK
-
-/////////////////////////////////////////////////////
-// TouCAN HAL return error codes
-
-typedef enum
-{
-    HAL_OK =      0x00U,
-    HAL_ERROR =   0x01U,
-    HAL_BUSY =    0x02U,
-    HAL_TIMEOUT = 0x03U
-} HAL_StatusTypeDef;
-
-
-/////////////////////////////////////////////////////
-// TouCAN CAN interface state
-
-typedef enum
-{
-    HAL_CAN_STATE_RESET =            0x00U,  /* CAN not yet initialized or disabled */
-    HAL_CAN_STATE_READY =            0x01U,  /* CAN initialized and ready for use   */
-    HAL_CAN_STATE_LISTENING =        0x02U,  /* CAN receive process is ongoing      */
-    HAL_CAN_STATE_SLEEP_PENDING =    0x03U,  /* CAN sleep request is pending        */
-    HAL_CAN_STATE_SLEEP_ACTIVE =     0x04U,  /* CAN sleep mode is active            */
-    HAL_CAN_STATE_ERROR =            0x05U   /* CAN error state                     */
-
-} HAL_CAN_StateTypeDef;
-
-
 //////////////////////////////////////////////////////////////////////
 // TouCAN init
 //
 
-int TouCAN_init(CANUSB_Handle_t hDevice, UInt16 u16Brp, UInt8 u8Tseg1, UInt8 u8Tseg2, UInt8 u8Sjw, UInt32 u32Flags) {
+int TouCAN_init(CANUSB_Handle_t handle, UInt16 brp, UInt8 tseg1, UInt8 tseg2, UInt8 sjw, UInt32 flags) {
     CANUSB_SetupPacket_t SetupPacket;
     CANUSB_Return_t retVal;
     UInt8 res;
@@ -133,28 +53,28 @@ int TouCAN_init(CANUSB_Handle_t hDevice, UInt16 u16Brp, UInt8 u8Tseg1, UInt8 u8T
     SetupPacket.Length = 9;
     
     // tseg1
-    data[0] = u8Tseg1;
+    data[0] = tseg1;
     // tseg2
-    data[1] = u8Tseg2;
+    data[1] = tseg2;
     // sjw
-    data[2] = u8Sjw;
+    data[2] = sjw;
     // Brp
 
-    data[3] = (UInt8) ((u16Brp >> 8) & 0xFF);
-    data[4] = (UInt8) (u16Brp & 0xFF);
+    data[3] = (UInt8) ((brp >> 8) & 0xFF);
+    data[4] = (UInt8) (brp & 0xFF);
 
     // flags
-    data[5] = (UInt8) ((u32Flags >> 24) & 0xFF);
-    data[6] = (UInt8) ((u32Flags >> 16) & 0xFF);
-    data[7] = (UInt8) ((u32Flags >> 8) & 0xFF);
-    data[8] = (UInt8)  (u32Flags & 0xFF);
+    data[5] = (UInt8) ((flags >> 24) & 0xFF);
+    data[6] = (UInt8) ((flags >> 16) & 0xFF);
+    data[7] = (UInt8) ((flags >> 8) & 0xFF);
+    data[8] = (UInt8)  (flags & 0xFF);
 
     // TouCAN_CAN_INTERFACE_INIT
-    retVal = CANUSB_DeviceRequest(hDevice, SetupPacket, (void *)data, 9, NULL);
+    retVal = CANUSB_DeviceRequest(handle, SetupPacket, (void *)data, 9, NULL);
     if (retVal < 0)
         return (int)retVal;
     
-    retVal = TouCAN_get_last_error_code(hDevice, &res);
+    retVal = TouCAN_get_last_error_code(handle, &res);
     if (retVal < 0)
         return (int)retVal;
     
@@ -168,7 +88,7 @@ int TouCAN_init(CANUSB_Handle_t hDevice, UInt16 u16Brp, UInt8 u8Tseg1, UInt8 u8T
 // TouCAN deinit
 //
 
-int TouCAN_deinit(CANUSB_Handle_t hDevice) {
+int TouCAN_deinit(CANUSB_Handle_t handle) {
     CANUSB_SetupPacket_t SetupPacket;
     CANUSB_Return_t retVal;
     UInt8 res;
@@ -180,11 +100,11 @@ int TouCAN_deinit(CANUSB_Handle_t hDevice) {
     SetupPacket.Length = 0;
     
     // TouCAN_CAN_INTERFACE_DEINIT
-    retVal = CANUSB_DeviceRequest(hDevice, SetupPacket, NULL, 0, NULL);
+    retVal = CANUSB_DeviceRequest(handle, SetupPacket, NULL, 0, NULL);
     if (retVal < 0)
         return (int)retVal;
     
-    retVal = TouCAN_get_last_error_code(hDevice, &res);
+    retVal = TouCAN_get_last_error_code(handle, &res);
     if (retVal < 0)
         return (int)retVal;
     
@@ -198,7 +118,7 @@ int TouCAN_deinit(CANUSB_Handle_t hDevice) {
 // TouCAN start
 //
 
-int TouCAN_start(CANUSB_Handle_t hDevice) {
+int TouCAN_start(CANUSB_Handle_t handle) {
     CANUSB_SetupPacket_t SetupPacket;
     CANUSB_Return_t retVal;
     UInt8 res;
@@ -210,11 +130,11 @@ int TouCAN_start(CANUSB_Handle_t hDevice) {
     SetupPacket.Length = 0;
     
     // TouCAN_CAN_INTERFACE_START
-    retVal = CANUSB_DeviceRequest(hDevice, SetupPacket, NULL, 0, NULL);
+    retVal = CANUSB_DeviceRequest(handle, SetupPacket, NULL, 0, NULL);
     if (retVal < 0)
         return (int)retVal;
     
-    retVal = TouCAN_get_last_error_code(hDevice, &res);
+    retVal = TouCAN_get_last_error_code(handle, &res);
     if (retVal < 0)
         return (int)retVal;
     
@@ -228,7 +148,7 @@ int TouCAN_start(CANUSB_Handle_t hDevice) {
 // TouCAN stop
 //
 
-int TouCAN_stop(CANUSB_Handle_t hDevice) {
+int TouCAN_stop(CANUSB_Handle_t handle) {
     CANUSB_SetupPacket_t SetupPacket;
     CANUSB_Return_t retVal;
     UInt8 res;
@@ -240,11 +160,11 @@ int TouCAN_stop(CANUSB_Handle_t hDevice) {
     SetupPacket.Length = 0;
 
     // TouCAN_CAN_INTERFACE_STOP
-    retVal = CANUSB_DeviceRequest(hDevice, SetupPacket, NULL, 0, NULL);
+    retVal = CANUSB_DeviceRequest(handle, SetupPacket, NULL, 0, NULL);
     if (retVal < 0)
         return (int)retVal;
     
-    retVal = TouCAN_get_last_error_code(hDevice, &res);
+    retVal = TouCAN_get_last_error_code(handle, &res);
     if (retVal < 0)
         return (int)retVal;
     
@@ -258,7 +178,7 @@ int TouCAN_stop(CANUSB_Handle_t hDevice) {
 // TouCAN HAL get last error
 //
 
-int TouCAN_get_last_error_code(CANUSB_Handle_t hDevice, UInt8 *res) {
+int TouCAN_get_last_error_code(CANUSB_Handle_t handle, UInt8 *res) {
     CANUSB_SetupPacket_t SetupPacket;
     CANUSB_Return_t retVal;
     UInt32 wLenDone;
@@ -270,7 +190,7 @@ int TouCAN_get_last_error_code(CANUSB_Handle_t hDevice, UInt8 *res) {
     SetupPacket.Index = 0;
     SetupPacket.Length = 1;
 
-    retVal = CANUSB_DeviceRequest(hDevice, SetupPacket, (void *)&LastErrorCode, 1, &wLenDone);
+    retVal = CANUSB_DeviceRequest(handle, SetupPacket, (void *)&LastErrorCode, 1, &wLenDone);
     if (retVal < 0)
         return (int)retVal;
     
@@ -287,7 +207,7 @@ int TouCAN_get_last_error_code(CANUSB_Handle_t hDevice, UInt8 *res) {
 // TouCAN get CAN interface ERROR:  hcan->ErrorCode;
 //
 
-int TouCAN_get_interface_error_code(CANUSB_Handle_t hDevice, UInt32 *ErrorCode) {
+int TouCAN_get_interface_error_code(CANUSB_Handle_t handle, UInt32 *ErrorCode) {
     CANUSB_SetupPacket_t SetupPacket;
     CANUSB_Return_t retVal;
     UInt8 buf[4];
@@ -299,11 +219,11 @@ int TouCAN_get_interface_error_code(CANUSB_Handle_t hDevice, UInt32 *ErrorCode) 
     SetupPacket.Index = 0;
     SetupPacket.Length = 4;
 
-    retVal = CANUSB_DeviceRequest(hDevice, SetupPacket, (void *)buf, 4, NULL);
+    retVal = CANUSB_DeviceRequest(handle, SetupPacket, (void *)buf, 4, NULL);
     if (retVal < 0)
         return (int)retVal;
 
-    retVal = TouCAN_get_last_error_code(hDevice, &res);
+    retVal = TouCAN_get_last_error_code(handle, &res);
     if (retVal < 0)
         return (int)retVal;
     
@@ -323,7 +243,7 @@ int TouCAN_get_interface_error_code(CANUSB_Handle_t hDevice, UInt32 *ErrorCode) 
 // TouCAN TouCAN_CLEAR_CAN_INTERFACE_ERROR_CODE:  hcan->ErrorCode;
 //
 
-int TouCAN_clear_interface_error_code(CANUSB_Handle_t hDevice) {
+int TouCAN_clear_interface_error_code(CANUSB_Handle_t handle) {
     CANUSB_SetupPacket_t SetupPacket;
     CANUSB_Return_t retVal;
     UInt8 res;
@@ -334,11 +254,11 @@ int TouCAN_clear_interface_error_code(CANUSB_Handle_t hDevice) {
     SetupPacket.Index = 0;
     SetupPacket.Length = 0;
 
-    retVal = CANUSB_DeviceRequest(hDevice, SetupPacket, NULL, 0, NULL);
+    retVal = CANUSB_DeviceRequest(handle, SetupPacket, NULL, 0, NULL);
     if (retVal < 0)
         return (int)retVal;
     
-    retVal = TouCAN_get_last_error_code(hDevice, &res);
+    retVal = TouCAN_get_last_error_code(handle, &res);
     if (retVal < 0)
         return (int)retVal;
     
@@ -352,7 +272,7 @@ int TouCAN_clear_interface_error_code(CANUSB_Handle_t hDevice) {
 // TouCAN TouCAN_GET_CAN_INTERFACE_STATE   hcan->State;
 //
 
-int TouCAN_get_interface_state(CANUSB_Handle_t hDevice, UInt8 *state) {
+int TouCAN_get_interface_state(CANUSB_Handle_t handle, UInt8 *state) {
     CANUSB_SetupPacket_t SetupPacket;
     CANUSB_Return_t retVal;
     UInt8 buf[1];
@@ -364,11 +284,11 @@ int TouCAN_get_interface_state(CANUSB_Handle_t hDevice, UInt8 *state) {
     SetupPacket.Index = 0;
     SetupPacket.Length = 1;
 
-    retVal = CANUSB_DeviceRequest(hDevice, SetupPacket, (void *)buf, 1, NULL);
+    retVal = CANUSB_DeviceRequest(handle, SetupPacket, (void *)buf, 1, NULL);
     if (retVal < 0)
         return (int)retVal;
     
-    retVal = TouCAN_get_last_error_code(hDevice, &res);
+    retVal = TouCAN_get_last_error_code(handle, &res);
     if (retVal < 0)
         return (int)retVal;
     
@@ -386,7 +306,7 @@ int TouCAN_get_interface_state(CANUSB_Handle_t hDevice, UInt8 *state) {
 // TouCAN TouCAN_get_statistics VSCP
 //
 
-int TouCAN_get_statistics(CANUSB_Handle_t hDevice, PCANALSTATISTICS statistics) {
+int TouCAN_get_statistics(CANUSB_Handle_t handle, PCANALSTATISTICS statistics) {
     return (int)TOUCAN_ERROR_OFFSET;
 }
 
@@ -394,7 +314,7 @@ int TouCAN_get_statistics(CANUSB_Handle_t hDevice, PCANALSTATISTICS statistics) 
 // TouCAN_clear_statistics VSCP
 //
 
-int TouCAN_clear_statistics(CANUSB_Handle_t hDevice) {
+int TouCAN_clear_statistics(CANUSB_Handle_t handle) {
     return (int)TOUCAN_ERROR_OFFSET;
 }
 
@@ -402,7 +322,7 @@ int TouCAN_clear_statistics(CANUSB_Handle_t hDevice) {
 // TouCAN_get_status VSCP
 //
 
-int TouCAN_get_canal_status(CANUSB_Handle_t hDevice, canalStatus *status) {
+int TouCAN_get_canal_status(CANUSB_Handle_t handle, canalStatus *status) {
     return (int)TOUCAN_ERROR_OFFSET;
 }
 #endif
@@ -411,7 +331,7 @@ int TouCAN_get_canal_status(CANUSB_Handle_t hDevice, canalStatus *status) {
 // TouCAN_get_hardware_version
 //
  
-int TouCAN_get_hardware_version(CANUSB_Handle_t hDevice, UInt32 *ver) {
+int TouCAN_get_hardware_version(CANUSB_Handle_t handle, UInt32 *ver) {
     CANUSB_SetupPacket_t SetupPacket;
     CANUSB_Return_t retVal;
     UInt8 buf[4];
@@ -423,11 +343,11 @@ int TouCAN_get_hardware_version(CANUSB_Handle_t hDevice, UInt32 *ver) {
     SetupPacket.Index = 0;
     SetupPacket.Length = 4;
 
-    retVal = CANUSB_DeviceRequest(hDevice, SetupPacket, (void *)buf, 4, NULL);
+    retVal = CANUSB_DeviceRequest(handle, SetupPacket, (void *)buf, 4, NULL);
     if (retVal < 0)
         return (int)retVal;
     
-    retVal = TouCAN_get_last_error_code(hDevice, &res);
+    retVal = TouCAN_get_last_error_code(handle, &res);
     if (retVal < 0)
         return (int)retVal;
     
@@ -447,7 +367,7 @@ int TouCAN_get_hardware_version(CANUSB_Handle_t hDevice, UInt32 *ver) {
 // TouCAN_get_firmware_version
 //
 //
-int TouCAN_get_firmware_version(CANUSB_Handle_t hDevice, UInt32 *ver) {
+int TouCAN_get_firmware_version(CANUSB_Handle_t handle, UInt32 *ver) {
     CANUSB_SetupPacket_t SetupPacket;
     CANUSB_Return_t retVal;
     UInt8 buf[4];
@@ -459,11 +379,11 @@ int TouCAN_get_firmware_version(CANUSB_Handle_t hDevice, UInt32 *ver) {
     SetupPacket.Index = 0;
     SetupPacket.Length = 4;
 
-    retVal = CANUSB_DeviceRequest(hDevice, SetupPacket, (void *)buf, 4, NULL);
+    retVal = CANUSB_DeviceRequest(handle, SetupPacket, (void *)buf, 4, NULL);
     if (retVal < 0)
         return (int)retVal;
     
-    retVal = TouCAN_get_last_error_code(hDevice, &res);
+    retVal = TouCAN_get_last_error_code(handle, &res);
     if (retVal < 0)
         return (int)retVal;
     
@@ -483,7 +403,7 @@ int TouCAN_get_firmware_version(CANUSB_Handle_t hDevice, UInt32 *ver) {
 // TouCAN_get_bootloader_version
 //
 //
-int TouCAN_get_bootloader_version(CANUSB_Handle_t hDevice, UInt32 *ver) {
+int TouCAN_get_bootloader_version(CANUSB_Handle_t handle, UInt32 *ver) {
     CANUSB_SetupPacket_t SetupPacket;
     CANUSB_Return_t retVal;
     UInt8 buf[4];
@@ -495,11 +415,11 @@ int TouCAN_get_bootloader_version(CANUSB_Handle_t hDevice, UInt32 *ver) {
     SetupPacket.Index = 0;
     SetupPacket.Length = 4;
 
-    retVal = CANUSB_DeviceRequest(hDevice, SetupPacket, (void *)buf, 4, NULL);
+    retVal = CANUSB_DeviceRequest(handle, SetupPacket, (void *)buf, 4, NULL);
     if (retVal < 0)
         return (int)retVal;
     
-    retVal = TouCAN_get_last_error_code(hDevice, &res);
+    retVal = TouCAN_get_last_error_code(handle, &res);
     if (retVal < 0)
         return (int)retVal;
     
@@ -519,7 +439,7 @@ int TouCAN_get_bootloader_version(CANUSB_Handle_t hDevice, UInt32 *ver) {
 // TouCAN_get_serial_number
 //
 //
-int TouCAN_get_serial_number(CANUSB_Handle_t hDevice, UInt32 *ver) {
+int TouCAN_get_serial_number(CANUSB_Handle_t handle, UInt32 *ver) {
     CANUSB_SetupPacket_t SetupPacket;
     CANUSB_Return_t retVal;
     UInt8 buf[4];
@@ -531,11 +451,11 @@ int TouCAN_get_serial_number(CANUSB_Handle_t hDevice, UInt32 *ver) {
     SetupPacket.Index = 0;
     SetupPacket.Length = 4;
 
-    retVal = CANUSB_DeviceRequest(hDevice, SetupPacket, (void *)buf, 4, NULL);
+    retVal = CANUSB_DeviceRequest(handle, SetupPacket, (void *)buf, 4, NULL);
     if (retVal < 0)
         return (int)retVal;
     
-    retVal = TouCAN_get_last_error_code(hDevice, &res);
+    retVal = TouCAN_get_last_error_code(handle, &res);
     if (retVal < 0)
         return (int)retVal;
     
@@ -556,7 +476,7 @@ int TouCAN_get_serial_number(CANUSB_Handle_t hDevice, UInt32 *ver) {
 // TouCAN_get_vid_pid
 //
 //
-int TouCAN_get_vid_pid(CANUSB_Handle_t hDevice, UInt32 *ver) {
+int TouCAN_get_vid_pid(CANUSB_Handle_t handle, UInt32 *ver) {
     CANUSB_SetupPacket_t SetupPacket;
     CANUSB_Return_t retVal;
     UInt8 buf[4];
@@ -568,11 +488,11 @@ int TouCAN_get_vid_pid(CANUSB_Handle_t hDevice, UInt32 *ver) {
     SetupPacket.Index = 0;
     SetupPacket.Length = 4;
 
-    retVal = CANUSB_DeviceRequest(hDevice, SetupPacket, (void *)buf, 4, NULL);
+    retVal = CANUSB_DeviceRequest(handle, SetupPacket, (void *)buf, 4, NULL);
     if (retVal < 0)
         return (int)retVal;
     
-    retVal = TouCAN_get_last_error_code(hDevice, &res);
+    retVal = TouCAN_get_last_error_code(handle, &res);
     if (retVal < 0)
         return (int)retVal;
     
@@ -592,7 +512,7 @@ int TouCAN_get_vid_pid(CANUSB_Handle_t hDevice, UInt32 *ver) {
 // TouCAN_get_device_id
 //
 //
-int TouCAN_get_device_id(CANUSB_Handle_t hDevice, UInt32 *ver) {
+int TouCAN_get_device_id(CANUSB_Handle_t handle, UInt32 *ver) {
     CANUSB_SetupPacket_t SetupPacket;
     CANUSB_Return_t retVal;
     UInt8 buf[4];
@@ -604,11 +524,11 @@ int TouCAN_get_device_id(CANUSB_Handle_t hDevice, UInt32 *ver) {
     SetupPacket.Index = 0;
     SetupPacket.Length = 4;
 
-    retVal = CANUSB_DeviceRequest(hDevice, SetupPacket, (void *)buf, 4, NULL);
+    retVal = CANUSB_DeviceRequest(handle, SetupPacket, (void *)buf, 4, NULL);
     if (retVal < 0)
         return (int)retVal;
     
-    retVal = TouCAN_get_last_error_code(hDevice, &res);
+    retVal = TouCAN_get_last_error_code(handle, &res);
     if (retVal < 0)
         return (int)retVal;
     
@@ -628,7 +548,7 @@ int TouCAN_get_device_id(CANUSB_Handle_t hDevice, UInt32 *ver) {
 // TouCAN_get_vendor
 //
 //
-int TouCAN_get_vendor(CANUSB_Handle_t hDevice, unsigned int size, char *str) {
+int TouCAN_get_vendor(CANUSB_Handle_t handle, unsigned int size, char *str) {
     CANUSB_SetupPacket_t SetupPacket;
     CANUSB_Return_t retVal;
     UInt8 buf[32];
@@ -640,11 +560,11 @@ int TouCAN_get_vendor(CANUSB_Handle_t hDevice, unsigned int size, char *str) {
     SetupPacket.Index = 0;
     SetupPacket.Length = 32;  // FIXME: 4(?)
 
-    retVal = CANUSB_DeviceRequest(hDevice, SetupPacket, (void *)buf, 32, NULL);
+    retVal = CANUSB_DeviceRequest(handle, SetupPacket, (void *)buf, 32, NULL);
     if (retVal < 0)
         return (int)retVal;
     
-    retVal = TouCAN_get_last_error_code(hDevice, &res);
+    retVal = TouCAN_get_last_error_code(handle, &res);
     if (retVal < 0)
         return (int)retVal;
     
@@ -658,20 +578,20 @@ int TouCAN_get_vendor(CANUSB_Handle_t hDevice, unsigned int size, char *str) {
 
 }
 
-int TouCAN_get_interface_transmit_delay(CANUSB_Handle_t hDevice, UInt8 channel,UInt32 *delay) {
+int TouCAN_get_interface_transmit_delay(CANUSB_Handle_t handle, UInt8 channel,UInt32 *delay) {
     return (int)TOUCAN_ERROR_OFFSET;
 }
 
-int TouCAN_set_interface_transmit_delay(CANUSB_Handle_t hDevice, UInt8 channel,UInt32 *delay) {
+int TouCAN_set_interface_transmit_delay(CANUSB_Handle_t handle, UInt8 channel,UInt32 *delay) {
     return (int)TOUCAN_ERROR_OFFSET;
 }
 
 ///////////////////////////////////////// LIST, MASK ////////////////////////////////////////////
-int TouCAN_set_filter_std_list_mask(CANUSB_Handle_t hDevice, Filter_Type_TypeDef type, UInt32 list, UInt32 mask) {
+int TouCAN_set_filter_std_list_mask(CANUSB_Handle_t handle, Filter_Type_TypeDef type, UInt32 list, UInt32 mask) {
     return (int)TOUCAN_ERROR_OFFSET;
 }
 
-int TouCAN_set_filter_ext_list_mask(CANUSB_Handle_t hDevice, Filter_Type_TypeDef type, UInt32 list, UInt32 mask) {
+int TouCAN_set_filter_ext_list_mask(CANUSB_Handle_t handle, Filter_Type_TypeDef type, UInt32 list, UInt32 mask) {
     return (int)TOUCAN_ERROR_OFFSET;
 }
 
@@ -844,33 +764,33 @@ int TouCAN_DecodeMessage(MacCAN_Message_t *message, const UInt8 *buffer, TouCAN_
     return index;
 }
 
-static int TouCAN_ResetDevice(CANUSB_Handle_t hDevice) {
+static int TouCAN_ResetDevice(CANUSB_Handle_t handle) {
     int retVal;
     UInt8 state = 0;
     UInt32 error = 0;
     
     /* get device state */
-    retVal = TouCAN_get_interface_state(hDevice, &state);
+    retVal = TouCAN_get_interface_state(handle, &state);
     if (retVal < 0)
         return retVal;
     /* state LISTENING ==> state READY */
     if (state == (UInt8)HAL_CAN_STATE_LISTENING) {
-        retVal = TouCAN_stop(hDevice);
+        retVal = TouCAN_stop(handle);
         if (retVal < 0)
             return retVal;
         /* get new device state */
-        retVal = TouCAN_get_interface_state(hDevice, &state);
+        retVal = TouCAN_get_interface_state(handle, &state);
         if (retVal < 0)
             return retVal;
     }
     /* state READY++ ==> state RESET */
     if (state != (UInt8)HAL_CAN_STATE_RESET) {
-        retVal = TouCAN_deinit(hDevice);
+        retVal = TouCAN_deinit(handle);
         if (retVal < 0)
             return retVal;
     }
     /* get interface error code */
-    retVal = TouCAN_get_interface_error_code(hDevice, &error);
+    retVal = TouCAN_get_interface_error_code(handle, &error);
     if (retVal < 0)
         return retVal;
     /* clear pending error(s) */
@@ -881,16 +801,16 @@ static int TouCAN_ResetDevice(CANUSB_Handle_t hDevice) {
          * RESET but the CAN controller is in an error state. We have first to
          * initialize the interface to reset the error and then to clear it.
          */
-        retVal = TouCAN_init(hDevice, 10U, 14U, 5U, 4U, 0x00000000U);
+        retVal = TouCAN_init(handle, 10U, 14U, 5U, 4U, 0x00000000U);
         //fprintf(stderr, "!!! TouCAN_init returned %i\n", retVal);
         if (retVal < 0)
             return retVal;
-        retVal = TouCAN_clear_interface_error_code(hDevice);
+        retVal = TouCAN_clear_interface_error_code(handle);
         //fprintf(stderr, "!!! TouCAN_clear_interface_error_code returned %i\n", retVal);
         if (retVal < 0)
             return retVal;
         /* again get interface error code, but in any case return an error */
-        retVal = TouCAN_get_interface_error_code(hDevice, &error);
+        retVal = TouCAN_get_interface_error_code(handle, &error);
         //fprintf(stderr, "!!! TouCAN_get_interface_error_code returned %i\n", retVal);
         if (retVal < 0)
             return retVal;
@@ -900,33 +820,33 @@ static int TouCAN_ResetDevice(CANUSB_Handle_t hDevice) {
         else
             retVal = (int)TOUCAN_ERROR_OFFSET - (int)TouCAN_RETVAL_ERROR;
         /* finally tear off all the crap */
-        (void)TouCAN_stop(hDevice);
-        (void)TouCAN_deinit(hDevice);
+        (void)TouCAN_stop(handle);
+        (void)TouCAN_deinit(handle);
     }
     return retVal;
 }
 
-int TouCAN_InitializeInterface(CANUSB_Handle_t hDevice) {
+int TouCAN_InitializeInterface(CANUSB_Handle_t handle) {
     int retVal;
     
     /* reset state and pending errors */
-    retVal = TouCAN_ResetDevice(hDevice);
+    retVal = TouCAN_ResetDevice(handle);
     if (retVal < 0)
         return retVal;
     /* initialize with default bit-rate and mode-flags */
     /* note: CAN API provides this at a later stage */
-    retVal = TouCAN_init(hDevice, 10U, 14U, 5U, 4U, 0x00000000U);
+    retVal = TouCAN_init(handle, 10U, 14U, 5U, 4U, 0x00000000U);
     
     return retVal;
 }
 
-int TouCAN_TeardownInterface(CANUSB_Handle_t hDevice) {
+int TouCAN_TeardownInterface(CANUSB_Handle_t handle) {
     /* enter RESET state (deinit) */
-    return TouCAN_ResetDevice(hDevice);
+    return TouCAN_ResetDevice(handle);
 }
 
-int TouCAN_SetBitrateAndMode(CANUSB_Handle_t hDevice, const MacCAN_Bitrate_t *bitrate,
-                                                      const MacCAN_OpMode_t *opMode) {
+int TouCAN_SetBitrateAndMode(CANUSB_Handle_t handle, const MacCAN_Bitrate_t *bitrate,
+                                                     const MacCAN_OpMode_t *opMode) {
     int retVal;
     UInt32 modeFlags = 0x00000000U;
 
@@ -939,25 +859,15 @@ int TouCAN_SetBitrateAndMode(CANUSB_Handle_t hDevice, const MacCAN_Bitrate_t *bi
     // TODO: modeFlags |= opMode->nxtd
 
     /* reset state and pending errors */
-    retVal = TouCAN_ResetDevice(hDevice);
+    retVal = TouCAN_ResetDevice(handle);
     if (retVal < 0)
         return retVal;
     /* initialize with demanded bit-rate and mode-flags */
-    retVal = TouCAN_init(hDevice,
+    retVal = TouCAN_init(handle,
                          bitrate->btr.nominal.brp,
                          bitrate->btr.nominal.tseg1,
                          bitrate->btr.nominal.tseg2,
                          bitrate->btr.nominal.sjw,
                          modeFlags);
     return retVal;
-}
-
-int TouCAN_StartInterface(CANUSB_Handle_t hDevice) {
-    /* enter LISTENING state */
-    return TouCAN_start(hDevice);
-}
-
-int TouCAN_StopInterface(CANUSB_Handle_t hDevice) {
-    /* enter READY state again */
-    return TouCAN_stop(hDevice);
 }

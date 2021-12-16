@@ -52,6 +52,7 @@
 		0F68BB0E24104206005DAB17 /* can_btr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = can_btr.h; path = ../../Sources/CANAPI/can_btr.h; sourceTree = "<group>"; };
 		0F6B18D72420164300545209 /* can_msg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = can_msg.c; path = ../../Sources/CANAPI/can_msg.c; sourceTree = "<group>"; };
 		0F6B18D82420164300545209 /* can_msg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = can_msg.h; path = ../../Sources/CANAPI/can_msg.h; sourceTree = "<group>"; };
+		0F7FF6F7276BE741000033BE /* TouCAN_Common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TouCAN_Common.h; path = ../../Sources/Driver/TouCAN_Common.h; sourceTree = "<group>"; };
 		0F8B2A9B259F60BA00C8841C /* MacCAN_MsgQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MacCAN_MsgQueue.h; path = ../../Sources/MacCAN/MacCAN_MsgQueue.h; sourceTree = "<group>"; };
 		0F8B2A9C259F60BA00C8841C /* MacCAN_Common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MacCAN_Common.h; path = ../../Sources/MacCAN/MacCAN_Common.h; sourceTree = "<group>"; };
 		0F8B2A9D259F60BA00C8841C /* MacCAN_MsgQueue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MacCAN_MsgQueue.c; path = ../../Sources/MacCAN/MacCAN_MsgQueue.c; sourceTree = "<group>"; };
@@ -91,6 +92,7 @@
 		0F60A9BF23F7FDD700D34D0E /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				0F7FF6F7276BE741000033BE /* TouCAN_Common.h */,
 				4446DFBC276949010026D37D /* main.c */,
 				4446DFBB276949010026D37D /* printmsg.c */,
 				0F39ACF8240D918300DA8EF5 /* CANAPI_Types.h */,
