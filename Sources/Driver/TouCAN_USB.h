@@ -42,37 +42,38 @@ typedef struct receive_data_t {  ///< reception data:
 
 typedef CANUSB_AsyncPipe_t TouCAN_ReceivePipe_t;
 
+typedef int TouCAN_Handle_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern int TouCAN_init(CANUSB_Handle_t handle, UInt16 brp, UInt8 tseg1, UInt8 tseg2, UInt8 sjw, UInt32 flags);
-extern int TouCAN_deinit(CANUSB_Handle_t handle);
-extern int TouCAN_start(CANUSB_Handle_t handle);
-extern int TouCAN_stop(CANUSB_Handle_t handle);
+extern int TouCAN_init(TouCAN_Handle_t handle, UInt16 brp, UInt8 tseg1, UInt8 tseg2, UInt8 sjw, UInt32 flags);
+extern int TouCAN_deinit(TouCAN_Handle_t handle);
+extern int TouCAN_start(TouCAN_Handle_t handle);
+extern int TouCAN_stop(TouCAN_Handle_t handle);
 
-extern int TouCAN_get_last_error_code(CANUSB_Handle_t handle, UInt8 *res);
-extern int TouCAN_get_interface_error_code(CANUSB_Handle_t handle, UInt32 *ErrorCode);
-extern int TouCAN_clear_interface_error_code(CANUSB_Handle_t handle);
-extern int TouCAN_get_interface_state(CANUSB_Handle_t handle, UInt8 *state);
+extern int TouCAN_get_last_error_code(TouCAN_Handle_t handle, UInt8 *res);
+extern int TouCAN_get_interface_error_code(TouCAN_Handle_t handle, UInt32 *ErrorCode);
+extern int TouCAN_clear_interface_error_code(TouCAN_Handle_t handle);
+extern int TouCAN_get_interface_state(TouCAN_Handle_t handle, UInt8 *state);
 #if (OPTION_TOUCAN_CANAL != 0)
-extern int TouCAN_get_statistics(CANUSB_Handle_t handle, PCANALSTATISTICS statistics);
-extern int TouCAN_clear_statistics(CANUSB_Handle_t handle);
-extern int TouCAN_get_canal_status(CANUSB_Handle_t handle, canalStatus *status);
+extern int TouCAN_get_statistics(TouCAN_Handle_t handle, PCANALSTATISTICS statistics);
+extern int TouCAN_clear_statistics(TouCAN_Handle_t handle);
+extern int TouCAN_get_canal_status(TouCAN_Handle_t handle, canalStatus *status);
 #endif
-extern int TouCAN_get_hardware_version(CANUSB_Handle_t handle, UInt32 *ver);
-extern int TouCAN_get_firmware_version(CANUSB_Handle_t handle, UInt32 *ver);
-extern int TouCAN_get_bootloader_version(CANUSB_Handle_t handle, UInt32 *ver);
-extern int TouCAN_get_serial_number(CANUSB_Handle_t handle, UInt32 *ver);
-extern int TouCAN_get_vid_pid(CANUSB_Handle_t handle, UInt32 *ver);
-extern int TouCAN_get_device_id(CANUSB_Handle_t handle, UInt32 *ver);
-extern int TouCAN_get_vendor(CANUSB_Handle_t handle, unsigned int size, char *str);
-extern int TouCAN_get_interface_transmit_delay(CANUSB_Handle_t handle, UInt8 channel,UInt32 *delay);
-extern int TouCAN_set_interface_transmit_delay(CANUSB_Handle_t handle, UInt8 channel,UInt32 *delay);
+extern int TouCAN_get_hardware_version(TouCAN_Handle_t handle, UInt32 *ver);
+extern int TouCAN_get_firmware_version(TouCAN_Handle_t handle, UInt32 *ver);
+extern int TouCAN_get_bootloader_version(TouCAN_Handle_t handle, UInt32 *ver);
+extern int TouCAN_get_serial_number(TouCAN_Handle_t handle, UInt32 *ver);
+extern int TouCAN_get_vid_pid(TouCAN_Handle_t handle, UInt32 *ver);
+extern int TouCAN_get_device_id(TouCAN_Handle_t handle, UInt32 *ver);
+extern int TouCAN_get_vendor(TouCAN_Handle_t handle, unsigned int size, char *str);
+extern int TouCAN_get_interface_transmit_delay(TouCAN_Handle_t handle, UInt8 channel,UInt32 *delay);
+extern int TouCAN_set_interface_transmit_delay(TouCAN_Handle_t handle, UInt8 channel,UInt32 *delay);
 
-extern int TouCAN_set_filter_std_list_mask(CANUSB_Handle_t handle, Filter_Type_TypeDef type, UInt32 list, UInt32 mask);
-extern int TouCAN_set_filter_ext_list_mask(CANUSB_Handle_t handle, Filter_Type_TypeDef type, UInt32 list, UInt32 mask);
+extern int TouCAN_set_filter_std_list_mask(TouCAN_Handle_t handle, Filter_Type_TypeDef type, UInt32 list, UInt32 mask);
+extern int TouCAN_set_filter_ext_list_mask(TouCAN_Handle_t handle, Filter_Type_TypeDef type, UInt32 list, UInt32 mask);
 
 /*
  *  That's my bullshit again;)
@@ -83,10 +84,10 @@ extern int TouCAN_AbortReception(TouCAN_ReceivePipe_t pipe);
 extern int TouCAN_EncodeMessage(UInt8 *buffer, const MacCAN_Message_t *message);
 extern int TouCAN_DecodeMessage(MacCAN_Message_t *message, const UInt8 *buffer, TouCAN_MsgParam_t *param);
 
-extern int TouCAN_InitializeInterface(CANUSB_Handle_t handle);
-extern int TouCAN_TeardownInterface(CANUSB_Handle_t handle);
+extern int TouCAN_InitializeInterface(TouCAN_Handle_t handle);
+extern int TouCAN_TeardownInterface(TouCAN_Handle_t handle);
 
-extern int TouCAN_SetBitrateAndMode(CANUSB_Handle_t handle, const MacCAN_Bitrate_t *bitrate,
+extern int TouCAN_SetBitrateAndMode(TouCAN_Handle_t handle, const MacCAN_Bitrate_t *bitrate,
                                                             const MacCAN_OpMode_t *opMode);
 
 #ifdef __cplusplus

@@ -21,6 +21,8 @@
 #ifndef TOUCAN_COMMON_H_INCLUDED
 #define TOUCAN_COMMON_H_INCLUDED
 
+#include <MacTypes.h>
+
 #define RUSOKU_VENDOR_ID  (UInt16)0x16D0
 #define RUSOKU_TOUCAN_USB_ID  (UInt16)0x0EAC
 
