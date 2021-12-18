@@ -59,8 +59,6 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
-#include "MacCAN_IOUsbKit.h"
-
 
 /*  -----------  options  ------------------------------------------------
  */
@@ -124,7 +122,7 @@ static int transmit(int handle, int frames, unsigned int delay);
 static int receive(int handle);
 //static int transmit_fd(int handle, int frames, unsigned int delay);
 //static int receive_fd(int handle);
-//static void verbose(const can_bitrate_t *bitrate, const can_speed_t *speed);
+static void verbose(const can_bitrate_t *bitrate, const can_speed_t *speed);
 
 #if defined(_WIN32) || defined(_WIN64)
 static void usleep(unsigned int usec);
@@ -151,12 +149,12 @@ static int option_log = OPTION_NO;
 #endif
 static int option_transmit = 0;
 static int option_mode = OPTION_MODE_CAN_20;
-static int option_fdf = OPTION_NO;
-static int option_brs = OPTION_NO;
+//static int option_fdf = OPTION_NO;
+//static int option_brs = OPTION_NO;
 #if (STOP_FRAMES != 0)
 static int stop_frames = 0;
 #endif
-static const uint8_t dtab[16] = {0,1,2,3,4,5,6,7,8,12,16,20,24,32,48,64};
+//static const uint8_t dtab[16] = {0,1,2,3,4,5,6,7,8,12,16,20,24,32,48,64};
 
 static volatile int running = 1;
 
@@ -182,7 +180,7 @@ int main(int argc, char *argv[])
     uint8_t op_mode = CANMODE_DEFAULT;
     unsigned int delay = 0;
     can_bitrate_t bitrate = { -CANBDR_250 };
-    //can_speed_t speed;
+    can_speed_t speed;
     can_status_t status;
     char *device, *firmware, *software;
 
@@ -222,14 +220,14 @@ int main(int argc, char *argv[])
     //}
     for(i = 1; i < argc; i++) {
         /* Rusoku TouCAN interfaces */
-        if(!strcmp(argv[i], "TouCAN-USB1")) channel = TOUCAN_USB1;
-        if(!strcmp(argv[i], "TouCAN-USB2")) channel = TOUCAN_USB2;
-        if(!strcmp(argv[i], "TouCAN-USB3")) channel = TOUCAN_USB3;
-        if(!strcmp(argv[i], "TouCAN-USB4")) channel = TOUCAN_USB4;
-        if(!strcmp(argv[i], "TouCAN-USB5")) channel = TOUCAN_USB5;
-        if(!strcmp(argv[i], "TouCAN-USB6")) channel = TOUCAN_USB6;
-        if(!strcmp(argv[i], "TouCAN-USB7")) channel = TOUCAN_USB7;
-        if(!strcmp(argv[i], "TouCAN-USB8")) channel = TOUCAN_USB8;
+        if(!strcmp(argv[i], "TouCAN-USB1") || !strcmp(argv[i], "CH:0")) channel = TOUCAN_USB1;
+        if(!strcmp(argv[i], "TouCAN-USB2") || !strcmp(argv[i], "CH:1")) channel = TOUCAN_USB2;
+        if(!strcmp(argv[i], "TouCAN-USB3") || !strcmp(argv[i], "CH:2")) channel = TOUCAN_USB3;
+        if(!strcmp(argv[i], "TouCAN-USB4") || !strcmp(argv[i], "CH:3")) channel = TOUCAN_USB4;
+        if(!strcmp(argv[i], "TouCAN-USB5") || !strcmp(argv[i], "CH:4")) channel = TOUCAN_USB5;
+        if(!strcmp(argv[i], "TouCAN-USB6") || !strcmp(argv[i], "CH:5")) channel = TOUCAN_USB6;
+        if(!strcmp(argv[i], "TouCAN-USB7") || !strcmp(argv[i], "CH:6")) channel = TOUCAN_USB7;
+        if(!strcmp(argv[i], "TouCAN-USB8") || !strcmp(argv[i], "CH:7")) channel = TOUCAN_USB8;
         /* baud rate (CAN 2.0) */
         if(!strcmp(argv[i], "BD:0") || !strcmp(argv[i], "BD:1000")) bitrate.index = -CANBDR_1000;
         if(!strcmp(argv[i], "BD:1") || !strcmp(argv[i], "BD:800")) bitrate.index = -CANBDR_800;
@@ -295,10 +293,6 @@ int main(int argc, char *argv[])
         if(!strcmp(argv[i], "RTR:OFF")) op_mode |= CANMODE_NRTR;
     }
     fprintf(stdout, "can_test: "__DATE__" "__TIME__" (macOS)\n");
-    if((rc = CANUSB_Initialize()) < 0) {
-        fprintf(stderr, "+++ error(%i): MacCAN driver could not be initialized\n", rc);
-        return rc;
-    }
     /* offline informations */
     if(option_info) {
         if((software = can_version()) != NULL)
@@ -344,7 +338,6 @@ int main(int argc, char *argv[])
         //else
         //    fprintf(stderr, "+++ error(%i): can_property(canIOCTL_GET_xxx) failed\n", rc);
     }
-#if (0)
     /* channel tester */
     if(option_test) {
         for(i = 0; (can_boards[i].type != EOF) && (can_boards[i].name != NULL); i++) {
@@ -360,7 +353,6 @@ int main(int argc, char *argv[])
             }
         }
     }
-#endif
     /* selected hardware */
     if(option_info) {
         for(i = 0; (can_boards[i].type != EOF) && (can_boards[i].name != NULL); i++) {
@@ -404,7 +396,6 @@ int main(int argc, char *argv[])
         else
             fprintf(stderr, "+++ error(%i): can_property(CANPROP_GET_STATUS) failed\n", rc);
     }
-#if (0)
     /* channel status */
     if(option_test) {
         if((rc = can_test(channel, op_mode, NULL, &opt)) == CANERR_NOERROR)
@@ -418,7 +409,6 @@ int main(int argc, char *argv[])
             fprintf(stderr, "+++ error(%i) can_test failed\n", rc);
         }
     }
-#endif
     /* start communication */
     if((rc = can_start(handle, &bitrate)) != CANERR_NOERROR) {
         fprintf(stderr, "+++ error(%i): can_start failed\n", rc);
@@ -428,7 +418,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "+++ error(%i): can_status failed\n", rc);
         goto end;
     }
-#if (0)
+#if (1)
     if((rc = can_bitrate(handle, &bitrate, &speed)) != CANERR_NOERROR) {
         fprintf(stderr, "+++ error(%i): can_bitrate failed\n", rc);
         goto end;
@@ -491,10 +481,6 @@ end:
         fprintf(stdout, "FAILED\n");
         fprintf(stderr, "+++ error(%i): can_exit failed\n", rc);
         return 1;
-    }
-    if((rc = CANUSB_Teardown()) < 0) {
-        fprintf(stderr, "+++ error(%i): MacCAN driver could not be released\n", rc);
-        return rc;
     }
     fprintf(stdout, "Bye!\n");
     return 0;
@@ -746,6 +732,7 @@ static int receive_fd(int handle)
     }
     return 0;
 }
+#endif
 
 static void verbose(const can_bitrate_t *bitrate, const can_speed_t *speed)
 {
@@ -783,7 +770,6 @@ static void verbose(const can_bitrate_t *bitrate, const can_speed_t *speed)
             bitrate->index == -CANBDR_10 ? "10" : "?", -bitrate->index);
     }
 }
-#endif
 
 #if defined(_WIN32) || defined(_WIN64)
  /* usleep(3) - Linux man page

@@ -7,7 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0F60A9E523F803E800D34D0E /* TouCAN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F60A9E223F803E800D34D0E /* TouCAN.cpp */; };
+		0F0F805A276C91FD0012597F /* TouCAN_Driver.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F0F8057276C8FC40012597F /* TouCAN_Driver.c */; };
+		0F0F805B276C92030012597F /* can_api.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F0F8058276C8FF80012597F /* can_api.c */; };
+		0F0F8061276D1CCD0012597F /* TouCAN_USB_Driver.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F0F805D276D133C0012597F /* TouCAN_USB_Driver.c */; };
+		0F0F8062276D1CD40012597F /* TouCAN_USB_Device.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F0F805E276D133C0012597F /* TouCAN_USB_Device.c */; };
 		0F60A9E623F803E800D34D0E /* TouCAN_USB.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F60A9E423F803E800D34D0E /* TouCAN_USB.c */; };
 		0F60A9EF23F8043100D34D0E /* MacCAN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F60A9EA23F8043100D34D0E /* MacCAN.cpp */; };
 		0F60A9F023F8043100D34D0E /* MacCAN_Devices.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F60A9EB23F8043100D34D0E /* MacCAN_Devices.c */; };
@@ -18,7 +21,6 @@
 		0F8B2A9E259F60BA00C8841C /* MacCAN_MsgQueue.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F8B2A9D259F60BA00C8841C /* MacCAN_MsgQueue.c */; };
 		4446DFBD276949060026D37D /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 4446DFBC276949010026D37D /* main.c */; };
 		4446DFBE2769490B0026D37D /* printmsg.c in Sources */ = {isa = PBXBuildFile; fileRef = 4446DFBB276949010026D37D /* printmsg.c */; };
-		44BEFED0276A5F9D0097B474 /* can_api.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4446DFBF27694A8F0026D37D /* can_api.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -34,6 +36,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0F0F8056276C8FC40012597F /* TouCAN_Driver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TouCAN_Driver.h; path = ../../Sources/Driver/TouCAN_Driver.h; sourceTree = "<group>"; };
+		0F0F8057276C8FC40012597F /* TouCAN_Driver.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = TouCAN_Driver.c; path = ../../Sources/Driver/TouCAN_Driver.c; sourceTree = "<group>"; };
+		0F0F8058276C8FF80012597F /* can_api.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = can_api.c; path = ../../Sources/Wrapper/can_api.c; sourceTree = "<group>"; };
+		0F0F8059276C8FF80012597F /* can_defs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = can_defs.h; path = ../../Sources/Wrapper/can_defs.h; sourceTree = "<group>"; };
+		0F0F805C276C98C20012597F /* TouCAN_Defines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TouCAN_Defines.h; path = ../../Sources/TouCAN_Defines.h; sourceTree = "<group>"; };
+		0F0F805D276D133C0012597F /* TouCAN_USB_Driver.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = TouCAN_USB_Driver.c; path = ../../Sources/Driver/TouCAN_USB_Driver.c; sourceTree = "<group>"; };
+		0F0F805E276D133C0012597F /* TouCAN_USB_Device.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = TouCAN_USB_Device.c; path = ../../Sources/Driver/TouCAN_USB_Device.c; sourceTree = "<group>"; };
+		0F0F805F276D133C0012597F /* TouCAN_USB_Driver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TouCAN_USB_Driver.h; path = ../../Sources/Driver/TouCAN_USB_Driver.h; sourceTree = "<group>"; };
+		0F0F8060276D133C0012597F /* TouCAN_USB_Device.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TouCAN_USB_Device.h; path = ../../Sources/Driver/TouCAN_USB_Device.h; sourceTree = "<group>"; };
 		0F39ACF8240D918300DA8EF5 /* CANAPI_Types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CANAPI_Types.h; path = ../../Sources/CANAPI/CANAPI_Types.h; sourceTree = "<group>"; };
 		0F60A9BD23F7FDD700D34D0E /* TouCAN */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TouCAN; sourceTree = BUILT_PRODUCTS_DIR; };
 		0F60A9E123F803E800D34D0E /* TouCAN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TouCAN.h; path = ../../Sources/TouCAN.h; sourceTree = "<group>"; };
@@ -52,7 +63,7 @@
 		0F68BB0E24104206005DAB17 /* can_btr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = can_btr.h; path = ../../Sources/CANAPI/can_btr.h; sourceTree = "<group>"; };
 		0F6B18D72420164300545209 /* can_msg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = can_msg.c; path = ../../Sources/CANAPI/can_msg.c; sourceTree = "<group>"; };
 		0F6B18D82420164300545209 /* can_msg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = can_msg.h; path = ../../Sources/CANAPI/can_msg.h; sourceTree = "<group>"; };
-		0F7FF6F7276BE741000033BE /* TouCAN_Common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TouCAN_Common.h; path = ../../Sources/Driver/TouCAN_Common.h; sourceTree = "<group>"; };
+		0F7FF6F7276BE741000033BE /* TouCAN_USB_Common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TouCAN_USB_Common.h; path = ../../Sources/Driver/TouCAN_USB_Common.h; sourceTree = "<group>"; };
 		0F8B2A9B259F60BA00C8841C /* MacCAN_MsgQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MacCAN_MsgQueue.h; path = ../../Sources/MacCAN/MacCAN_MsgQueue.h; sourceTree = "<group>"; };
 		0F8B2A9C259F60BA00C8841C /* MacCAN_Common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MacCAN_Common.h; path = ../../Sources/MacCAN/MacCAN_Common.h; sourceTree = "<group>"; };
 		0F8B2A9D259F60BA00C8841C /* MacCAN_MsgQueue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MacCAN_MsgQueue.c; path = ../../Sources/MacCAN/MacCAN_MsgQueue.c; sourceTree = "<group>"; };
@@ -92,7 +103,15 @@
 		0F60A9BF23F7FDD700D34D0E /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				0F7FF6F7276BE741000033BE /* TouCAN_Common.h */,
+				0F0F8057276C8FC40012597F /* TouCAN_Driver.c */,
+				0F0F8056276C8FC40012597F /* TouCAN_Driver.h */,
+				0F0F805D276D133C0012597F /* TouCAN_USB_Driver.c */,
+				0F0F805F276D133C0012597F /* TouCAN_USB_Driver.h */,
+				0F0F805E276D133C0012597F /* TouCAN_USB_Device.c */,
+				0F0F8060276D133C0012597F /* TouCAN_USB_Device.h */,
+				0F7FF6F7276BE741000033BE /* TouCAN_USB_Common.h */,
+				0F0F8058276C8FF80012597F /* can_api.c */,
+				0F0F8059276C8FF80012597F /* can_defs.h */,
 				4446DFBC276949010026D37D /* main.c */,
 				4446DFBB276949010026D37D /* printmsg.c */,
 				0F39ACF8240D918300DA8EF5 /* CANAPI_Types.h */,
@@ -114,6 +133,7 @@
 				0F60A9E723F8043100D34D0E /* MacCAN.h */,
 				0F60A9E423F803E800D34D0E /* TouCAN_USB.c */,
 				0F60A9E323F803E800D34D0E /* TouCAN_USB.h */,
+				0F0F805C276C98C20012597F /* TouCAN_Defines.h */,
 				0F60A9E223F803E800D34D0E /* TouCAN.cpp */,
 				0F60A9E123F803E800D34D0E /* TouCAN.h */,
 				0FFF2C3623FB2D6500AAC0C0 /* build_no.h */,
@@ -178,7 +198,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0F0F8061276D1CCD0012597F /* TouCAN_USB_Driver.c in Sources */,
 				4446DFBD276949060026D37D /* main.c in Sources */,
+				0F0F805A276C91FD0012597F /* TouCAN_Driver.c in Sources */,
 				0F6B18D92420164300545209 /* can_msg.c in Sources */,
 				4446DFBE2769490B0026D37D /* printmsg.c in Sources */,
 				0F60A9E623F803E800D34D0E /* TouCAN_USB.c in Sources */,
@@ -187,9 +209,9 @@
 				0F60A9F023F8043100D34D0E /* MacCAN_Devices.c in Sources */,
 				0F60A9EF23F8043100D34D0E /* MacCAN.cpp in Sources */,
 				0F60A9F223F8043100D34D0E /* MacCAN_Debug.c in Sources */,
+				0F0F805B276C92030012597F /* can_api.c in Sources */,
 				0F68BB0F24104206005DAB17 /* can_btr.c in Sources */,
-				0F60A9E523F803E800D34D0E /* TouCAN.cpp in Sources */,
-				44BEFED0276A5F9D0097B474 /* can_api.cpp in Sources */,
+				0F0F8062276D1CD40012597F /* TouCAN_USB_Device.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

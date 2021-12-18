@@ -1,7 +1,8 @@
+/*  SPDX-License-Identifier: GPL-3.0-or-later */
 /*
  *  TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Interfaces
  *
- *  Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+ *  Copyright (C) 2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
  *  This file is part of MacCAN-TouCAN.
  *
@@ -18,19 +19,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with MacCAN-TouCAN.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef TOUCAN_COMMON_H_INCLUDED
-#define TOUCAN_COMMON_H_INCLUDED
+#ifndef TOUCAN_USB_COMMON_H_INCLUDED
+#define TOUCAN_USB_COMMON_H_INCLUDED
 
-#include <MacTypes.h>
+#include <stdint.h>
+#include <stdbool.h>
 
-#define RUSOKU_VENDOR_ID  (UInt16)0x16D0
-#define RUSOKU_TOUCAN_USB_ID  (UInt16)0x0EAC
+#define TOUCAN_VENDOR_ID  (UInt16)0x16D0
+#define TOUCAN_USB_ID     (UInt16)0x0EAC
 
-#define TOUCAN_USB_VENDOR_NAME  "Rusoku technologijos UAB, Lithuania"
-#define TOUCAN_USB_VENDOR_URL   "www.rusoku.com"
-#define TOUCAN_USB_DEVICE_NAME  "TouCAN USB"
-#define TOUCAN_USB_DEVICE_TYPE  (SInt32)1
+#define TOUCAN_VENDOR_NAME  "Rusoku technologijos UAB, Lithuania"
+#define TOUCAN_VENDOR_URL   "www.rusoku.com"
 
+// TODO: move this into USB_Driver.h (when MacCAN enpoind module realized)
 #define TOUCAN_USB_TX_DATA_PIPE_REF  1U
 #define TOUCAN_USB_RX_DATA_PIPE_REF  2U
 #define TOUCAN_USB_TX_DATA_PIPE_SIZE  64U
@@ -39,33 +40,27 @@
 #define TOUCAN_USB_RX_DATA_FRAME_SIZE  18U
 #define TOUCAN_USB_TX_DATA_FRAME_CNT  (TOUCAN_USB_TX_DATA_PIPE_SIZE / TOUCAN_USB_TX_DATA_FRAME_SIZE)
 #define TOUCAN_USB_RX_DATA_FRAME_CNT  (TOUCAN_USB_RX_DATA_PIPE_SIZE / TOUCAN_USB_RX_DATA_FRAME_SIZE)
+// TODO: end!
 
-#define TOUCAN_USB_RCV_QUEUE_SIZE  65536
-#define TOUCAN_USB_TRM_QUEUE_SIZE  256
+#define TOUCAN_RCV_QUEUE_SIZE  65536
+#define TOUCAN_TRM_QUEUE_SIZE  256
 
-#define TOUCAN_USB_MAX_FRAME_CNT  3
-#define TOUCAN_USB_MAX_FRAME_DLC  CAN_MAX_DLC
-#define TOUCAN_USB_MAX_FRAME_LEN  CAN_MAX_LEN
-
-#define TOUCAN_MSG_STD_MAX_ID  CAN_MAX_STD_ID
-#define TOUCAN_MSG_XTD_MAX_ID  CAN_MAX_XTD_ID
-
-#define TOUCAN_USB_CLOCK_DOMAIN  50000000
-
-#define TOUCAN_MAX_NAME_LENGTH  42
+#define TOUCAN_MAX_NAME_LENGTH  32
 
 #define TOUCAN_ERROR_SUCCESS  0
 #define TOUCAN_ERROR_OFFSET  (-100)
 
-#define TOUCAN_USB_MODE_FDOE  0 /* CAN FD operation enable/disable */
-#define TOUCAN_USB_MODE_BRSE  0 /* bit-rate switch enable/disable */
-#define TOUCAN_USB_MODE_NISO  0 /* Non-ISO CAN FD enable/disable */
-#define TOUCAN_USB_MODE_SHRD  0 /* shared access enable/disable */
-#define TOUCAN_USB_MODE_NXTD  0 /* extended format disable/enable */
-#define TOUCAN_USB_MODE_NRTR  0 /* remote frames disable/enable */
-#define TOUCAN_USB_MODE_ERR   1 /* error frames enable/disable */
-#define TOUCAN_USB_MODE_MON   1 /* monitor mode enable/disable */
-
+/* ---  general CAN data types and defines  ---
+ */
+#if (OPTION_CANAPI_DRIVER != 0)
+    #include "CANAPI_Types.h"
+    /* typedefs from CAN API V3 */
+    typedef can_message_t TouCAN_CanMessage_t;
+    typedef can_timestamp_t TouCAN_Timestamp_t;
+#else
+    /* typedefs from <3rdParty.h> */
+    // TODO: insert coin here
+#endif
 
 /* --- Defines and typdefs copied from CANAL interface DLL (CTouCANobj.h) ---
  *
@@ -251,4 +246,4 @@ typedef enum {
   FILTER_VALUE,
 }Filter_Type_TypeDef;
 
-#endif /* TOUCAN_COMMON_H_INCLUDED */
+#endif /* TOUCAN_USB_COMMON_H_INCLUDED */
