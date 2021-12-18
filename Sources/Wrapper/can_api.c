@@ -379,12 +379,14 @@ int can_write(int handle, const can_message_t *message, uint16_t timeout)
         return CANERR_ILLPARA;          // suppress extended frames
     if (message->rtr && can[handle].mode.nrtr)
         return CANERR_ILLPARA;          // suppress remote frames
+#if (OPTION_CAN_2_0_ONLY == 0)
     if (message->fdf && !can[handle].mode.fdoe)
         return CANERR_ILLPARA;          // long frames only with CAN FD
     if (message->brs && !can[handle].mode.brse)
         return CANERR_ILLPARA;          // fast frames only with CAN FD
     if (message->brs && !message->fdf)
         return CANERR_ILLPARA;          // bit-rate switching only with CAN FD
+#endif
     if (message->sts)
         return CANERR_ILLPARA;          // error frames cannot be sent
 
@@ -775,17 +777,13 @@ static int drv_parameter(int handle, uint16_t param, void *value, size_t nbyte)
     switch (param) {
     case CANPROP_GET_DEVICE_TYPE:       // device type of the CAN interface (int32_t)
         if (nbyte >= sizeof(int32_t)) {
-#if (0)
-            *(int32_t*)value = (int32_t)can[handle].device.deviceInfo.card.hwType;
-#else
-            *(int32_t*)value = (int32_t)1;  // FIXME: magic number
-#endif
+            *(int32_t*)value = (int32_t)can[handle].device.deviceInfo.type;
             rc = CANERR_NOERROR;
         }
         break;
     case CANPROP_GET_DEVICE_NAME:       // device name of the CAN interface (char[256])
-        if ((nbyte > strlen(can[handle].device.name)) && (nbyte <= CANPROP_MAX_BUFFER_SIZE)) {
-            strcpy((char*)value, can[handle].device.name);
+        if ((nbyte > strlen(can[handle].device.deviceInfo.name)) && (nbyte <= CANPROP_MAX_BUFFER_SIZE)) {
+            strcpy((char*)value, can[handle].device.deviceInfo.name);
             rc = CANERR_NOERROR;
         }
         break;
@@ -863,6 +861,7 @@ static int drv_parameter(int handle, uint16_t param, void *value, size_t nbyte)
             rc = CANERR_NOERROR;
         }
         break;
+    // TODO: TouCAN specific properties!
     default:
 //        if ((CANPROP_GET_VENDOR_PROP <= param) &&  // get a vendor-specific property value (void*)
 //           (param < (CANPROP_GET_VENDOR_PROP + CANPROP_VENDOR_PROP_RANGE))) {
