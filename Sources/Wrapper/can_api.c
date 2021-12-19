@@ -281,13 +281,7 @@ int can_start(int handle, const can_bitrate_t *bitrate)
 
     can_speed_t tmpSpeed;               // CAN bus speed
     TouCAN_Bitrate_t touBitrate;        // TouCAN bit-rate settings
-#if (OPTION_CAN_2_0_ONLY == 0)
-        bool fdoe = can[handle].mode.fdoe ? true : false;
-        bool brse = can[handle].mode.brse ? true : false;
-#else
-        bool fdoe = false;
-        bool brse = false;
-#endif
+
     memset(&tmpSpeed, 0, sizeof(can_speed_t));
     memset(&touBitrate, 0, sizeof(TouCAN_Bitrate_t));
 
@@ -309,6 +303,13 @@ int can_start(int handle, const can_bitrate_t *bitrate)
         if (!TouCAN_Index2Bitrate(&can[handle].device, bitrate->index, &touBitrate))
             return CANERR_BAUDRATE;
     } else {
+#if (OPTION_CAN_2_0_ONLY == 0)
+        bool fdoe = can[handle].mode.fdoe ? true : false;
+        bool brse = can[handle].mode.brse ? true : false;
+#else
+        bool fdoe = false;
+        bool brse = false;
+#endif
         // note: bit-rate settings are checked by the conversion function
         if (btr_bitrate2speed(bitrate, fdoe, brse, &tmpSpeed) < 0)
             return CANERR_BAUDRATE;
@@ -489,13 +490,7 @@ int can_bitrate(int handle, can_bitrate_t *bitrate, can_speed_t *speed)
 
     can_bitrate_t tmpBitrate;           // bit-rate settings
     can_speed_t tmpSpeed;               // transmission speed
-#if (OPTION_CAN_2_0_ONLY == 0)
-    bool fdoe = can[handle].mode.fdoe ? true : false;
-    bool brse = can[handle].mode.brse ? true : false;
-#else
-    bool fdoe = false;
-    bool brse = false;
-#endif
+
     memset(&tmpBitrate, 0, sizeof(can_bitrate_t));
     memset(&tmpSpeed, 0, sizeof(can_speed_t));
 
@@ -512,7 +507,13 @@ int can_bitrate(int handle, can_bitrate_t *bitrate, can_speed_t *speed)
     tmpBitrate.btr.nominal.tseg1 = can[handle].device.bitRate.tseg1;
     tmpBitrate.btr.nominal.tseg2 = can[handle].device.bitRate.tseg2;
     tmpBitrate.btr.nominal.sjw = can[handle].device.bitRate.sjw;
-
+#if (OPTION_CAN_2_0_ONLY == 0)
+    bool fdoe = can[handle].mode.fdoe ? true : false;
+    bool brse = can[handle].mode.brse ? true : false;
+#else
+    bool fdoe = false;
+    bool brse = false;
+#endif
     // calculate bus speed from bit-rate settings
     if ((rc = btr_bitrate2speed(&tmpBitrate, fdoe, brse, &tmpSpeed)) < 0)
         return CANERR_BAUDRATE;
