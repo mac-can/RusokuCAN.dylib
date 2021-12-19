@@ -266,8 +266,9 @@ EXPORT
 CANAPI_Return_t CTouCAN::MapIndex2Bitrate(int32_t index, CANAPI_Bitrate_t &bitrate) {
     CANAPI_Return_t retVal = CCanApi::NoError;
 
-    // note: we have vendor-specific bit-timing (clock domain is 50MHz)
-    //       so override the method from the base class
+    // note: we have vendor-specific bit-timing (CAN clock is 50MHz)
+    //       so we cannot use the default bit-rate converter
+    // FIXME: this work only for the TouCAN USB adapter
     switch (index) {
         case CANBTR_INDEX_1M:
             bitrate.btr.frequency = TOUCAN_USB_CLOCK_DOMAIN;

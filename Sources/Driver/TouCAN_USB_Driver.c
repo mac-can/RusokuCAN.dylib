@@ -141,6 +141,10 @@ CANUSB_Return_t TouCAN_USB_InitializeChannel(TouCAN_Device_t *device, TouCAN_OpM
     if (retVal < 0) {
         MACCAN_DEBUG_ERROR("+++ %s (device #%u): device id. could not be read (%i)\n", device->name, device->handle, retVal);
     }
+    retVal = TouCAN_get_vid_pid(device->handle, &device->deviceInfo.vid_pid);
+    if (retVal < 0) {
+        MACCAN_DEBUG_ERROR("+++ %s (device #%u): VID & PID could not be read (%i)\n", device->name, device->handle, retVal);
+    }
     /* initialize with default bit-rate and mode flags */
     /* note: CAN API provides this at a later stage */
     retVal = TouCAN_init(device->handle, device->bitRate.brp, device->bitRate.tseg1,

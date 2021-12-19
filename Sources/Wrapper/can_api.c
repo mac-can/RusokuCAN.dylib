@@ -861,7 +861,55 @@ static int drv_parameter(int handle, uint16_t param, void *value, size_t nbyte)
             rc = CANERR_NOERROR;
         }
         break;
-    // TODO: TouCAN specific properties!
+    /* TouCAN specific properties */
+    case TOUCAN_GET_CAN_CLOCK:          // TouCAN USB: CAN clock in [Hz] (int23_t)
+        if ((size_t)nbyte >= sizeof(int32_t)) {
+            *(int32_t*)value = (int32_t)can[handle].device.canClock;
+            rc = CANERR_NOERROR;
+        }
+        break;
+    case TOUCAN_GET_HARDWARE_VERSION:   // TouCAN USB: hardware version as "0xggrrss00" (uint23_t)
+        if ((size_t)nbyte >= sizeof(uint32_t)) {
+            *(uint32_t*)value = (uint32_t)can[handle].device.deviceInfo.hardware;
+            rc = CANERR_NOERROR;
+        }
+        break;
+    case TOUCAN_GET_FIRMWARE_VERSION:   // TouCAN USB: firmware version as "0xggrrss00" (uint23_t)
+        if ((size_t)nbyte >= sizeof(uint32_t)) {
+            *(uint32_t*)value = (uint32_t)can[handle].device.deviceInfo.firmware;
+            rc = CANERR_NOERROR;
+        }
+        break;
+    case TOUCAN_GET_BOOTLOADER_VERSION: // TouCAN USB: boot-loader version as "0xggrrss00" (uint23_t)
+        if ((size_t)nbyte >= sizeof(uint32_t)) {
+            *(uint32_t*)value = (uint32_t)can[handle].device.deviceInfo.bootloader;
+            rc = CANERR_NOERROR;
+        }
+        break;
+    case TOUCAN_GET_SERIAL_NUMBER:      // TouCAN USB: serial no. in hex (uint23_t)
+        if ((size_t)nbyte >= sizeof(uint32_t)) {
+            *(uint32_t*)value = (uint32_t)can[handle].device.deviceInfo.serialNo;
+            rc = CANERR_NOERROR;
+        }
+        break;
+    case TOUCAN_GET_VID_PID:            // TouCAN USB: VID & PID (uint23_t)
+        if ((size_t)nbyte >= sizeof(uint32_t)) {
+            *(uint32_t*)value = (uint32_t)can[handle].device.deviceInfo.vid_pid;
+            rc = CANERR_NOERROR;
+        }
+        break;
+    case TOUCAN_GET_DEVICE_ID:          // TouCAN USB: device id. (uint23_t)
+        if ((size_t)nbyte >= sizeof(uint32_t)) {
+            *(uint32_t*)value = (uint32_t)can[handle].device.deviceInfo.deviceId;
+            rc = CANERR_NOERROR;
+        }
+        break;
+    case TOUCAN_GET_VENDOR_URL:         // TouCAN USB: URL of Rusoku's website (uint23_t)
+            if ((nbyte > strlen(can[handle].device.website)) && (nbyte <= CANPROP_MAX_BUFFER_SIZE)) {
+                strcpy((char*)value, can[handle].device.website);
+                rc = CANERR_NOERROR;
+            }
+        break;
     default:
 //        if ((CANPROP_GET_VENDOR_PROP <= param) &&  // get a vendor-specific property value (void*)
 //           (param < (CANPROP_GET_VENDOR_PROP + CANPROP_VENDOR_PROP_RANGE))) {

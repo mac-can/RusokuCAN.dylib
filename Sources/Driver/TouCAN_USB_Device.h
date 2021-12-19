@@ -61,6 +61,7 @@ typedef struct device_info_t {          /* device information: */
     uint32_t bootloader;                /* - boot loader version (0xggrrss00) */
     uint32_t serialNo;                  /* - serial no. (32-bit) */
     uint32_t deviceId;                  /* - device id. (32-bit) */
+    uint32_t vid_pid;                   /* - VID & PID (32-bit) */
 } TouCAN_DeviceInfo_t;
 
 typedef struct toucan_device_t_ {       /* TouCAN device: */
