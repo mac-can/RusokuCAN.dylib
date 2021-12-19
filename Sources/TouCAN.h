@@ -21,6 +21,7 @@
 #ifndef TOUCAN_H_INCLUDED
 #define TOUCAN_H_INCLUDED
 
+#include "TouCAN_Defines.h"
 #include "CANAPI.h"
 
 /// \name   TouCAN
