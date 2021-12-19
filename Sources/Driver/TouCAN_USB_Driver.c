@@ -565,12 +565,12 @@ static int TouCAN_DecodeMessage(TouCAN_CanMessage_t *message, const UInt8 *buffe
             param->startTime = sw_usec - hw_usec;
         }
         UInt64 diff_time = sw_usec - param->startTime;
-        hw_usec += ((diff_time / 0x100000000U) * 0x100000000U);
+        hw_usec += ((diff_time / 0x100000000U) * 0x100000000U);  // FIXME: Don't understand!
     }
     /* timestamp as struct timespec (fraction in [nsec]) */
     message->timestamp.tv_sec = (time_t)(hw_usec / 1000000U);
     message->timestamp.tv_nsec =  (long)(hw_usec % 1000000U) * (long)1000;
-    if (message->timestamp.tv_nsec >= (long)1000000000) {
+    if (message->timestamp.tv_nsec >= (long)1000000000) {  // FIXME:  Condition 'message->timestamp.tv_nsec>=(long)1000000000' is always false
         message->timestamp.tv_nsec %= (long)1000000000;
         message->timestamp.tv_sec += (time_t)1;
     }

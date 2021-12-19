@@ -251,9 +251,9 @@ bool TouCAN_Index2Bitrate(TouCAN_Device_t *device, int32_t index, TouCAN_Bitrate
 
     /* sanity check */
     if (!device)
-        return CANUSB_ERROR_NULLPTR;
+        return false;
     if (!device->configured)
-        return CANUSB_ERROR_NOTINIT;
+        return false;
 
     /* map CiA CANopen index to bit-rate settings */
     switch (device->productId) {
