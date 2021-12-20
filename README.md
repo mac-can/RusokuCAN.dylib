@@ -22,42 +22,45 @@ and some C/C++, Swift, and Python example programs.
 ```C++
 /// \name   TouCAN API
 /// \brief  MacCAN driver for Rusoku TouCAN USB interfaces
-/// \note   See CMacCAN for a description of the overridden methods
+/// \note   See CCanApi for a description of the overridden methods
 /// \{
-class CTouCAN : public CMacCAN {
+class CANCPP CTouCAN : public CCanApi {
 public:
     // constructor / destructor
     CTouCAN();
     ~CTouCAN();
-    // CMacCAN overrides
-    static MacCAN_Return_t ProbeChannel(int32_t channel, MacCAN_OpMode_t opMode, const void *param, EChannelState &state);
-    static MacCAN_Return_t ProbeChannel(int32_t channel, MacCAN_OpMode_t opMode, EChannelState &state);
 
-    MacCAN_Return_t InitializeChannel(int32_t channel, MacCAN_OpMode_t opMode, const void *param = NULL);
-    MacCAN_Return_t TeardownChannel();
-    MacCAN_Return_t SignalChannel();
+    // CCanApi overrides
+    static CANAPI_Return_t ProbeChannel(int32_t channel, const CANAPI_OpMode_t &opMode, const void *param, EChannelState &state);
+    static CANAPI_Return_t ProbeChannel(int32_t channel, const CANAPI_OpMode_t &opMode, EChannelState &state);
 
-    MacCAN_Return_t StartController(MacCAN_Bitrate_t bitrate);
-    MacCAN_Return_t ResetController();
+    CANAPI_Return_t InitializeChannel(int32_t channel, const CANAPI_OpMode_t &opMode, const void *param = NULL);
+    CANAPI_Return_t TeardownChannel();
+    CANAPI_Return_t SignalChannel();
 
-    MacCAN_Return_t WriteMessage(MacCAN_Message_t message, uint16_t timeout = 0U);
-    MacCAN_Return_t ReadMessage(MacCAN_Message_t &message, uint16_t timeout = CANREAD_INFINITE);
+    CANAPI_Return_t StartController(CANAPI_Bitrate_t bitrate);
+    CANAPI_Return_t ResetController();
 
-    MacCAN_Return_t GetStatus(MacCAN_Status_t &status);
-    MacCAN_Return_t GetBusLoad(uint8_t &load);
+    CANAPI_Return_t WriteMessage(CANAPI_Message_t message, uint16_t timeout = 0U);
+    CANAPI_Return_t ReadMessage(CANAPI_Message_t &message, uint16_t timeout = CANREAD_INFINITE);
 
-    MacCAN_Return_t GetBitrate(MacCAN_Bitrate_t &bitrate);
-    MacCAN_Return_t GetBusSpeed(MacCAN_BusSpeed_t &speed);
+    CANAPI_Return_t GetStatus(CANAPI_Status_t &status);
+    CANAPI_Return_t GetBusLoad(uint8_t &load);
 
-    MacCAN_Return_t GetProperty(uint16_t param, void *value, uint32_t nbyte);
-    MacCAN_Return_t SetProperty(uint16_t param, const void *value, uint32_t nbyte);
+    CANAPI_Return_t GetBitrate(CANAPI_Bitrate_t &bitrate);
+    CANAPI_Return_t GetBusSpeed(CANAPI_BusSpeed_t &speed);
+
+    CANAPI_Return_t GetProperty(uint16_t param, void *value, uint32_t nbyte);
+    CANAPI_Return_t SetProperty(uint16_t param, const void *value, uint32_t nbyte);
 
     char *GetHardwareVersion();  // (for compatibility reasons)
     char *GetFirmwareVersion();  // (for compatibility reasons)
     static char *GetVersion();  // (for compatibility reasons)
 
-    // note: we have vendor-specific bit-timing (clock domain is 50MHz)
-    static MacCAN_Return_t MapIndex2Bitrate(int32_t index, MacCAN_Bitrate_t &bitrate);
+    static CANAPI_Return_t MapIndex2Bitrate(int32_t index, CANAPI_Bitrate_t &bitrate);
+    static CANAPI_Return_t MapString2Bitrate(const char *string, CANAPI_Bitrate_t &bitrate);
+    static CANAPI_Return_t MapBitrate2String(CANAPI_Bitrate_t bitrate, char *string, size_t length);
+    static CANAPI_Return_t MapBitrate2Speed(CANAPI_Bitrate_t bitrate, CANAPI_BusSpeed_t &speed);
 };
 /// \}
 ```
@@ -118,6 +121,12 @@ Type `can_test --help` to display all program options.
 
 ### Development Environment
 
+#### macOS Monterey
+
+- macOS Big Sur (11.1) on a Mac mini (M1, 2020)
+- Apple clang version 13.0.0 (clang-1300.0.29.30)
+- Xcode Version 13.2.1 (13C100)
+
 #### macOS Big Sur
 
 - macOS Big Sur (11.3.1) on a MacBook Pro (2019)
@@ -134,6 +143,12 @@ Type `can_test --help` to display all program options.
 
 - TouCAN USB (Model F4FS1, Hardware 1.0.0, Firmware 1.0.1)
 - TouCAN USB (Model F4FS1, Hardware 1.0.0, Firmware 1.0.4)
+
+### Testing
+
+The XCode project for the trial program includes a xctest target with one test suite for each CAN API V3 **C** interface function.
+To run the test suites or single test cases two CAN devices are required.
+General test settings can be change in the file `Settings.h`.
 
 ## Known Bugs and Caveats
 
