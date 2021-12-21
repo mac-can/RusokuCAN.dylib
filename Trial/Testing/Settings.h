@@ -76,4 +76,4 @@
 
 #endif // SETTINGS_H_INCLUDED
 
-// $Id$  Copyright (c) UV Software, Berlin //
+// $Id: Settings.h 1035 2021-12-21 12:03:27Z makemake $  Copyright (c) UV Software, Berlin //

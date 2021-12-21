@@ -41,10 +41,10 @@
 #define CAN_DEVICE2  TOUCAN_USB_CHANNEL1
 
 //  (§4) define macros for CAN Classic bit-rate settings (at least BITRATE_1M, BITRATE_500K, BITRATE_250K, BITRATE_125K)
-#define BITRATE_1M(x)       do{ x.btr.frequency=50000000; x.btr.nominal.brp= 5; x.btr.nominal.tseg1=  7; x.btr.nominal.tseg2= 2; x.btr.nominal.sjw= 2; } while(0)
-#define BITRATE_500K(x)     do{ x.btr.frequency=50000000; x.btr.nominal.brp= 5; x.btr.nominal.tseg1= 14; x.btr.nominal.tseg2= 5; x.btr.nominal.sjw= 4; } while(0)
-#define BITRATE_250K(x)     do{ x.btr.frequency=50000000; x.btr.nominal.brp=10; x.btr.nominal.tseg1= 14; x.btr.nominal.tseg2= 5; x.btr.nominal.sjw= 4; } while(0)
-#define BITRATE_125K(x)     do{ x.btr.frequency=50000000; x.btr.nominal.brp=20; x.btr.nominal.tseg1= 15; x.btr.nominal.tseg2= 5; x.btr.nominal.sjw= 4; } while(0)
+#define BITRATE_1M(x)       do{ x.btr.frequency=50000000; x.btr.nominal.brp=5;  x.btr.nominal.tseg1=7;  x.btr.nominal.tseg2=2; x.btr.nominal.sjw=2; x.btr.nominal.sam=0; } while(0)
+#define BITRATE_500K(x)     do{ x.btr.frequency=50000000; x.btr.nominal.brp=5;  x.btr.nominal.tseg1=14; x.btr.nominal.tseg2=5; x.btr.nominal.sjw=4; x.btr.nominal.sam=0; } while(0)
+#define BITRATE_250K(x)     do{ x.btr.frequency=50000000; x.btr.nominal.brp=10; x.btr.nominal.tseg1=14; x.btr.nominal.tseg2=5; x.btr.nominal.sjw=4; x.btr.nominal.sam=0; } while(0)
+#define BITRATE_125K(x)     do{ x.btr.frequency=50000000; x.btr.nominal.brp=20; x.btr.nominal.tseg1=15; x.btr.nominal.tseg2=5; x.btr.nominal.sjw=4; x.btr.nominal.sam=0; } while(0)
 
 //  ($5) define macros for unsupported features in CAN Classic operation mode (at least BITRATE_800K_UNSUPPORTED, ..)
 #define BITRATE_800K_UNSUPPORTED  1
@@ -59,14 +59,10 @@
 #if (CAN_FD_SUPPORTED != 0)
 
 //  (§8) define macros for CAN Classic bit-rate settings (at least BITRATE_1M8M, BITRATE_500K4M, BITRATE_250K2M, BITRATE_125K1M)
-#define BITRATE_1M8M(x)     do{ x.btr.frequency=50000000; x.btr.nominal.brp= 5; x.btr.nominal.tseg1=  7; x.btr.nominal.tseg2= 2; x.btr.nominal.sjw= 2; \
-                                                          x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
-#define BITRATE_500K4M(x)   do{ x.btr.frequency=50000000; x.btr.nominal.brp= 5; x.btr.nominal.tseg1= 14; x.btr.nominal.tseg2= 5; x.btr.nominal.sjw= 4; \
-                                                          x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
-#define BITRATE_250K2M(x)   do{ x.btr.frequency=50000000; x.btr.nominal.brp=10; x.btr.nominal.tseg1= 14; x.btr.nominal.tseg2= 5; x.btr.nominal.sjw= 4; \
-                                                          x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
-#define BITRATE_125K1M(x)   do{ x.btr.frequency=50000000; x.btr.nominal.brp=20; x.btr.nominal.tseg1= 15; x.btr.nominal.tseg2= 5; x.btr.nominal.sjw= 4; \
-                                                          x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
+#define BITRATE_1M8M(x)     do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
+#define BITRATE_500K4M(x)   do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
+#define BITRATE_250K2M(x)   do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
+#define BITRATE_125K1M(x)   do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
 
 //  ($9) define macros for unsupported features in CAN Classic operation mode
 //#define BITRATE_SWITCHING_UNSUPPORTED  0
@@ -77,4 +73,4 @@
 #endif // CAN_FD_SUPPORTED
 #endif // TEMPLATE_H_INCLUDED
 
-// $Id$  Copyright (c) UV Software, Berlin //
+// $Id: Template.h 1035 2021-12-21 12:03:27Z makemake $  Copyright (c) UV Software, Berlin //

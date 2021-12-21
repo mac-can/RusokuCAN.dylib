@@ -89,7 +89,7 @@
     int state = CANBRD_NOT_TESTABLE;
     int handle = INVALID_HANDLE;
     int rc = CANERR_FATAL;
-    
+
     // @pre:
     // @- initialize DUT1 with configured settings
     handle = can_init(DUT1, TEST_CANMODE, NULL);
@@ -236,7 +236,7 @@
     // @- shutdown DUT1
     rc = can_exit(handle);
     XCTAssertEqual(CANERR_NOERROR, rc);
-    
+
     // @test:
     mode.byte = capa.byte;
     // @- probe DUT1 with all bits from operation capacity
@@ -264,7 +264,7 @@
     // @- shutdown DUT1
     rc = can_exit(handle);
     XCTAssertEqual(CANERR_NOERROR, rc);
-    
+
     // @test:
     mode.mon = 1;
     // @- probe DUT1 with operation mode bit MON set
@@ -297,7 +297,7 @@
     // @- shutdown DUT1
     rc = can_exit(handle);
     XCTAssertEqual(CANERR_NOERROR, rc);
-    
+
     // @test:
     mode.err = 1;
     // @- probe DUT1 with operation mode bit ERR set
@@ -329,7 +329,7 @@
     // @- shutdown DUT1
     rc = can_exit(handle);
     XCTAssertEqual(CANERR_NOERROR, rc);
-    
+
     // @test:
     mode.nrtr = 1;
     // @- probe DUT1 with operation mode bit NRTR set
@@ -361,7 +361,7 @@
     // @- shutdown DUT1
     rc = can_exit(handle);
     XCTAssertEqual(CANERR_NOERROR, rc);
-    
+
     // @test:
     mode.nxtd = 1;
     // @- probe DUT1 with operation mode bit NXTD set
@@ -393,7 +393,7 @@
     // @- shutdown DUT1
     rc = can_exit(handle);
     XCTAssertEqual(CANERR_NOERROR, rc);
-    
+
     // @test:
     mode.fdoe = 1;
     mode.brse = 0;
@@ -426,7 +426,7 @@
     // @- shutdown DUT1
     rc = can_exit(handle);
     XCTAssertEqual(CANERR_NOERROR, rc);
-    
+
     // @test:
     mode.fdoe = 1;
     mode.brse = 1;
@@ -437,7 +437,7 @@
     } else {
         XCTAssertEqual(CANERR_ILLPARA, rc);
     }
-    
+
     // @test:
     mode.fdoe = 0;
     mode.brse = 1;
@@ -451,3 +451,5 @@
 }
 
 @end
+
+// $Id$  Copyright (c) UV Software, Berlin //

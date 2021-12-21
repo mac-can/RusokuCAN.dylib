@@ -1135,4 +1135,4 @@
 
 @end
 
-// $Id$  Copyright (c) UV Software, Berlin //
+// $Id: test_can_property.mm 1035 2021-12-21 12:03:27Z makemake $  Copyright (c) UV Software, Berlin //

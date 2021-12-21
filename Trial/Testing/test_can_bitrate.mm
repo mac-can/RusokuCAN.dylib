@@ -142,7 +142,7 @@
     // @- start DUT1 with configured bit-rate settings
     rc = can_start(handle, &bitrate);
     XCTAssertEqual(CANERR_NOERROR, rc);
-    
+
     // @test:
     // @- get bit-rate of DUT1 with NULL for parameter 'bitrate'
     rc = can_bitrate(handle, NULL, &speed);
@@ -151,7 +151,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    
+
     // @post:
     // @- sunnyday traffic (optional):
 #if (SEND_TEST_FRAMES != 0)
@@ -196,7 +196,7 @@
     // @- start DUT1 with configured bit-rate settings
     rc = can_start(handle, &bitrate);
     XCTAssertEqual(CANERR_NOERROR, rc);
-    
+
     // @test:
     // @- get bit-rate of DUT1 with NULL for speed
     rc = can_bitrate(handle, &bitrate, NULL);
@@ -205,7 +205,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    
+
     // @post:
     // @- sunnyday traffic (optional):
 #if (SEND_TEST_FRAMES != 0)
@@ -259,7 +259,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    
+
     // @post:
     // @- sunnyday traffic (optional):
 #if (SEND_TEST_FRAMES != 0)
@@ -434,7 +434,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    
+
     // @test:
     // @- get bit-rate of DUT1
     rc = can_bitrate(handle, &bitrate, NULL);
@@ -500,7 +500,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertTrue(status.can_stopped);
-    
+
     // @post:
     // @- shutdown DUT1
     rc = can_exit(handle);
@@ -633,3 +633,5 @@
 //}
 
 @end
+
+// $Id$  Copyright (c) UV Software, Berlin //
