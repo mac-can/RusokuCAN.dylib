@@ -283,3 +283,5 @@ int CTester::CheckReceivedData(const CANAPI_Message_t &message, uint64_t &expect
         expected += 1U;
     return rc;
 }
+
+// $Id$  Copyright (c) UV Software, Berlin //

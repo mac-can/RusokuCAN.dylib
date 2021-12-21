@@ -116,7 +116,7 @@
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
     // @- sunnyday traffic (optional):
-#if (OPTION_SEND_TEST_FRAMES != 0)
+#if (SEND_TEST_FRAMES != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
     XCTAssertEqual(TEST_FRAMES, tester.ReceiveSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -150,8 +150,6 @@
 // @xctest TC01.3: Probe interface when used by another process.
 //
 // @expected: CANERR_NOERROR and interface state CANBRD_OCCUPIED
-//
-
 //
 - (void)testWhenInterfaceOccupiedByAnotherProcess {
     // @note: this scenario is not testable:

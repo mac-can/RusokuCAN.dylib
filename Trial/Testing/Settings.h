@@ -50,19 +50,30 @@
 
 #import "Tester.h"
 
+//  Device under Test (2 devices required)
 #define DUT1  (SInt32)CAN_DEVICE1
 #define DUT2  (SInt32)CAN_DEVICE2
 
+//  Default operation mode and bit-rate settings
 #define TEST_CANMODE  CANMODE_DEFAULT
 #define TEST_BTRINDEX  CANBTR_INDEX_250K
 
+//  General test options:
+//  - number of CAN frames to be send during test cases
 #define TEST_FRAMES  8
+//  - number of CAN frames to be send during smoke test
 #define TEST_TRAFFIC  2048
+//  - number of CAN frames to be send until queue overrun
 #define TEST_QUEUE_FULL  65536
+//  - enable/disable sending of CAN frames during test cases
+#define SEND_TEST_FRAMES  1
+//  - enable/disable sending of CAN frames with non-default baudrate
+//    note: disable this option when a 3rd CAN device is on the bus.
+#define SEND_WITH_NONE_DEFAULT_BAUDRATE  0
 
-#define OPTION_SEND_TEST_FRAMES  1
-#define OPTION_SEND_WITH_NONE_DEFAULT_BAUDRATE  0
-
+//  Useful stuff:
 #define INVALID_HANDLE  (-1)
 
-#endif /* SETTINGS_H_INCLUDED */
+#endif // SETTINGS_H_INCLUDED
+
+// $Id$  Copyright (c) UV Software, Berlin //

@@ -66,4 +66,6 @@ public:
     static uint8_t Dlc2Len(uint8_t dlc) { return CCanApi::Dlc2Len(dlc); }
     static uint8_t Len2Dlc(uint8_t len) { return CCanApi::Len2Dlc(len); }};
 
-#endif /* TESTER_H_INCLUDED */
+#endif // TESTER_H_INCLUDED
+
+// $Id$  Copyright (c) UV Software, Berlin //

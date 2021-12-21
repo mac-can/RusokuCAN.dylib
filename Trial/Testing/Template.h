@@ -1,7 +1,7 @@
 //
 //  TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Interfaces
 //
-//  Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+//  Copyright (C) 2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
 //
 //  This file is part of MacCAN-TouCAN.
 //
@@ -28,34 +28,53 @@
 #ifndef TEMPLATE_H_INCLUDED
 #define TEMPLATE_H_INCLUDED
 
+//  A Template for CAN API V3 Testing
+//
+//  (§1) include the header file of the CAN API V3 C++ class of the CAN driver
 #include "TouCAN.h"
 
+//  (§2) define macro CDriverCAN with the class name of the CAN driver
 #define CDriverCAN  CTouCAN
 
+//  (§3) define macro CAN_DEVICE1 and CAN_DEVICE2 with a valid CAN channel no.
 #define CAN_DEVICE1  TOUCAN_USB_CHANNEL0
 #define CAN_DEVICE2  TOUCAN_USB_CHANNEL1
 
-#define BITRATE_1M(x)       do{ x.btr.frequency=80000000; x.btr.nominal.brp=2; x.btr.nominal.tseg1= 31; x.btr.nominal.tseg2= 8; x.btr.nominal.sjw= 8; } while(0)
-#define BITRATE_500K(x)     do{ x.btr.frequency=80000000; x.btr.nominal.brp=2; x.btr.nominal.tseg1= 63; x.btr.nominal.tseg2=16; x.btr.nominal.sjw= 8; } while(0)
-#define BITRATE_250K(x)     do{ x.btr.frequency=80000000; x.btr.nominal.brp=2; x.btr.nominal.tseg1=127; x.btr.nominal.tseg2=32; x.btr.nominal.sjw= 8; } while(0)
-#define BITRATE_125K(x)     do{ x.btr.frequency=80000000; x.btr.nominal.brp=4; x.btr.nominal.tseg1=127; x.btr.nominal.tseg2=32; x.btr.nominal.sjw= 8; } while(0)
+//  (§4) define macros for CAN Classic bit-rate settings (at least BITRATE_1M, BITRATE_500K, BITRATE_250K, BITRATE_125K)
+#define BITRATE_1M(x)       do{ x.btr.frequency=50000000; x.btr.nominal.brp= 5; x.btr.nominal.tseg1=  7; x.btr.nominal.tseg2= 2; x.btr.nominal.sjw= 2; } while(0)
+#define BITRATE_500K(x)     do{ x.btr.frequency=50000000; x.btr.nominal.brp= 5; x.btr.nominal.tseg1= 14; x.btr.nominal.tseg2= 5; x.btr.nominal.sjw= 4; } while(0)
+#define BITRATE_250K(x)     do{ x.btr.frequency=50000000; x.btr.nominal.brp=10; x.btr.nominal.tseg1= 14; x.btr.nominal.tseg2= 5; x.btr.nominal.sjw= 4; } while(0)
+#define BITRATE_125K(x)     do{ x.btr.frequency=50000000; x.btr.nominal.brp=20; x.btr.nominal.tseg1= 15; x.btr.nominal.tseg2= 5; x.btr.nominal.sjw= 4; } while(0)
 
-#define BITRATE_1M8M(x)     do{ x.btr.frequency=80000000; x.btr.nominal.brp=2; x.btr.nominal.tseg1= 31; x.btr.nominal.tseg2= 8; x.btr.nominal.sjw= 8; x.btr.data.brp=2; x.btr.data.tseg1= 3; x.btr.data.tseg2=1; x.btr.data.sjw=1; } while(0)
-#define BITRATE_500K4M(x)   do{ x.btr.frequency=80000000; x.btr.nominal.brp=2; x.btr.nominal.tseg1= 63; x.btr.nominal.tseg2=16; x.btr.nominal.sjw= 8; x.btr.data.brp=2; x.btr.data.tseg1= 7; x.btr.data.tseg2=2; x.btr.data.sjw=2; } while(0)
-#define BITRATE_250K2M(x)   do{ x.btr.frequency=80000000; x.btr.nominal.brp=2; x.btr.nominal.tseg1=127; x.btr.nominal.tseg2=32; x.btr.nominal.sjw= 8; x.btr.data.brp=2; x.btr.data.tseg1=15; x.btr.data.tseg2=4; x.btr.data.sjw=2; } while(0)
-#define BITRATE_125K1M(x)   do{ x.btr.frequency=80000000; x.btr.nominal.brp=4; x.btr.nominal.tseg1=127; x.btr.nominal.tseg2=32; x.btr.nominal.sjw= 8; x.btr.data.brp=2; x.btr.data.tseg1=31; x.btr.data.tseg2=8; x.btr.data.sjw=2; } while(0)
+//  ($5) define macros for unsupported features in CAN Classic operation mode (at least BITRATE_800K_UNSUPPORTED, ..)
+#define BITRATE_800K_UNSUPPORTED  1
+#define BITRATE_5K_UNSUPPORTED  1
+#define TX_ACKNOWLEDGE_UNSUPPORTED  1
 
-#define OPTION_CIABTR_INDEX0_SUPPORTED  1
-#define OPTION_CIABTR_INDEX1_SUPPORTED  0
-#define OPTION_CIABTR_INDEX2_SUPPORTED  1
-#define OPTION_CIABTR_INDEX3_SUPPORTED  1
-#define OPTION_CIABTR_INDEX4_SUPPORTED  1
-#define OPTION_CIABTR_INDEX5_SUPPORTED  1
-#define OPTION_CIABTR_INDEX6_SUPPORTED  1
-#define OPTION_CIABTR_INDEX7_SUPPORTED  1
-#define OPTION_CIABTR_INDEX8_SUPPORTED  1
-#define OPTION_CIABTR_INDEX9_SUPPORTED  0
+//  (§6) define macros for workarounds in CAN Classic operation mode (e.g. TC01_3_WORKARAOUND)
+//#define TX0x_y_WORKARAOUND  1
 
-#define OPTION_WRITE_TX_BUSY_DISABLED   1
+//  (§7) define macro CAN_FD_SUPPORTED when CAN FD operation mode is supported
+#define CAN_FD_SUPPORTED  0
+#if (CAN_FD_SUPPORTED != 0)
 
-#endif /* TEMPLATE_H_INCLUDED */
+//  (§8) define macros for CAN Classic bit-rate settings (at least BITRATE_1M8M, BITRATE_500K4M, BITRATE_250K2M, BITRATE_125K1M)
+#define BITRATE_1M8M(x)     do{ x.btr.frequency=50000000; x.btr.nominal.brp= 5; x.btr.nominal.tseg1=  7; x.btr.nominal.tseg2= 2; x.btr.nominal.sjw= 2; \
+                                                          x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
+#define BITRATE_500K4M(x)   do{ x.btr.frequency=50000000; x.btr.nominal.brp= 5; x.btr.nominal.tseg1= 14; x.btr.nominal.tseg2= 5; x.btr.nominal.sjw= 4; \
+                                                          x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
+#define BITRATE_250K2M(x)   do{ x.btr.frequency=50000000; x.btr.nominal.brp=10; x.btr.nominal.tseg1= 14; x.btr.nominal.tseg2= 5; x.btr.nominal.sjw= 4; \
+                                                          x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
+#define BITRATE_125K1M(x)   do{ x.btr.frequency=50000000; x.btr.nominal.brp=20; x.btr.nominal.tseg1= 15; x.btr.nominal.tseg2= 5; x.btr.nominal.sjw= 4; \
+                                                          x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
+
+//  ($9) define macros for unsupported features in CAN Classic operation mode
+//#define BITRATE_SWITCHING_UNSUPPORTED  0
+
+//  (§10) define macros for workarounds in CAN Classic operation mode (e.g. TC01_3_WORKARAOUND)
+//#define TX0x_y_WORKARAOUND  1
+
+#endif // CAN_FD_SUPPORTED
+#endif // TEMPLATE_H_INCLUDED
+
+// $Id$  Copyright (c) UV Software, Berlin //
