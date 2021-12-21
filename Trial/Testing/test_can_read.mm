@@ -531,6 +531,12 @@
         if (CANERR_NOERROR != rc)
             break;
     }
+#if (TX_ACKNOWLEDGE_UNSUPPORTED != 0)
+    // @note: a delay (after burner) to guarantee that all CAN messages are really sent
+    //        is required when messages are not acknowlegded by the CAN controller.
+    CTimer::Delay(TEST_AFTER_BURNER*CTimer::MSEC);
+    // @note: the delay depends on the bit-rate (set TEST_AFTER_BURNER in "Settings.h").
+#endif
     NSLog(@"%d frame(s) sent", i);
     // @- read a message from DUT1 (there should be at least one)
     rc = can_read(handle1, &message1, 0U);
@@ -585,4 +591,4 @@
 //
 @end
 
-// $Id: test_can_read.mm 1035 2021-12-21 12:03:27Z makemake $  Copyright (c) UV Software, Berlin //
+// $Id: test_can_read.mm 1037 2021-12-21 19:27:26Z makemake $  Copyright (c) UV Software, Berlin //

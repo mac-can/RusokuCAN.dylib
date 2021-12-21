@@ -914,7 +914,7 @@
 
 // @xctest TC03.16: Start CAN controller with invalid CiA bit-timing index.
 //
-// @expected:
+// @expected: CANERR_NOERROR
 //
 - (void)testCheckInvalidCiaIndex {
     can_bitrate_t bitrate = { TEST_BTRINDEX };
@@ -1033,6 +1033,7 @@
     // @test: loop over CiA bit-timing table indexes 0 to 8
     for (SInt32 index = CANBTR_INDEX_1M; index >= CANBTR_INDEX_10K; index--) {
 #if (BITRATE_800K_UNSUPPORTED != 0)
+        // @note: CiA index 1 (800kbps) is not supported by all CAN controllers.
         if (index == CANBTR_INDEX_800K)
             continue;
 #endif
@@ -1253,4 +1254,4 @@
 
 @end
 
-// $Id: test_can_start.mm 1036 2021-12-21 14:42:37Z makemake $  Copyright (c) UV Software, Berlin //
+// $Id: test_can_start.mm 1037 2021-12-21 19:27:26Z makemake $  Copyright (c) UV Software, Berlin //

@@ -1546,10 +1546,13 @@
     XCTAssertEqual(CANERR_NOERROR, rc);
 }
 
-// @xctest TC05.19: Send a CAN message when the transmitter is busy (transmitt queue full).
+// @xctest TC05.19: Send a CAN message when the transmitter is busy (transmit queue full).
 //
 // @expected: CANERR_TX_BUSY
 //
+// @note: flag 'transmitter_busy' is only set when the message is acknowlegded by the CAN controller.
+//
+#if (TX_ACKNOWLEDGE_UNSUPPORTED == 0)
 - (void)testWhenTransmitterIsBusy {
     can_bitrate_t bitrate = { TEST_BTRINDEX };
     can_status_t status = { CANSTAT_RESET };
@@ -1641,7 +1644,8 @@
     rc = can_exit(handle2);
     XCTAssertEqual(CANERR_NOERROR, rc);
 }
+#endif
 
 @end
 
-// $Id: test_can_write.mm 1035 2021-12-21 12:03:27Z makemake $  Copyright (c) UV Software, Berlin //
+// $Id: test_can_write.mm 1037 2021-12-21 19:27:26Z makemake $  Copyright (c) UV Software, Berlin //

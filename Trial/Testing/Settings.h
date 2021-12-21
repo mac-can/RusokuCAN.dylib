@@ -49,6 +49,7 @@
 #define SETTINGS_H_INCLUDED
 
 #import "Tester.h"
+#import "Timer.h"
 
 //  Device under Test (2 devices required)
 #define DUT1  (SInt32)CAN_DEVICE1
@@ -65,6 +66,9 @@
 #define TEST_TRAFFIC  2048
 //  - number of CAN frames to be send until queue overrun
 #define TEST_QUEUE_FULL  65536
+#if (TX_ACKNOWLEDGE_UNSUPPORTED != 0)
+#define TEST_AFTER_BURNER  3000 /* [ms] */
+#endif
 //  - enable/disable sending of CAN frames during test cases
 #define SEND_TEST_FRAMES  1
 //  - enable/disable sending of CAN frames with non-default baudrate
@@ -76,4 +80,4 @@
 
 #endif // SETTINGS_H_INCLUDED
 
-// $Id: Settings.h 1035 2021-12-21 12:03:27Z makemake $  Copyright (c) UV Software, Berlin //
+// $Id: Settings.h 1037 2021-12-21 19:27:26Z makemake $  Copyright (c) UV Software, Berlin //
