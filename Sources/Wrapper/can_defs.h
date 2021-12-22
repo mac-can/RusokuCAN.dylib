@@ -1,3 +1,4 @@
+/*  SPDX-License-Identifier: GPL-3.0-or-later */
 /*
  *  CAN Interface API, Version 3 (for Rusoku TouCAN Interface)
  *

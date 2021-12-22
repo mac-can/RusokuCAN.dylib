@@ -75,11 +75,20 @@ extern "C" {
 /** @name  CAN API Property Value
  *  @brief TouCAN parameter to be read or written
  *  @{ */
-// TODO: define parameters
-// ...
+#define TOUCAN_GET_CAN_CLOCK           (CANPROP_GET_VENDOR_PROP + 0U)     /**< CAN clock in [Hz] (int23_t) */
+#define TOUCAN_GET_HARDWARE_VERSION    (CANPROP_GET_VENDOR_PROP + 0x10U)  /**< hardware version as "0xggrrss00" (uint23_t) */
+#define TOUCAN_GET_FIRMWARE_VERSION    (CANPROP_GET_VENDOR_PROP + 0x11U)  /**< firmware version as "0xggrrss00" (uint23_t) */
+#define TOUCAN_GET_BOOTLOADER_VERSION  (CANPROP_GET_VENDOR_PROP + 0x12U)  /**< boot-loader version as "0xggrrss00" (uint23_t) */
+#define TOUCAN_GET_SERIAL_NUMBER       (CANPROP_GET_VENDOR_PROP + 0x13U)  /**< serial no. in hex (uint23_t) */
+#define TOUCAN_GET_VID_PID             (CANPROP_GET_VENDOR_PROP + 0x16U)  /**< VID & PID (uint23_t) */
+#define TOUCAN_GET_DEVICE_ID           (CANPROP_GET_VENDOR_PROP + 0x17U)  /**< device id. (uint23_t) */
+#define TOUCAN_GET_VENDOR_URL          (CANPROP_GET_VENDOR_PROP + 0x18U)  /**< URL of Rusoku's website (uint23_t) */
+#if (OPTION_TOUCAN_CANAL != 0)
+#define TOUCAN_GET_CANAL_ERROR_STATUS  (CANPROP_GET_VENDOR_PROP + 0xF0U)  // CANAL API (r?)
+#define TOUCAN_GET_CANAL_STATISTICS    (CANPROP_GET_VENDOR_PROP + 0xF1U)  // CANAL API (rw)
+#endif
 #define TOUCAN_MAX_BUFFER_SIZE   256U   /**< max. buffer size for CAN_GetValue/CAN_SetValue */
 /** @} */
-
 
 /** @name  CAN API Library ID
  *  @brief Library ID and dynamic library names

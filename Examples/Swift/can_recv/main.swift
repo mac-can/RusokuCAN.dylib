@@ -1,4 +1,6 @@
 //
+//  MacCAN-TouCAN - Swift example for receiving CAN messages
+//
 //  Please build the MacCAN artifacts first by calling `make` in the repo´s root.
 //  You should have the following folders created:
 //  - $(REPOROOT)/Binaries

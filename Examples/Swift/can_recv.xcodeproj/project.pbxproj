@@ -13,6 +13,16 @@
 		0F7BCB4D267BC40400C7BCD8 /* libUVCANTOU.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F7BCB4C267BC40400C7BCD8 /* libUVCANTOU.a */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		0F82853E27731C0D00FE2C2E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0F82853A27731C0D00FE2C2E /* can_send.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 0F7BCB32267BC1D200C7BCD8;
+			remoteInfo = can_send;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		0F7BCB1D267BC15700C7BCD8 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -28,9 +38,10 @@
 /* Begin PBXFileReference section */
 		0F7BCB1F267BC15700C7BCD8 /* can_recv */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = can_recv; sourceTree = BUILT_PRODUCTS_DIR; };
 		0F7BCB46267BC3AB00C7BCD8 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = main.swift; path = can_recv/main.swift; sourceTree = "<group>"; };
-		0F7BCB48267BC3E000C7BCD8 /* TouCAN.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TouCAN.swift; path = ../../Sources/TouCAN_Swift/TouCAN.swift; sourceTree = "<group>"; };
-		0F7BCB49267BC3E000C7BCD8 /* CANAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CANAPI.swift; path = ../../Sources/TouCAN_Swift/CANAPI.swift; sourceTree = "<group>"; };
+		0F7BCB48267BC3E000C7BCD8 /* TouCAN.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TouCAN.swift; path = ../../Sources/Swift/TouCAN.swift; sourceTree = "<group>"; };
+		0F7BCB49267BC3E000C7BCD8 /* CANAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CANAPI.swift; path = ../../Sources/Swift/CANAPI.swift; sourceTree = "<group>"; };
 		0F7BCB4C267BC40400C7BCD8 /* libUVCANTOU.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libUVCANTOU.a; path = ../../Binaries/libUVCANTOU.a; sourceTree = "<group>"; };
+		0F82853A27731C0D00FE2C2E /* can_send.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = can_send.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,6 +59,7 @@
 		0F7BCB16267BC15700C7BCD8 = {
 			isa = PBXGroup;
 			children = (
+				0F82853A27731C0D00FE2C2E /* can_send.xcodeproj */,
 				0F7BCB4C267BC40400C7BCD8 /* libUVCANTOU.a */,
 				0F7BCB45267BC39100C7BCD8 /* Sources */,
 				0F7BCB20267BC15700C7BCD8 /* Products */,
@@ -70,6 +82,14 @@
 				0F7BCB46267BC3AB00C7BCD8 /* main.swift */,
 			);
 			name = Sources;
+			sourceTree = "<group>";
+		};
+		0F82853B27731C0D00FE2C2E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0F82853F27731C0D00FE2C2E /* can_send */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -99,7 +119,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1250;
-				LastUpgradeCheck = 1250;
+				LastUpgradeCheck = 1320;
 				TargetAttributes = {
 					0F7BCB1E267BC15700C7BCD8 = {
 						CreatedOnToolsVersion = 12.5;
@@ -118,12 +138,28 @@
 			mainGroup = 0F7BCB16267BC15700C7BCD8;
 			productRefGroup = 0F7BCB20267BC15700C7BCD8 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 0F82853B27731C0D00FE2C2E /* Products */;
+					ProjectRef = 0F82853A27731C0D00FE2C2E /* can_send.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				0F7BCB1E267BC15700C7BCD8 /* can_recv */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		0F82853F27731C0D00FE2C2E /* can_send */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = can_send;
+			remoteRef = 0F82853E27731C0D00FE2C2E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXSourcesBuildPhase section */
 		0F7BCB1B267BC15700C7BCD8 /* Sources */ = {
@@ -191,7 +227,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../Binaries";
-				MACOSX_DEPLOYMENT_TARGET = 11.3;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -249,7 +285,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../Binaries";
-				MACOSX_DEPLOYMENT_TARGET = 11.3;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "-lc++";
@@ -264,6 +300,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -280,6 +317,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

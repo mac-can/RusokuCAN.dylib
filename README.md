@@ -2,9 +2,9 @@
 
 _Copyright &copy; 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)_
 
-# Running CAN on a Mac&reg;
+# Running CAN on Mac&reg;
 
-_Running CAN on a Mac_ is the mission of the MacCAN project.
+_Running CAN on Mac_ is the mission of the MacCAN project.
 The macOS driver for TouCAN USB interfaces from [Rusoku](https://www.rusoku.com) is based on _MacCAN-Core_ which is an abstraction (or rather a wrapper) of Apple´s IOUsbKit to create USB user-space drivers for CAN interfaces from various vendors under macOS.
 
 ## MacCAN-TouCAN
@@ -22,42 +22,45 @@ and some C/C++, Swift, and Python example programs.
 ```C++
 /// \name   TouCAN API
 /// \brief  MacCAN driver for Rusoku TouCAN USB interfaces
-/// \note   See CMacCAN for a description of the overridden methods
+/// \note   See CCanApi for a description of the overridden methods
 /// \{
-class CTouCAN : public CMacCAN {
+class CANCPP CTouCAN : public CCanApi {
 public:
     // constructor / destructor
     CTouCAN();
     ~CTouCAN();
-    // CMacCAN overrides
-    static MacCAN_Return_t ProbeChannel(int32_t channel, MacCAN_OpMode_t opMode, const void *param, EChannelState &state);
-    static MacCAN_Return_t ProbeChannel(int32_t channel, MacCAN_OpMode_t opMode, EChannelState &state);
 
-    MacCAN_Return_t InitializeChannel(int32_t channel, MacCAN_OpMode_t opMode, const void *param = NULL);
-    MacCAN_Return_t TeardownChannel();
-    MacCAN_Return_t SignalChannel();
+    // CCanApi overrides
+    static CANAPI_Return_t ProbeChannel(int32_t channel, const CANAPI_OpMode_t &opMode, const void *param, EChannelState &state);
+    static CANAPI_Return_t ProbeChannel(int32_t channel, const CANAPI_OpMode_t &opMode, EChannelState &state);
 
-    MacCAN_Return_t StartController(MacCAN_Bitrate_t bitrate);
-    MacCAN_Return_t ResetController();
+    CANAPI_Return_t InitializeChannel(int32_t channel, const CANAPI_OpMode_t &opMode, const void *param = NULL);
+    CANAPI_Return_t TeardownChannel();
+    CANAPI_Return_t SignalChannel();
 
-    MacCAN_Return_t WriteMessage(MacCAN_Message_t message, uint16_t timeout = 0U);
-    MacCAN_Return_t ReadMessage(MacCAN_Message_t &message, uint16_t timeout = CANREAD_INFINITE);
+    CANAPI_Return_t StartController(CANAPI_Bitrate_t bitrate);
+    CANAPI_Return_t ResetController();
 
-    MacCAN_Return_t GetStatus(MacCAN_Status_t &status);
-    MacCAN_Return_t GetBusLoad(uint8_t &load);
+    CANAPI_Return_t WriteMessage(CANAPI_Message_t message, uint16_t timeout = 0U);
+    CANAPI_Return_t ReadMessage(CANAPI_Message_t &message, uint16_t timeout = CANREAD_INFINITE);
 
-    MacCAN_Return_t GetBitrate(MacCAN_Bitrate_t &bitrate);
-    MacCAN_Return_t GetBusSpeed(MacCAN_BusSpeed_t &speed);
+    CANAPI_Return_t GetStatus(CANAPI_Status_t &status);
+    CANAPI_Return_t GetBusLoad(uint8_t &load);
 
-    MacCAN_Return_t GetProperty(uint16_t param, void *value, uint32_t nbyte);
-    MacCAN_Return_t SetProperty(uint16_t param, const void *value, uint32_t nbyte);
+    CANAPI_Return_t GetBitrate(CANAPI_Bitrate_t &bitrate);
+    CANAPI_Return_t GetBusSpeed(CANAPI_BusSpeed_t &speed);
+
+    CANAPI_Return_t GetProperty(uint16_t param, void *value, uint32_t nbyte);
+    CANAPI_Return_t SetProperty(uint16_t param, const void *value, uint32_t nbyte);
 
     char *GetHardwareVersion();  // (for compatibility reasons)
     char *GetFirmwareVersion();  // (for compatibility reasons)
     static char *GetVersion();  // (for compatibility reasons)
 
-    // note: we have vendor-specific bit-timing (clock domain is 50MHz)
-    static MacCAN_Return_t MapIndex2Bitrate(int32_t index, MacCAN_Bitrate_t &bitrate);
+    static CANAPI_Return_t MapIndex2Bitrate(int32_t index, CANAPI_Bitrate_t &bitrate);
+    static CANAPI_Return_t MapString2Bitrate(const char *string, CANAPI_Bitrate_t &bitrate);
+    static CANAPI_Return_t MapBitrate2String(CANAPI_Bitrate_t bitrate, char *string, size_t length);
+    static CANAPI_Return_t MapBitrate2Speed(CANAPI_Bitrate_t bitrate, CANAPI_BusSpeed_t &speed);
 };
 /// \}
 ```
@@ -114,15 +117,21 @@ Type `can_test --help` to display all program options.
 
 ### Target Platform
 
-- Apple´s macOS (x86_64)
+- macOS 11.0 and later (Intel and Apple silicon)
 
 ### Development Environment
 
+#### macOS Monterey
+
+- macOS Monterey (12.1) on a Mac mini (M1, 2020)
+- Apple clang version 13.0.0 (clang-1300.0.29.30)
+- Xcode Version 13.2.1 (13C100)
+
 #### macOS Big Sur
 
-- macOS Big Sur (11.3.1) on a MacBook Pro (2019)
-- Apple clang version 12.0.5 (clang-1205.0.22.9)
-- Xcode Version 12.5 (12E262)
+- macOS Big Sur (11.6.1) on a MacBook Pro (2019)
+- Apple clang version 13.0.0 (clang-1300.0.29.30)
+- Xcode Version 13.2.1 (13C100)
 
 #### macOS High Sierra
 
@@ -135,6 +144,12 @@ Type `can_test --help` to display all program options.
 - TouCAN USB (Model F4FS1, Hardware 1.0.0, Firmware 1.0.1)
 - TouCAN USB (Model F4FS1, Hardware 1.0.0, Firmware 1.0.4)
 
+### Testing
+
+The XCode project for the trial program includes a xctest target with one test suite for each CAN API V3 **C** interface function.
+To run the test suites or single test cases two CAN devices are required.
+General test settings can be change in the file `Settings.h`.
+
 ## Known Bugs and Caveats
 
 - For a list of known bugs and caveats see tab [Issues](https://github.com/mac-can/RusokuCAN/issues) in the GitHub repo.
@@ -143,7 +158,7 @@ Type `can_test --help` to display all program options.
 
 For reasons unknown to me, the artifacts build with Xcode detect the TouCAN USB adapter only under macOS 10.15 (Catalina) and higher.
 The artifacts build by Makefile also detect the adapter under macOS 10.13 (High Sierra).
-So I hope that the artifacts build by Makefile are backward compatible up to version 10.6 (Mountain Lion) of the world´s mostest advanced OS.
+So I hope that the artifacts build by Makefile are backward compatible down to version 10.6 (Mountain Lion) of the world´s mostest advanced OS.
 
 ### MacCAN-Core Repo
 
@@ -164,7 +179,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with MacCAN-TouCAN.  If not, see <http://www.gnu.org/licenses/>.
+along with MacCAN-TouCAN.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
 
 #### MacCAN-Core License
 
@@ -175,6 +190,8 @@ The terms of the GNU General Public License v3.0 (or any later version) apply to
 ### Trademarks
 
 Mac and macOS are trademarks of Apple Inc., registered in the U.S. and other countries. \
+Windows is a registered trademark of Microsoft Corporation in the United States and/or other countries. \
+Linux is a registered trademark of Linus Torvalds. \
 All other company, product and service names mentioned herein are trademarks, registered trademarks or service marks of their respective owners.
 
 ### Hazard Note

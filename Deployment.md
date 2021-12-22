@@ -17,14 +17,14 @@ _All rights reserved._
    when required and commit them with commit comment:
   - `Update CAN API V3 sources to rev. `_nnn_ \
     `- `_list of major changes_
-2. Update the MacCAN-Core sources in `$(PROJROOT)/Sources/MacCAN_Core` from SVN repo
+2. Update the MacCAN-Core sources in `$(PROJROOT)/Sources/MacCAN` from SVN repo
    when required and commit them with commit comment:
   - `Update MacCAN-Core sources to rev. `_nnn_ \
     `- `_list of major changes_
 3. Check and update the version and date information in the following files:
   - `$(PROJROOT)/Sources/TouCAN.h`
   - `$(PROJROOT)/Sources/TouCAN.cpp`
-  - `$(PROJROOT)/Sources/TouCAN_Wrapper/can_api.cpp`
+  - `$(PROJROOT)/Sources/Wrapper/can_api.c`
   - `$(PROJROOT)/Libraries/CANAPI/Makefile`<sup>*</sup>
   - `$(PROJROOT)/Libraries/TouCAN/Makefile`<sup>*</sup>
   - `$(PROJROOT)/Utilities/can_moni/Sources/main.cpp`
@@ -42,18 +42,25 @@ _All rights reserved._
 2. Open the trial program with Xcode and run a code analysis.
   - _**There should not be any serious finding.**_
   - _If there are findings then fix them or create an issue in the repo._
-3. Run the `Makefile` in the project root directory.
+3. Select the Xcode Testing target and run all test cases:
+  - _**There should be no failed test case.**_
+  - _If there are failed tests then fix the root cause or define a workaround._
+4. Run the `Makefile` in the project root directory.
   - _**There should be absolute no compiler or linker error!**_
   - _If there are compiler or linker warnings then think twice._
-4. Try out the trial program with different options.
+5. Try out the trial program with different options.
   - _**There should be no crash, hangup, or any other error.**_
   - _If there is an error then fix it or create an issue in the repo._
-5. Try out the utilities with different options.
+6. Try out the utilities with different options.
   - _**There should be no crash, hangup, or any other error.**_
   - _If there is an error then fix it or create an issue in the repo._
-6. Build and try out the examples (repair them when necessary);
+7. Open the SPM configuration with Xcode and check for errors:
+  - _**There should be absolute no package manager error!**_
+  - _If there are package manager warnings then think twice._
+8. Build and try out the examples (repair them when necessary);
   - `$(PROJROOT)/Examples/C++`
   - `$(PROJROOT)/Examples/Python`
+  - `$(PROJROOT)/Examples/Swift`
 
 ### Pull Request
 
@@ -70,7 +77,7 @@ _All rights reserved._
 2. Double check all version numbers again (see above).
 3. Run the `Makefile` in the project root directory:
   - `uv-pc013mac:RusokuCAN eris$ make pristine`
-  - `uv-pc013mac:RusokuCAN eris$ make all`
+  - `uv-pc013mac:RusokuCAN eris$ make all BINARY=UNIVERSAL`
   - `uv-pc013mac:RusokuCAN eris$ make test`
   - `uv-pc013mac:RusokuCAN eris$ sudo make install`
 4. Update and build the CAN API V3 Loader Library:
@@ -81,7 +88,7 @@ _All rights reserved._
   - `uv-pc013mac:macOS eris$ make clean`
   - `uv-pc013mac:macOS eris$ make all`
 6. Run the CAN API V3 GoogleTest with two TouCAN USB devices:
-  - `uv-pc013mac:macOS eris$ ./can_testing --can_path=/Users/eris/Projects/CAN/API/json/ --can_dut1=TouCAN-USB1 --can_dut2=TouCAN-USB2  --gtest_output=xml:TestReport_TouCAN.xml --gtest_filter=-SmokeTest.* --sunnyday_traffic=2048` [...]
+  - `uv-pc013mac:macOS eris$ ./can_testing --can_path=/Users/eris/Projects/CAN/API/json/ --can_dut1=TouCAN-USB1 --can_dut2=TouCAN-USB2  --gtest_output=xml:TestReport_TouCAN.xml --gtest_filter="-SmokeTest.*" --sunnyday_traffic=2048` [...]
   - _If there is any error then **stop** here or create an issue for each error in the repo._
   - Copy the test report into the binaries folder `$(PROJROOT)/Binaries`.
 7. Pack the artifacts into a .zip-archive, e.g. `artifacts.zip`:

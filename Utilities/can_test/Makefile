@@ -26,8 +26,8 @@ MAIN_DIR = ./Sources
 
 SOURCE_DIR = $(HOME_DIR)/Sources
 CANAPI_DIR = $(HOME_DIR)/Sources/CANAPI
-MACCAN_DIR = $(HOME_DIR)/Sources/MacCAN_Core
-TOUCAN_DIR = $(HOME_DIR)/Sources/TouCAN_Driver
+MACCAN_DIR = $(HOME_DIR)/Sources/MacCAN
+TOUCAN_DIR = $(HOME_DIR)/Sources/Driver
 
 OBJECTS = $(OUTDIR)/main.o $(OUTDIR)/Timer.o $(BINDIR)/libTouCAN.a
 
@@ -63,12 +63,17 @@ LIBRARIES =
 LDFLAGS  += -lpthread \
 	-Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation
 
+ifeq ($(BINARY),UNIVERSAL)
+CFLAGS += -arch arm64 -arch x86_64
+CXXFLAGS += -arch arm64 -arch x86_64
+LDFLAGS += -arch arm64 -arch x86_64
+endif
 endif
 
 
-CXX = g++
-CC = gcc
-LD = g++
+CXX = clang++
+CC = clang
+LD = clang++
 RM = rm -f
 CP = cp -f
 
@@ -117,4 +122,5 @@ $(OUTDIR)/Timer.o: $(MAIN_DIR)/Timer.cpp
 $(TARGET): $(OBJECTS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBRARIES)
 	$(CP) $(TARGET) $(BINDIR)
+	@lipo -archs $(TARGET)
 	@echo "\033[1mTarget '"$@"' successfully build\033[0m"
