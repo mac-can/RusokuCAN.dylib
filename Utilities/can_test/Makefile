@@ -63,6 +63,11 @@ LIBRARIES =
 LDFLAGS  += -lpthread \
 	-Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation
 
+ifeq ($(BINARY),UNIVERSAL)
+CFLAGS += -arch arm64 -arch x86_64
+CXXFLAGS += -arch arm64 -arch x86_64
+LDFLAGS += -arch arm64 -arch x86_64
+endif
 endif
 
 
@@ -117,4 +122,5 @@ $(OUTDIR)/Timer.o: $(MAIN_DIR)/Timer.cpp
 $(TARGET): $(OBJECTS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBRARIES)
 	$(CP) $(TARGET) $(BINDIR)
+	@lipo -archs $(TARGET)
 	@echo "\033[1mTarget '"$@"' successfully build\033[0m"

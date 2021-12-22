@@ -64,6 +64,11 @@ LIBRARIES =
 LDFLAGS  += -lpthread \
 	-Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation
 
+ifeq ($(BINARY),UNIVERSAL)
+CFLAGS += -arch arm64 -arch x86_64
+CXXFLAGS += -arch arm64 -arch x86_64
+LDFLAGS += -arch arm64 -arch x86_64
+endif
 endif
 
 
@@ -143,4 +148,5 @@ $(OUTDIR)/main.o: $(MAIN_DIR)/main.cpp
 
 $(TARGET): $(OBJECTS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBRARIES)
+	@lipo -archs $(TARGET)
 	@echo "\033[1mTarget '"$@"' successfully build\033[0m"

@@ -89,22 +89,27 @@ CXXFLAGS += -g -Wall -Wextra -pthread \
 
 LIBRARIES =
 
-LDFLAGS  += -lpthread \
+LDFLAGS += -lpthread \
 	-nostartfiles -dynamiclib -fvisibility=hidden \
 	-Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation \
 	-install_name $(INSTALL_NAME) \
 	-current_version $(CURRENT_VERSION) \
 	-compatibility_version $(COMPATIBILITY_VERSION)
 
-ARFLAGS = r
+LTFLAGS += -static
 
+ifeq ($(BINARY),UNIVERSAL)
+CFLAGS += -arch arm64 -arch x86_64
+CXXFLAGS += -arch arm64 -arch x86_64
+LDFLAGS += -arch arm64 -arch x86_64
+endif
 endif
 
 
 CXX = clang++
 CC = clang
 LD = clang++
-AR = ar
+LT = libtool
 RM = rm -f
 CP = cp -f
 LN = ln -s
@@ -131,7 +136,7 @@ bindir:
 
 incdir:
 	@mkdir -p $(INCDIR)
-	@cp $(SOURCE_DIR)/*_Defines.h $(INCDIR)
+	@cp $(SOURCE_DIR)/TouCAN_Defines.h $(INCDIR)
 	@cp $(SOURCE_DIR)/TouCAN.h $(INCDIR)
 	@cp $(CANAPI_DIR)/CANAPI.h $(INCDIR)
 	@cp $(CANAPI_DIR)/CANAPI_Types.h $(INCDIR)
@@ -191,10 +196,13 @@ $(OUTDIR)/TouCAN.o: $(SOURCE_DIR)/TouCAN.cpp
 
 
 $(STATIC): $(OBJECTS)
-	$(AR) $(ARFLAGS) $@ $(OBJECTS) $(LIBRARIES)
-	$(CP) $(STATIC) $(BINDIR)
+	$(LT) $(LTFLAGS) -o $@ $(OBJECTS) $(LIBRARIES)
+	$(CP) $@ $(BINDIR)
+	@lipo -archs $@
+	@echo "\033[1mTarget '"$@"' successfully build\033[0m"
 
 $(TARGET): $(OBJECTS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBRARIES)
-	$(CP) $(TARGET) $(BINDIR)
+	$(CP) $@ $(BINDIR)
+	@lipo -archs $@
 	@echo "\033[1mTarget '"$@"' successfully build\033[0m"
