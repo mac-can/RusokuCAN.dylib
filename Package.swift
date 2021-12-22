@@ -32,27 +32,30 @@ let package = Package(
             dependencies: [],
             path: "Sources",
             exclude: [
-                "Swift/CANAPI.swift",
-                "Swift/TouCAN.swift",
+                "TouCAN.cpp",
+                "MacCAN/MacCAN.cpp",
                 "MacCAN/README.md",
                 "MacCAN/LICENSE.BSD-2-Clause",
                 "MacCAN/LICENSE.GPL-3.0-or-later",
                 "CANAPI/README.md",
                 "CANAPI/LICENSE.BSD-2-Clause",
                 "CANAPI/LICENSE.GPL-3.0-or-later",
+                "Swift/CANAPI.swift",
+                "Swift/TouCAN.swift",
                 "include/README.md"
             ],
             sources: [
-                "TouCAN.cpp",
+                "Driver/TouCAN_Driver.c",
+                "Driver/TouCAN_USB_Driver.c",
+                "Driver/TouCAN_USB_Device.c",
                 "Driver/TouCAN_USB.c",
-                "Wrapper/can_api.cpp",
-                "MacCAN/MacCAN.cpp",
                 "MacCAN/MacCAN_MsgQueue.c",
                 "MacCAN/MacCAN_IOUsbKit.c",
                 "MacCAN/MacCAN_Devices.c",
                 "MacCAN/MacCAN_Debug.c",
                 "CANAPI/can_btr.c",
-                "CANAPI/can_msg.c"
+                "CANAPI/can_msg.c",
+                "Wrapper/can_api.c"
             ],
             cSettings: [
                 CSetting.headerSearchPath("."),

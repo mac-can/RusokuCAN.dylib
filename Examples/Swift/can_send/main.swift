@@ -1,4 +1,6 @@
 //
+//  MacCAN-TouCAN - Swift example for sending CAN messages
+//
 //  Please build the MacCAN artifacts first by calling `make` in the repo´s root.
 //  You should have the following folders created:
 //  - $(REPOROOT)/Binaries
@@ -61,7 +63,7 @@ for i in 0..<frames {
         break;
     }
 }
-sleep(1)  // afterburner
+sleep(1)  // afterburner: tx is not acknowledged by hw
 if let statistics = can.statistics {
     print(">>> \(statistics.transmitted) frame(s) sent")
 }
