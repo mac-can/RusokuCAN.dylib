@@ -66,9 +66,9 @@ LDFLAGS  += -lpthread \
 endif
 
 
-CXX = g++
-CC = gcc
-LD = g++
+CXX = clang++
+CC = clang
+LD = clang++
 RM = rm -f
 CP = cp -f
 

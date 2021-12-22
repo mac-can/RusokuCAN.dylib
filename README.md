@@ -117,21 +117,21 @@ Type `can_test --help` to display all program options.
 
 ### Target Platform
 
-- Apple´s macOS (x86_64)
+- macOS 11.0 and later (Intel and Apple silicon)
 
 ### Development Environment
 
 #### macOS Monterey
 
-- macOS Big Sur (11.1) on a Mac mini (M1, 2020)
+- macOS Monterey (12.1) on a Mac mini (M1, 2020)
 - Apple clang version 13.0.0 (clang-1300.0.29.30)
 - Xcode Version 13.2.1 (13C100)
 
 #### macOS Big Sur
 
-- macOS Big Sur (11.3.1) on a MacBook Pro (2019)
-- Apple clang version 12.0.5 (clang-1205.0.22.9)
-- Xcode Version 12.5 (12E262)
+- macOS Big Sur (11.6.1) on a MacBook Pro (2019)
+- Apple clang version 13.0.0 (clang-1300.0.29.30)
+- Xcode Version 13.2.1 (13C100)
 
 #### macOS High Sierra
 
