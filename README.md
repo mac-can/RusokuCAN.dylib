@@ -24,7 +24,7 @@ and some C/C++, Swift, and Python example programs.
 /// \brief  MacCAN driver for Rusoku TouCAN USB interfaces
 /// \note   See CCanApi for a description of the overridden methods
 /// \{
-class CANCPP CTouCAN : public CCanApi {
+class CTouCAN : public CCanApi {
 public:
     // constructor / destructor
     CTouCAN();
@@ -201,6 +201,4 @@ _If you connect your CAN device to a real CAN network when using this library, y
 ### Contact
 
 E-Mail: mailto://info@mac.can.com \
-Internet: https://www.mac-can.com
-
-##### *Enjoy!*
+Internet: https://www.mac-can.net
