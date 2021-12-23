@@ -1430,7 +1430,7 @@ static int SetupDirectory(SInt32 vendorID, SInt32 productID)
     kern_return_t           kr;
 
     /* Create a master port for communication with the I/O Kit */
-#if (__MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_12_0)
+#if defined(__MAC_12_0) && (__MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_12_0)
     kr = IOMainPort(MACH_PORT_NULL, &masterPort);
 #else
     /*  'IOMasterPort' is deprecated: first deprecated in macOS 12.0 */
@@ -1862,5 +1862,5 @@ exit_worker_thread:
     return NULL;
 }
 
-/* * $Id: MacCAN_IOUsbKit.c 1044 2021-12-23 14:25:47Z makemake $ *** (c) UV Software, Berlin ***
+/* * $Id: MacCAN_IOUsbKit.c 1045 2021-12-23 15:49:37Z neptune $ *** (c) UV Software, Berlin ***
  */
