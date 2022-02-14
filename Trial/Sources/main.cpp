@@ -71,6 +71,7 @@ int main(int argc, const char * argv[]) {
     int32_t channel = (int32_t)TOUCAN_USB_CHANNEL0;
     uint16_t timeout = CANREAD_INFINITE;
     useconds_t delay = 0U;
+    CCanApi::SChannelInfo info;
     CCanApi::EChannelState state;
     char szVal[CANPROP_MAX_BUFFER_SIZE];
     uint16_t u16Val;
@@ -204,14 +205,32 @@ int main(int argc, const char * argv[]) {
             return 0;
     }
     if (option_test) {
-        for (int32_t ch = 0; ch < 8; ch++) {
-            retVal = CTouCAN::ProbeChannel(ch, opMode, state);
-            fprintf(stdout, ">>> myDriver.ProbeChannel(%i): state = %s", ch,
-                            (state == CTouCAN::ChannelOccupied) ? "occupied" :
-                            (state == CTouCAN::ChannelAvailable) ? "available" :
-                            (state == CTouCAN::ChannelNotAvailable) ? "not available" : "not testable");
-            fprintf(stdout, "%s", (retVal == CCanApi::IllegalParameter) ? " (waring: Op.-Mode not supported)\n" : "\n");
+#if (1)
+        bool result = CTouCAN::GetFirstChannel(info);
+        while (result) {
+            retVal = CTouCAN::ProbeChannel(info.m_nChannelNo, opMode, state);
+            fprintf(stdout, ">>> CCanAPI::ProbeChannel(%i): state = %s", info.m_nChannelNo,
+                            (state == CCanApi::ChannelOccupied) ? "occupied" :
+                            (state == CCanApi::ChannelAvailable) ? "available" :
+                            (state == CCanApi::ChannelNotAvailable) ? "not available" : "not testable");
+            fprintf(stdout, "%s", (retVal == CCanApi::IllegalParameter) ? " (warning: Op.-Mode not supported)\n" : "\n");
+            result = CTouCAN::GetNextChannel(info);
         }
+#else
+        retVal = myDriver.SetProperty(CANPROP_SET_FIRST_CHANNEL, (void *)NULL, 0U);
+        while (retVal == CCanApi::NoError) {
+            retVal = myDriver.GetProperty(CANPROP_GET_CHANNEL_NO, (void *)&i32Val, sizeof(int32_t));
+            if (retVal == CCanApi::NoError) {
+                retVal = CTouCAN::ProbeChannel(i32Val, opMode, state);
+                fprintf(stdout, ">>> CCanApi::ProbeChannel(%i): state = %s", i32Val,
+                                (state == CCanApi::ChannelOccupied) ? "occupied" :
+                                (state == CCanApi::ChannelAvailable) ? "available" :
+                                (state == CCanApi::ChannelNotAvailable) ? "not available" : "not testable");
+                fprintf(stdout, "%s", (retVal == CCanApi::IllegalParameter) ? " (warning: Op.-Mode not supported)\n" : "\n");
+            }
+            retVal = myDriver.SetProperty(CANPROP_SET_NEXT_CHANNEL, (void *)NULL, 0U);
+        }
+#endif
         if (option_exit)
             return 0;
     }
