@@ -2,7 +2,7 @@
 /*
  *  TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Adapters
  *
- *  Copyright (C) 2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+ *  Copyright (C) 2021-2022  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
  *  This file is part of MacCAN-TouCAN.
  *
@@ -104,7 +104,7 @@ CANUSB_Return_t TouCAN_ProbeUsbDevice(CANUSB_Index_t channel, uint16_t *productI
     if (!CANUSB_IsDevicePresent(index)) {
 //        MACCAN_DEBUG_INFO("+++ MacCAN-Core: device (%02x) not available\n", channel);
         retVal = CANERR_HANDLE;
-    } else if (!CANUSB_IsDeviceOpened(index)) {
+    } else if (!CANUSB_IsDeviceInUse(index)) {
 //        MACCAN_DEBUG_INFO("+++ MacCAN-Core: device (%02x) available\n", channel);
         retVal = CANERR_NOERROR;
     } else {
@@ -233,4 +233,3 @@ CANUSB_Return_t TouCAN_AbortReception(TouCAN_Device_t *device) {
 
     return retVal;
 }
-
