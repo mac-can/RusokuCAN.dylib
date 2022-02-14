@@ -23,29 +23,29 @@ all:
 	@./build_no.sh
 	@echo "\033[1mBuilding MacCAN-TouCAN...\033[0m"
 	$(MAKE) -C Trial $@
-	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Libraries/CANAPI $@
+	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Utilities/can_test $@
 	$(MAKE) -C Utilities/can_moni $@
 
 clean:
 	$(MAKE) -C Trial $@
-	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Libraries/CANAPI $@
+	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Utilities/can_test $@
 	$(MAKE) -C Utilities/can_moni $@
 
 pristine:
 	$(MAKE) -C Trial $@
-	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Libraries/CANAPI $@
+	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Utilities/can_test $@
 	$(MAKE) -C Utilities/can_moni $@
 
 install:
 #	$(MAKE) -C Trial $@
-	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Libraries/CANAPI $@
+	$(MAKE) -C Libraries/TouCAN $@
 #	$(MAKE) -C Utilities/can_test $@
 #	$(MAKE) -C Utilities/can_moni $@
 

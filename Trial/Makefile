@@ -18,12 +18,11 @@ TOUCAN_DIR = $(HOME_DIR)/Sources/Driver
 
 WRAPPER_DIR = $(HOME_DIR)/Sources/Wrapper
 
-OBJECTS = $(OUTDIR)/TouCAN_Driver.o $(OUTDIR)/TouCAN_USB_Driver.o \
-	$(OUTDIR)/TouCAN_USB_Device.o $(OUTDIR)/TouCAN_USB.o \
-	$(OUTDIR)/MacCAN.o $(OUTDIR)/MacCAN_Debug.o $(OUTDIR)/MacCAN_Devices.o \
+OBJECTS = $(OUTDIR)/main.o $(OUTDIR)/MacCAN_Debug.o $(OUTDIR)/MacCAN_Devices.o \
 	$(OUTDIR)/MacCAN_IOUsbKit.o $(OUTDIR)/MacCAN_MsgQueue.o \
-	$(OUTDIR)/can_btr.o $(OUTDIR)/can_api.o \
-	$(OUTDIR)/TouCAN.o $(OUTDIR)/main.o
+	$(OUTDIR)/TouCAN.o $(OUTDIR)/TouCAN_Driver.o $(OUTDIR)/TouCAN_USB_Driver.o \
+	$(OUTDIR)/TouCAN_USB_Device.o $(OUTDIR)/TouCAN_USB.o \
+	$(OUTDIR)/can_api.o  $(OUTDIR)/can_btr.o
 
 ifeq ($(current_OS),Darwin) # macOS - libTouCAN.dylib
 
@@ -37,9 +36,10 @@ DEFINES = -DOPTION_CAN_2_0_ONLY=1 \
 	-DOPTION_CANAPI_DRIVER=1 \
 	-DOPTION_CANAPI_RETVALS=1 \
 	-DOPTION_CANAPI_COMPANIONS=1 \
-	-DOPTION_MACCAN_LOGGER=1 \
-	-DOPTION_MACCAN_MULTICHANNEL=0 \
+	-DOPTION_MACCAN_PIPE_INFO=0 \
 	-DOPTION_MACCAN_PIPE_TIMEOUT=0 \
+	-DOPTION_MACCAN_MULTICHANNEL=0 \
+	-DOPTION_MACCAN_LOGGER=1 \
 	-DOPTION_MACCAN_DEBUG_LEVEL=4 \
 	-DOPTION_MACCAN_INSTRUMENTATION=0
 
@@ -106,19 +106,7 @@ install:
 test: info outdir $(TARGET)
 	./$(TARGET) INFO EXIT
 
-$(OUTDIR)/TouCAN_Driver.o: $(TOUCAN_DIR)/TouCAN_Driver.c
-	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
-
-$(OUTDIR)/TouCAN_USB_Driver.o: $(TOUCAN_DIR)/TouCAN_USB_Driver.c
-	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
-
-$(OUTDIR)/TouCAN_USB_Device.o: $(TOUCAN_DIR)/TouCAN_USB_Device.c
-	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
-
-$(OUTDIR)/TouCAN_USB.o: $(TOUCAN_DIR)/TouCAN_USB.c
-	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
-
-$(OUTDIR)/MacCAN.o: $(MACCAN_DIR)/MacCAN.cpp
+$(OUTDIR)/main.o: $(MAIN_DIR)/main.cpp
 	$(CXX) $(CXXFLAGS) -MMD -MF $*.d -o $@ -c $<
 
 $(OUTDIR)/MacCAN_Debug.o: $(MACCAN_DIR)/MacCAN_Debug.c
@@ -133,20 +121,29 @@ $(OUTDIR)/MacCAN_IOUsbKit.o: $(MACCAN_DIR)/MacCAN_IOUsbKit.c
 $(OUTDIR)/MacCAN_MsgQueue.o: $(MACCAN_DIR)/MacCAN_MsgQueue.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
-$(OUTDIR)/can_btr.o: $(CANAPI_DIR)/can_btr.c
+$(OUTDIR)/TouCAN.o: $(SOURCE_DIR)/TouCAN.cpp
+	$(CXX) $(CXXFLAGS) -MMD -MF $*.d -o $@ -c $<
+
+$(OUTDIR)/TouCAN_Driver.o: $(TOUCAN_DIR)/TouCAN_Driver.c
+	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
+
+$(OUTDIR)/TouCAN_USB_Driver.o: $(TOUCAN_DIR)/TouCAN_USB_Driver.c
+	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
+
+$(OUTDIR)/TouCAN_USB_Device.o: $(TOUCAN_DIR)/TouCAN_USB_Device.c
+	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
+
+$(OUTDIR)/TouCAN_USB.o: $(TOUCAN_DIR)/TouCAN_USB.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
 $(OUTDIR)/can_api.o: $(WRAPPER_DIR)/can_api.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
-$(OUTDIR)/TouCAN.o: $(SOURCE_DIR)/TouCAN.cpp
-	$(CXX) $(CXXFLAGS) -MMD -MF $*.d -o $@ -c $<
-
-$(OUTDIR)/main.o: $(MAIN_DIR)/main.cpp
-	$(CXX) $(CXXFLAGS) -MMD -MF $*.d -o $@ -c $<
+$(OUTDIR)/can_btr.o: $(CANAPI_DIR)/can_btr.c
+	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
 
 $(TARGET): $(OBJECTS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBRARIES)
-	@lipo -archs $(TARGET)
+	@lipo -archs $@
 	@echo "\033[1mTarget '"$@"' successfully build\033[0m"
