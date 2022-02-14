@@ -1,7 +1,7 @@
 //
 //  TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Interfaces
 //
-//  Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+//  Copyright (C) 2020-2022  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
 //
 //  This file is part of MacCAN-TouCAN.
 //
@@ -35,7 +35,7 @@
 #endif
 #define TOUCAN_LIBRARY_VENDOR  "UV Software, Berlin"
 #define TOUCAN_LIBRARY_LICENSE  "GNU General Public License, Version 3"
-#define TOUCAN_LIBRARY_COPYRIGHT  "Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin"
+#define TOUCAN_LIBRARY_COPYRIGHT  "Copyright (C) 2020-2022  Uwe Vogt, UV Software, Berlin"
 #define TOUCAN_LIBRARY_HAZARD_NOTE  "If you connect your CAN device to a real CAN network when using this library,\n" \
                                     "you might damage your application."
 /// \}
