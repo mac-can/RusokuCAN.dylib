@@ -10,7 +10,7 @@
 //
 import Foundation
 
-let can = TouCAN()
+let can = CanApi()
 let channel: Int32 = 1
 let mode: CanApi.Mode = [.DefaultOperationMode]
 let baud: CanApi.CiaIndex = .Index250kbps
@@ -21,10 +21,12 @@ var message = CanApi.Message(canId: 0x000, data: [0x00, 0x00, 0x00, 0x00, 0x00, 
 let frames = 2048
 
 print("\(try CanApi.GetVersion())")
-//for x in TouCanChannel.allCases {
-//    let state = try TouCAN.ProbeChannel(channel: x.rawValue, mode: mode)
-//    print(">>> ProbeChannel(\(x.rawValue)): \(x.description) -> (\(state.description))")
-//}
+if let info = try? CanApi.GetFirstChannel() {
+    print(">>> channel: \(info.channel), name: \(info.name), vendor: \(info.vendor), library: \(info.library), driver: \(info.driver)")
+    while let info = try? CanApi.GetNextChannel() {
+        print(">>> channel: \(info.channel), name: \(info.name), vendor: \(info.vendor), library: \(info.library), driver: \(info.driver)")
+    }
+}
 do {
     step = "InitializeChannel"
     print(">>> \(step)(channel: \(channel), mode: \(mode))")

@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		0F7BCB47267BC3AB00C7BCD8 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F7BCB46267BC3AB00C7BCD8 /* main.swift */; };
-		0F7BCB4A267BC3E000C7BCD8 /* TouCAN.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F7BCB48267BC3E000C7BCD8 /* TouCAN.swift */; };
 		0F7BCB4B267BC3E000C7BCD8 /* CANAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F7BCB49267BC3E000C7BCD8 /* CANAPI.swift */; };
 		0F7BCB4D267BC40400C7BCD8 /* libUVCANTOU.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F7BCB4C267BC40400C7BCD8 /* libUVCANTOU.a */; };
 /* End PBXBuildFile section */
@@ -38,7 +37,6 @@
 /* Begin PBXFileReference section */
 		0F7BCB1F267BC15700C7BCD8 /* can_recv */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = can_recv; sourceTree = BUILT_PRODUCTS_DIR; };
 		0F7BCB46267BC3AB00C7BCD8 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = main.swift; path = can_recv/main.swift; sourceTree = "<group>"; };
-		0F7BCB48267BC3E000C7BCD8 /* TouCAN.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TouCAN.swift; path = ../../Sources/Swift/TouCAN.swift; sourceTree = "<group>"; };
 		0F7BCB49267BC3E000C7BCD8 /* CANAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CANAPI.swift; path = ../../Sources/Swift/CANAPI.swift; sourceTree = "<group>"; };
 		0F7BCB4C267BC40400C7BCD8 /* libUVCANTOU.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libUVCANTOU.a; path = ../../Binaries/libUVCANTOU.a; sourceTree = "<group>"; };
 		0F82853A27731C0D00FE2C2E /* can_send.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = can_send.xcodeproj; sourceTree = "<group>"; };
@@ -78,7 +76,6 @@
 			isa = PBXGroup;
 			children = (
 				0F7BCB49267BC3E000C7BCD8 /* CANAPI.swift */,
-				0F7BCB48267BC3E000C7BCD8 /* TouCAN.swift */,
 				0F7BCB46267BC3AB00C7BCD8 /* main.swift */,
 			);
 			name = Sources;
@@ -168,7 +165,6 @@
 			files = (
 				0F7BCB4B267BC3E000C7BCD8 /* CANAPI.swift in Sources */,
 				0F7BCB47267BC3AB00C7BCD8 /* main.swift in Sources */,
-				0F7BCB4A267BC3E000C7BCD8 /* TouCAN.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
