@@ -108,13 +108,12 @@ bool CTouCAN::GetFirstChannel(SChannelInfo &info, void *param) {
     // set index to the first entry in the interface list (if any)
     CANAPI_Return_t rc = can_property((-1), CANPROP_SET_FIRST_CHANNEL, NULL, 0U);
     if (CANERR_NOERROR == rc) {
-        // get channel no, device name and device DLL name at actual index in the interface list
+        // get channel no, device name, etc. at actual index in the interface list
         if (((can_property((-1), CANPROP_GET_CHANNEL_NO, (void*)&info.m_nChannelNo, sizeof(int32_t))) == 0) &&
             ((can_property((-1), CANPROP_GET_CHANNEL_NAME, (void*)&info.m_szDeviceName, CANPROP_MAX_BUFFER_SIZE)) == 0) &&
-            ((can_property((-1), CANPROP_GET_CHANNEL_DLLNAME, (void*)&info.m_szDeviceDllName, CANPROP_MAX_BUFFER_SIZE)) == 0)) {
-            // we know the library id and its vendor already
-            info.m_nLibraryId = TOUCAN_LIBRARY_ID;
-            strncpy(info.m_szVendorName, TOUCAN_LIB_VENDOR, CANPROP_MAX_BUFFER_SIZE-1);
+            ((can_property((-1), CANPROP_GET_CHANNEL_DLLNAME, (void*)&info.m_szDeviceDllName, CANPROP_MAX_BUFFER_SIZE)) == 0) &&
+            ((can_property((-1), CANPROP_GET_CHANNEL_VENDOR_ID, (void*)&info.m_nLibraryId, sizeof(int32_t))) == 0) &&
+            ((can_property((-1), CANPROP_GET_CHANNEL_VENDOR_NAME, (void*)&info.m_szVendorName, CANPROP_MAX_BUFFER_SIZE)) == 0)) {
             result = true;
         }
     }
@@ -130,13 +129,12 @@ bool CTouCAN::GetNextChannel(SChannelInfo &info, void *param) {
     // set index to the next entry in the interface list (if any)
     CANAPI_Return_t rc = can_property((-1), CANPROP_SET_NEXT_CHANNEL, NULL, 0U);
     if (CANERR_NOERROR == rc) {
-        // get channel no, device name and device DLL name at actual index in the interface list
+        // get channel no, device name, etc. at actual index in the interface list
         if (((can_property((-1), CANPROP_GET_CHANNEL_NO, (void*)&info.m_nChannelNo, sizeof(int32_t))) == 0) &&
             ((can_property((-1), CANPROP_GET_CHANNEL_NAME, (void*)&info.m_szDeviceName, CANPROP_MAX_BUFFER_SIZE)) == 0) &&
-            ((can_property((-1), CANPROP_GET_CHANNEL_DLLNAME, (void*)&info.m_szDeviceDllName, CANPROP_MAX_BUFFER_SIZE)) == 0)) {
-            // we know the library id and its vendor already
-            info.m_nLibraryId = TOUCAN_LIBRARY_ID;
-            strncpy(info.m_szVendorName, TOUCAN_LIB_VENDOR, CANPROP_MAX_BUFFER_SIZE-1);
+            ((can_property((-1), CANPROP_GET_CHANNEL_DLLNAME, (void*)&info.m_szDeviceDllName, CANPROP_MAX_BUFFER_SIZE)) == 0) &&
+            ((can_property((-1), CANPROP_GET_CHANNEL_VENDOR_ID, (void*)&info.m_nLibraryId, sizeof(int32_t))) == 0) &&
+            ((can_property((-1), CANPROP_GET_CHANNEL_VENDOR_NAME, (void*)&info.m_szVendorName, CANPROP_MAX_BUFFER_SIZE)) == 0)) {
             result = true;
         }
     }
