@@ -75,9 +75,9 @@ typedef struct toucan_device_t_ {       /* TouCAN device: */
     TouCAN_Bitrate_t bitRate;           /* - CAN bit-rate settings (demanded) */
     TouCAN_CanClock_t canClock;         /* - CAN clock (in [Hz]) = CPU frequency */
     TouCAN_DeviceInfo_t deviceInfo;     /* - device information (hw, sw, etc.) */
-    char name[TOUCAN_MAX_NAME_LENGTH+1];  /* - device name (zero-terminated string) */
-    char vendor[TOUCAN_MAX_NAME_LENGTH+1];/* - vendor name (zero-terminated string) */
-    char website[TOUCAN_MAX_NAME_LENGTH+1];/*- vendor website (zero-terminated string) */
+    char name[TOUCAN_MAX_NAME_LENGTH+1];     /* - device name (zero-terminated string) */
+    char vendor[TOUCAN_MAX_STRING_LENGTH+1]; /* - vendor name (zero-terminated string) */
+    char website[TOUCAN_MAX_STRING_LENGTH+1];/* - vendor website (zero-terminated string) */
     bool configured;                    /* - flag to indicate the structure's validity */
 } TouCAN_Device_t;
 

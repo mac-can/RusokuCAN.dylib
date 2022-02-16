@@ -85,8 +85,8 @@ static CANUSB_Return_t GetUsbConfiguration(CANUSB_Handle_t handle, TouCAN_Device
     /* set device name, vendor name and website (zero-terminated strings) */
     if (CANUSB_GetDeviceName(handle, device->name, TOUCAN_MAX_NAME_LENGTH) < 0)
         strncpy(device->name, "(unkown)", TOUCAN_MAX_NAME_LENGTH);
-    strncpy(device->vendor, TOUCAN_VENDOR_NAME, TOUCAN_MAX_NAME_LENGTH);
-    strncpy(device->website, TOUCAN_VENDOR_URL, TOUCAN_MAX_NAME_LENGTH);
+    strncpy(device->vendor, TOUCAN_VENDOR_NAME, TOUCAN_MAX_STRING_LENGTH);
+    strncpy(device->website, TOUCAN_VENDOR_URL, TOUCAN_MAX_STRING_LENGTH);
 
     /* the USB handle and the CAN channel number are valid now,
      * but the configuration must be confirmed for the device! */

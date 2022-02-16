@@ -2,7 +2,7 @@
 /*
  *  TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Interfaces
  *
- *  Copyright (C) 2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+ *  Copyright (C) 2021-2022  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
  *  This file is part of MacCAN-TouCAN.
  *
@@ -46,6 +46,7 @@
 #define TOUCAN_TRM_QUEUE_SIZE  256
 
 #define TOUCAN_MAX_NAME_LENGTH  32
+#define TOUCAN_MAX_STRING_LENGTH  80
 
 #define TOUCAN_ERROR_SUCCESS  0
 #define TOUCAN_ERROR_OFFSET  (-100)
