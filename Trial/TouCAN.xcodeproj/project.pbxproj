@@ -16,40 +16,38 @@
 		0F60A9F123F8043100D34D0E /* MacCAN_IOUsbKit.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F60A9EC23F8043100D34D0E /* MacCAN_IOUsbKit.c */; };
 		0F60A9F223F8043100D34D0E /* MacCAN_Debug.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F60A9EE23F8043100D34D0E /* MacCAN_Debug.c */; };
 		0F68BB0F24104206005DAB17 /* can_btr.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F68BB0D24104206005DAB17 /* can_btr.c */; };
-		0F6B18D92420164300545209 /* can_msg.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F6B18D72420164300545209 /* can_msg.c */; };
 		0F8B2A9E259F60BA00C8841C /* MacCAN_MsgQueue.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F8B2A9D259F60BA00C8841C /* MacCAN_MsgQueue.c */; };
 		0FC21A0D276E77A900863E5A /* TouCAN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F60A9E223F803E800D34D0E /* TouCAN.cpp */; };
 		0FC21A12276E90C100863E5A /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FC21A11276E90BC00863E5A /* main.cpp */; };
-		44C0E1D9276FCD2700E6740C /* Testing.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44C0E1D3276FCD2700E6740C /* Testing.mm */; };
-		44C0E1DA276FCD2700E6740C /* Timer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44C0E1D4276FCD2700E6740C /* Timer.cpp */; };
-		44C0E1DB276FCD2700E6740C /* Tester.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44C0E1D6276FCD2700E6740C /* Tester.cpp */; };
-		44C0E1DC276FCE3E00E6740C /* can_api.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F0F8058276C8FF80012597F /* can_api.c */; };
-		44C0E1DD276FCE4800E6740C /* can_btr.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F68BB0D24104206005DAB17 /* can_btr.c */; };
-		44C0E1DE276FCE4F00E6740C /* can_msg.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F6B18D72420164300545209 /* can_msg.c */; };
-		44C0E1DF276FCE5600E6740C /* MacCAN_IOUsbKit.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F60A9EC23F8043100D34D0E /* MacCAN_IOUsbKit.c */; };
-		44C0E1E0276FCE5A00E6740C /* MacCAN_MsgQueue.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F8B2A9D259F60BA00C8841C /* MacCAN_MsgQueue.c */; };
-		44C0E1E1276FCE5F00E6740C /* MacCAN_Devices.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F60A9EB23F8043100D34D0E /* MacCAN_Devices.c */; };
-		44C0E1E2276FCE6300E6740C /* MacCAN_Debug.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F60A9EE23F8043100D34D0E /* MacCAN_Debug.c */; };
-		44C0E1E3276FCE6B00E6740C /* TouCAN_USB_Device.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F0F805E276D133C0012597F /* TouCAN_USB_Device.c */; };
-		44C0E1E4276FCE7100E6740C /* TouCAN_USB.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F60A9E423F803E800D34D0E /* TouCAN_USB.c */; };
-		44C0E1E5276FCE7600E6740C /* TouCAN_USB_Driver.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F0F805D276D133C0012597F /* TouCAN_USB_Driver.c */; };
-		44C0E1E6276FCE7C00E6740C /* TouCAN_Driver.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F0F8057276C8FC40012597F /* TouCAN_Driver.c */; };
-		44C0E1E7276FCE8100E6740C /* TouCAN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F60A9E223F803E800D34D0E /* TouCAN.cpp */; };
-		44C0E1F6276FD10100E6740C /* test_can_reset.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44C0E1E8276FD10100E6740C /* test_can_reset.mm */; };
-		44C0E1F7276FD10100E6740C /* test_can_kill.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44C0E1E9276FD10100E6740C /* test_can_kill.mm */; };
-		44C0E1F8276FD10100E6740C /* test_can_bitrate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44C0E1EA276FD10100E6740C /* test_can_bitrate.mm */; };
-		44C0E1F9276FD10100E6740C /* test_can_version.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44C0E1EB276FD10100E6740C /* test_can_version.mm */; };
-		44C0E1FA276FD10100E6740C /* test_can_software.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44C0E1EC276FD10100E6740C /* test_can_software.mm */; };
-		44C0E1FB276FD10100E6740C /* test_can_hardware.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44C0E1ED276FD10100E6740C /* test_can_hardware.mm */; };
-		44C0E1FC276FD10100E6740C /* test_can_test.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44C0E1EE276FD10100E6740C /* test_can_test.mm */; };
-		44C0E1FD276FD10100E6740C /* test_can_busload.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44C0E1EF276FD10100E6740C /* test_can_busload.mm */; };
-		44C0E1FE276FD10100E6740C /* test_can_property.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44C0E1F0276FD10100E6740C /* test_can_property.mm */; };
-		44C0E1FF276FD10100E6740C /* test_can_exit.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44C0E1F1276FD10100E6740C /* test_can_exit.mm */; };
-		44C0E200276FD10100E6740C /* test_can_init.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44C0E1F2276FD10100E6740C /* test_can_init.mm */; };
-		44C0E201276FD10100E6740C /* test_can_start.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44C0E1F3276FD10100E6740C /* test_can_start.mm */; };
-		44C0E202276FD10100E6740C /* test_can_read.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44C0E1F4276FD10100E6740C /* test_can_read.mm */; };
-		44C0E203276FD10100E6740C /* test_can_status.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44C0E1F5276FD10100E6740C /* test_can_status.mm */; };
-		44C0E205276FD1B300E6740C /* test_can_write.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44C0E204276FD1B300E6740C /* test_can_write.mm */; };
+		44912E6D27BD9707000EE31D /* Timer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44912E5727BD9707000EE31D /* Timer.cpp */; };
+		44912E6E27BD9707000EE31D /* test_can_version.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44912E5827BD9707000EE31D /* test_can_version.mm */; };
+		44912E6F27BD9707000EE31D /* test_can_test.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44912E5927BD9707000EE31D /* test_can_test.mm */; };
+		44912E7027BD9707000EE31D /* test_can_read.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44912E5B27BD9707000EE31D /* test_can_read.mm */; };
+		44912E7127BD9707000EE31D /* test_can_start.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44912E5E27BD9707000EE31D /* test_can_start.mm */; };
+		44912E7227BD9707000EE31D /* test_can_reset.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44912E5F27BD9707000EE31D /* test_can_reset.mm */; };
+		44912E7327BD9707000EE31D /* test_can_status.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44912E6027BD9707000EE31D /* test_can_status.mm */; };
+		44912E7427BD9707000EE31D /* Tester.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44912E6127BD9707000EE31D /* Tester.cpp */; };
+		44912E7527BD9707000EE31D /* test_can_busload.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44912E6327BD9707000EE31D /* test_can_busload.mm */; };
+		44912E7627BD9707000EE31D /* test_can_kill.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44912E6427BD9707000EE31D /* test_can_kill.mm */; };
+		44912E7727BD9707000EE31D /* test_can_hardware.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44912E6527BD9707000EE31D /* test_can_hardware.mm */; };
+		44912E7827BD9707000EE31D /* test_can_bitrate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44912E6627BD9707000EE31D /* test_can_bitrate.mm */; };
+		44912E7927BD9707000EE31D /* test_can_firmware.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44912E6727BD9707000EE31D /* test_can_firmware.mm */; };
+		44912E7A27BD9707000EE31D /* test_can_exit.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44912E6827BD9707000EE31D /* test_can_exit.mm */; };
+		44912E7B27BD9707000EE31D /* test_can_init.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44912E6927BD9707000EE31D /* test_can_init.mm */; };
+		44912E7C27BD9707000EE31D /* test_can_property.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44912E6A27BD9707000EE31D /* test_can_property.mm */; };
+		44912E7D27BD9707000EE31D /* test_can_write.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44912E6B27BD9707000EE31D /* test_can_write.mm */; };
+		44912E7E27BD9707000EE31D /* Testing.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44912E6C27BD9707000EE31D /* Testing.mm */; };
+		44912E7F27BD9714000EE31D /* can_api.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F0F8058276C8FF80012597F /* can_api.c */; };
+		44912E8027BD971E000EE31D /* can_btr.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F68BB0D24104206005DAB17 /* can_btr.c */; };
+		44912E8127BD9725000EE31D /* MacCAN_IOUsbKit.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F60A9EC23F8043100D34D0E /* MacCAN_IOUsbKit.c */; };
+		44912E8227BD9729000EE31D /* MacCAN_MsgQueue.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F8B2A9D259F60BA00C8841C /* MacCAN_MsgQueue.c */; };
+		44912E8327BD972D000EE31D /* MacCAN_Devices.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F60A9EB23F8043100D34D0E /* MacCAN_Devices.c */; };
+		44912E8427BD9734000EE31D /* MacCAN_Debug.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F60A9EE23F8043100D34D0E /* MacCAN_Debug.c */; };
+		44912E8527BD9738000EE31D /* TouCAN_USB_Device.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F0F805E276D133C0012597F /* TouCAN_USB_Device.c */; };
+		44912E8627BD973D000EE31D /* TouCAN_USB.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F60A9E423F803E800D34D0E /* TouCAN_USB.c */; };
+		44912E8727BD9742000EE31D /* TouCAN_USB_Driver.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F0F805D276D133C0012597F /* TouCAN_USB_Driver.c */; };
+		44912E8827BD9747000EE31D /* TouCAN_Driver.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F0F8057276C8FC40012597F /* TouCAN_Driver.c */; };
+		44912E8927BD974E000EE31D /* TouCAN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F60A9E223F803E800D34D0E /* TouCAN.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -99,29 +97,29 @@
 		0FC21A10276E78C900863E5A /* CANAPI_Defines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CANAPI_Defines.h; path = ../../Sources/CANAPI/CANAPI_Defines.h; sourceTree = "<group>"; };
 		0FC21A11276E90BC00863E5A /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0FFF2C3623FB2D6500AAC0C0 /* build_no.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = build_no.h; path = ../../Sources/build_no.h; sourceTree = "<group>"; };
-		44C0E1CC276FCADC00E6740C /* Testing.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Testing.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		44C0E1D3276FCD2700E6740C /* Testing.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Testing.mm; sourceTree = "<group>"; };
-		44C0E1D4276FCD2700E6740C /* Timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Timer.cpp; sourceTree = "<group>"; };
-		44C0E1D5276FCD2700E6740C /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Timer.h; sourceTree = "<group>"; };
-		44C0E1D6276FCD2700E6740C /* Tester.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Tester.cpp; sourceTree = "<group>"; };
-		44C0E1D7276FCD2700E6740C /* Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Settings.h; sourceTree = "<group>"; };
-		44C0E1D8276FCD2700E6740C /* Tester.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tester.h; sourceTree = "<group>"; };
-		44C0E1E8276FD10100E6740C /* test_can_reset.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = test_can_reset.mm; sourceTree = "<group>"; };
-		44C0E1E9276FD10100E6740C /* test_can_kill.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = test_can_kill.mm; sourceTree = "<group>"; };
-		44C0E1EA276FD10100E6740C /* test_can_bitrate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = test_can_bitrate.mm; sourceTree = "<group>"; };
-		44C0E1EB276FD10100E6740C /* test_can_version.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = test_can_version.mm; sourceTree = "<group>"; };
-		44C0E1EC276FD10100E6740C /* test_can_software.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = test_can_software.mm; sourceTree = "<group>"; };
-		44C0E1ED276FD10100E6740C /* test_can_hardware.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = test_can_hardware.mm; sourceTree = "<group>"; };
-		44C0E1EE276FD10100E6740C /* test_can_test.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = test_can_test.mm; sourceTree = "<group>"; };
-		44C0E1EF276FD10100E6740C /* test_can_busload.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = test_can_busload.mm; sourceTree = "<group>"; };
-		44C0E1F0276FD10100E6740C /* test_can_property.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = test_can_property.mm; sourceTree = "<group>"; };
-		44C0E1F1276FD10100E6740C /* test_can_exit.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = test_can_exit.mm; sourceTree = "<group>"; };
-		44C0E1F2276FD10100E6740C /* test_can_init.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = test_can_init.mm; sourceTree = "<group>"; };
-		44C0E1F3276FD10100E6740C /* test_can_start.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = test_can_start.mm; sourceTree = "<group>"; };
-		44C0E1F4276FD10100E6740C /* test_can_read.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = test_can_read.mm; sourceTree = "<group>"; };
-		44C0E1F5276FD10100E6740C /* test_can_status.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = test_can_status.mm; sourceTree = "<group>"; };
-		44C0E204276FD1B300E6740C /* test_can_write.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = test_can_write.mm; sourceTree = "<group>"; };
-		44C0E206276FD50200E6740C /* Template.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Template.h; sourceTree = "<group>"; };
+		44912E4E27BD95B0000EE31D /* Testing.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Testing.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		44912E5727BD9707000EE31D /* Timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Timer.cpp; path = ../Tests/UnitTests/Timer.cpp; sourceTree = "<group>"; };
+		44912E5827BD9707000EE31D /* test_can_version.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = test_can_version.mm; path = ../Tests/UnitTests/test_can_version.mm; sourceTree = "<group>"; };
+		44912E5927BD9707000EE31D /* test_can_test.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = test_can_test.mm; path = ../Tests/UnitTests/test_can_test.mm; sourceTree = "<group>"; };
+		44912E5A27BD9707000EE31D /* Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Settings.h; path = ../Tests/UnitTests/Settings.h; sourceTree = "<group>"; };
+		44912E5B27BD9707000EE31D /* test_can_read.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = test_can_read.mm; path = ../Tests/UnitTests/test_can_read.mm; sourceTree = "<group>"; };
+		44912E5C27BD9707000EE31D /* Driver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Driver.h; path = ../Tests/UnitTests/Driver.h; sourceTree = "<group>"; };
+		44912E5D27BD9707000EE31D /* Tester.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Tester.h; path = ../Tests/UnitTests/Tester.h; sourceTree = "<group>"; };
+		44912E5E27BD9707000EE31D /* test_can_start.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = test_can_start.mm; path = ../Tests/UnitTests/test_can_start.mm; sourceTree = "<group>"; };
+		44912E5F27BD9707000EE31D /* test_can_reset.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = test_can_reset.mm; path = ../Tests/UnitTests/test_can_reset.mm; sourceTree = "<group>"; };
+		44912E6027BD9707000EE31D /* test_can_status.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = test_can_status.mm; path = ../Tests/UnitTests/test_can_status.mm; sourceTree = "<group>"; };
+		44912E6127BD9707000EE31D /* Tester.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Tester.cpp; path = ../Tests/UnitTests/Tester.cpp; sourceTree = "<group>"; };
+		44912E6227BD9707000EE31D /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Timer.h; path = ../Tests/UnitTests/Timer.h; sourceTree = "<group>"; };
+		44912E6327BD9707000EE31D /* test_can_busload.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = test_can_busload.mm; path = ../Tests/UnitTests/test_can_busload.mm; sourceTree = "<group>"; };
+		44912E6427BD9707000EE31D /* test_can_kill.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = test_can_kill.mm; path = ../Tests/UnitTests/test_can_kill.mm; sourceTree = "<group>"; };
+		44912E6527BD9707000EE31D /* test_can_hardware.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = test_can_hardware.mm; path = ../Tests/UnitTests/test_can_hardware.mm; sourceTree = "<group>"; };
+		44912E6627BD9707000EE31D /* test_can_bitrate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = test_can_bitrate.mm; path = ../Tests/UnitTests/test_can_bitrate.mm; sourceTree = "<group>"; };
+		44912E6727BD9707000EE31D /* test_can_firmware.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = test_can_firmware.mm; path = ../Tests/UnitTests/test_can_firmware.mm; sourceTree = "<group>"; };
+		44912E6827BD9707000EE31D /* test_can_exit.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = test_can_exit.mm; path = ../Tests/UnitTests/test_can_exit.mm; sourceTree = "<group>"; };
+		44912E6927BD9707000EE31D /* test_can_init.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = test_can_init.mm; path = ../Tests/UnitTests/test_can_init.mm; sourceTree = "<group>"; };
+		44912E6A27BD9707000EE31D /* test_can_property.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = test_can_property.mm; path = ../Tests/UnitTests/test_can_property.mm; sourceTree = "<group>"; };
+		44912E6B27BD9707000EE31D /* test_can_write.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = test_can_write.mm; path = ../Tests/UnitTests/test_can_write.mm; sourceTree = "<group>"; };
+		44912E6C27BD9707000EE31D /* Testing.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = Testing.mm; path = ../Tests/UnitTests/Testing.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,7 +130,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		44C0E1C9276FCADC00E6740C /* Frameworks */ = {
+		44912E4B27BD95B0000EE31D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -146,7 +144,7 @@
 			isa = PBXGroup;
 			children = (
 				0F60A9BF23F7FDD700D34D0E /* Sources */,
-				44C0E1CD276FCADC00E6740C /* Testing */,
+				44912E5627BD9629000EE31D /* Testing */,
 				0F60A9BE23F7FDD700D34D0E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -155,7 +153,7 @@
 			isa = PBXGroup;
 			children = (
 				0F60A9BD23F7FDD700D34D0E /* TouCAN */,
-				44C0E1CC276FCADC00E6740C /* Testing.xctest */,
+				44912E4E27BD95B0000EE31D /* Testing.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -200,33 +198,33 @@
 			path = Sources;
 			sourceTree = "<group>";
 		};
-		44C0E1CD276FCADC00E6740C /* Testing */ = {
+		44912E5627BD9629000EE31D /* Testing */ = {
 			isa = PBXGroup;
 			children = (
-				44C0E206276FD50200E6740C /* Template.h */,
-				44C0E1D7276FCD2700E6740C /* Settings.h */,
-				44C0E1D3276FCD2700E6740C /* Testing.mm */,
-				44C0E1EE276FD10100E6740C /* test_can_test.mm */,
-				44C0E1F2276FD10100E6740C /* test_can_init.mm */,
-				44C0E1F3276FD10100E6740C /* test_can_start.mm */,
-				44C0E1F4276FD10100E6740C /* test_can_read.mm */,
-				44C0E204276FD1B300E6740C /* test_can_write.mm */,
-				44C0E1E8276FD10100E6740C /* test_can_reset.mm */,
-				44C0E1E9276FD10100E6740C /* test_can_kill.mm */,
-				44C0E1F1276FD10100E6740C /* test_can_exit.mm */,
-				44C0E1F5276FD10100E6740C /* test_can_status.mm */,
-				44C0E1EF276FD10100E6740C /* test_can_busload.mm */,
-				44C0E1EA276FD10100E6740C /* test_can_bitrate.mm */,
-				44C0E1F0276FD10100E6740C /* test_can_property.mm */,
-				44C0E1ED276FD10100E6740C /* test_can_hardware.mm */,
-				44C0E1EC276FD10100E6740C /* test_can_software.mm */,
-				44C0E1EB276FD10100E6740C /* test_can_version.mm */,
-				44C0E1D6276FCD2700E6740C /* Tester.cpp */,
-				44C0E1D8276FCD2700E6740C /* Tester.h */,
-				44C0E1D4276FCD2700E6740C /* Timer.cpp */,
-				44C0E1D5276FCD2700E6740C /* Timer.h */,
+				44912E5C27BD9707000EE31D /* Driver.h */,
+				44912E5A27BD9707000EE31D /* Settings.h */,
+				44912E6627BD9707000EE31D /* test_can_bitrate.mm */,
+				44912E6327BD9707000EE31D /* test_can_busload.mm */,
+				44912E6827BD9707000EE31D /* test_can_exit.mm */,
+				44912E6727BD9707000EE31D /* test_can_firmware.mm */,
+				44912E6527BD9707000EE31D /* test_can_hardware.mm */,
+				44912E6927BD9707000EE31D /* test_can_init.mm */,
+				44912E6427BD9707000EE31D /* test_can_kill.mm */,
+				44912E6A27BD9707000EE31D /* test_can_property.mm */,
+				44912E5B27BD9707000EE31D /* test_can_read.mm */,
+				44912E5F27BD9707000EE31D /* test_can_reset.mm */,
+				44912E5E27BD9707000EE31D /* test_can_start.mm */,
+				44912E6027BD9707000EE31D /* test_can_status.mm */,
+				44912E5927BD9707000EE31D /* test_can_test.mm */,
+				44912E5827BD9707000EE31D /* test_can_version.mm */,
+				44912E6B27BD9707000EE31D /* test_can_write.mm */,
+				44912E6127BD9707000EE31D /* Tester.cpp */,
+				44912E5D27BD9707000EE31D /* Tester.h */,
+				44912E6C27BD9707000EE31D /* Testing.mm */,
+				44912E5727BD9707000EE31D /* Timer.cpp */,
+				44912E6227BD9707000EE31D /* Timer.h */,
 			);
-			path = Testing;
+			name = Testing;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -249,13 +247,13 @@
 			productReference = 0F60A9BD23F7FDD700D34D0E /* TouCAN */;
 			productType = "com.apple.product-type.tool";
 		};
-		44C0E1CB276FCADC00E6740C /* Testing */ = {
+		44912E4D27BD95B0000EE31D /* Testing */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 44C0E1D2276FCADC00E6740C /* Build configuration list for PBXNativeTarget "Testing" */;
+			buildConfigurationList = 44912E5427BD95B0000EE31D /* Build configuration list for PBXNativeTarget "Testing" */;
 			buildPhases = (
-				44C0E1C8276FCADC00E6740C /* Sources */,
-				44C0E1C9276FCADC00E6740C /* Frameworks */,
-				44C0E1CA276FCADC00E6740C /* Resources */,
+				44912E4A27BD95B0000EE31D /* Sources */,
+				44912E4B27BD95B0000EE31D /* Frameworks */,
+				44912E4C27BD95B0000EE31D /* Resources */,
 			);
 			buildRules = (
 			);
@@ -263,7 +261,7 @@
 			);
 			name = Testing;
 			productName = Testing;
-			productReference = 44C0E1CC276FCADC00E6740C /* Testing.xctest */;
+			productReference = 44912E4E27BD95B0000EE31D /* Testing.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -278,7 +276,7 @@
 					0F60A9BC23F7FDD700D34D0E = {
 						CreatedOnToolsVersion = 11.3.1;
 					};
-					44C0E1CB276FCADC00E6740C = {
+					44912E4D27BD95B0000EE31D = {
 						CreatedOnToolsVersion = 13.2.1;
 					};
 				};
@@ -297,13 +295,13 @@
 			projectRoot = "";
 			targets = (
 				0F60A9BC23F7FDD700D34D0E /* TouCAN */,
-				44C0E1CB276FCADC00E6740C /* Testing */,
+				44912E4D27BD95B0000EE31D /* Testing */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		44C0E1CA276FCADC00E6740C /* Resources */ = {
+		44912E4C27BD95B0000EE31D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -320,7 +318,6 @@
 				0F0F8061276D1CCD0012597F /* TouCAN_USB_Driver.c in Sources */,
 				0F0F805A276C91FD0012597F /* TouCAN_Driver.c in Sources */,
 				0FC21A0D276E77A900863E5A /* TouCAN.cpp in Sources */,
-				0F6B18D92420164300545209 /* can_msg.c in Sources */,
 				0F60A9E623F803E800D34D0E /* TouCAN_USB.c in Sources */,
 				0F8B2A9E259F60BA00C8841C /* MacCAN_MsgQueue.c in Sources */,
 				0F60A9F123F8043100D34D0E /* MacCAN_IOUsbKit.c in Sources */,
@@ -333,40 +330,39 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		44C0E1C8276FCADC00E6740C /* Sources */ = {
+		44912E4A27BD95B0000EE31D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				44C0E1E4276FCE7100E6740C /* TouCAN_USB.c in Sources */,
-				44C0E1E0276FCE5A00E6740C /* MacCAN_MsgQueue.c in Sources */,
-				44C0E1FC276FD10100E6740C /* test_can_test.mm in Sources */,
-				44C0E1E1276FCE5F00E6740C /* MacCAN_Devices.c in Sources */,
-				44C0E1E7276FCE8100E6740C /* TouCAN.cpp in Sources */,
-				44C0E1D9276FCD2700E6740C /* Testing.mm in Sources */,
-				44C0E1FB276FD10100E6740C /* test_can_hardware.mm in Sources */,
-				44C0E1DC276FCE3E00E6740C /* can_api.c in Sources */,
-				44C0E201276FD10100E6740C /* test_can_start.mm in Sources */,
-				44C0E1FF276FD10100E6740C /* test_can_exit.mm in Sources */,
-				44C0E1FD276FD10100E6740C /* test_can_busload.mm in Sources */,
-				44C0E1DA276FCD2700E6740C /* Timer.cpp in Sources */,
-				44C0E202276FD10100E6740C /* test_can_read.mm in Sources */,
-				44C0E1DD276FCE4800E6740C /* can_btr.c in Sources */,
-				44C0E200276FD10100E6740C /* test_can_init.mm in Sources */,
-				44C0E1E2276FCE6300E6740C /* MacCAN_Debug.c in Sources */,
-				44C0E1DE276FCE4F00E6740C /* can_msg.c in Sources */,
-				44C0E203276FD10100E6740C /* test_can_status.mm in Sources */,
-				44C0E1E6276FCE7C00E6740C /* TouCAN_Driver.c in Sources */,
-				44C0E1E5276FCE7600E6740C /* TouCAN_USB_Driver.c in Sources */,
-				44C0E1F6276FD10100E6740C /* test_can_reset.mm in Sources */,
-				44C0E1F9276FD10100E6740C /* test_can_version.mm in Sources */,
-				44C0E1FE276FD10100E6740C /* test_can_property.mm in Sources */,
-				44C0E1DF276FCE5600E6740C /* MacCAN_IOUsbKit.c in Sources */,
-				44C0E205276FD1B300E6740C /* test_can_write.mm in Sources */,
-				44C0E1DB276FCD2700E6740C /* Tester.cpp in Sources */,
-				44C0E1E3276FCE6B00E6740C /* TouCAN_USB_Device.c in Sources */,
-				44C0E1F8276FD10100E6740C /* test_can_bitrate.mm in Sources */,
-				44C0E1F7276FD10100E6740C /* test_can_kill.mm in Sources */,
-				44C0E1FA276FD10100E6740C /* test_can_software.mm in Sources */,
+				44912E7627BD9707000EE31D /* test_can_kill.mm in Sources */,
+				44912E7C27BD9707000EE31D /* test_can_property.mm in Sources */,
+				44912E7127BD9707000EE31D /* test_can_start.mm in Sources */,
+				44912E8027BD971E000EE31D /* can_btr.c in Sources */,
+				44912E8727BD9742000EE31D /* TouCAN_USB_Driver.c in Sources */,
+				44912E8527BD9738000EE31D /* TouCAN_USB_Device.c in Sources */,
+				44912E7327BD9707000EE31D /* test_can_status.mm in Sources */,
+				44912E7D27BD9707000EE31D /* test_can_write.mm in Sources */,
+				44912E7527BD9707000EE31D /* test_can_busload.mm in Sources */,
+				44912E8827BD9747000EE31D /* TouCAN_Driver.c in Sources */,
+				44912E8927BD974E000EE31D /* TouCAN.cpp in Sources */,
+				44912E7427BD9707000EE31D /* Tester.cpp in Sources */,
+				44912E8427BD9734000EE31D /* MacCAN_Debug.c in Sources */,
+				44912E7027BD9707000EE31D /* test_can_read.mm in Sources */,
+				44912E7F27BD9714000EE31D /* can_api.c in Sources */,
+				44912E7927BD9707000EE31D /* test_can_firmware.mm in Sources */,
+				44912E7227BD9707000EE31D /* test_can_reset.mm in Sources */,
+				44912E8227BD9729000EE31D /* MacCAN_MsgQueue.c in Sources */,
+				44912E7A27BD9707000EE31D /* test_can_exit.mm in Sources */,
+				44912E6D27BD9707000EE31D /* Timer.cpp in Sources */,
+				44912E7E27BD9707000EE31D /* Testing.mm in Sources */,
+				44912E8327BD972D000EE31D /* MacCAN_Devices.c in Sources */,
+				44912E7727BD9707000EE31D /* test_can_hardware.mm in Sources */,
+				44912E6F27BD9707000EE31D /* test_can_test.mm in Sources */,
+				44912E7827BD9707000EE31D /* test_can_bitrate.mm in Sources */,
+				44912E7B27BD9707000EE31D /* test_can_init.mm in Sources */,
+				44912E8127BD9725000EE31D /* MacCAN_IOUsbKit.c in Sources */,
+				44912E8627BD973D000EE31D /* TouCAN_USB.c in Sources */,
+				44912E6E27BD9707000EE31D /* test_can_version.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -536,18 +532,18 @@
 			};
 			name = Release;
 		};
-		44C0E1D0276FCADC00E6740C /* Debug */ = {
+		44912E5227BD95B0000EE31D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"OPTION_TOUCAN_DRIVER=1",
+					"DEBUG=1",
 					"$(inherited)",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 12.1;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "uv-software.Testing";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -555,14 +551,14 @@
 			};
 			name = Debug;
 		};
-		44C0E1D1276FCADC00E6740C /* Release */ = {
+		44912E5327BD95B0000EE31D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 12.1;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "uv-software.Testing";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -591,11 +587,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		44C0E1D2276FCADC00E6740C /* Build configuration list for PBXNativeTarget "Testing" */ = {
+		44912E5427BD95B0000EE31D /* Build configuration list for PBXNativeTarget "Testing" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				44C0E1D0276FCADC00E6740C /* Debug */,
-				44C0E1D1276FCADC00E6740C /* Release */,
+				44912E5227BD95B0000EE31D /* Debug */,
+				44912E5327BD95B0000EE31D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

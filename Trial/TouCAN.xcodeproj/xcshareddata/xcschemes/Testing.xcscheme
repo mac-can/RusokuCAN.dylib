@@ -14,7 +14,7 @@
             buildForAnalyzing = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "44C0E1CB276FCADC00E6740C"
+               BlueprintIdentifier = "44912E4D27BD95B0000EE31D"
                BuildableName = "Testing.xctest"
                BlueprintName = "Testing"
                ReferencedContainer = "container:TouCAN.xcodeproj">
@@ -32,7 +32,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "44C0E1CB276FCADC00E6740C"
+               BlueprintIdentifier = "44912E4D27BD95B0000EE31D"
                BuildableName = "Testing.xctest"
                BlueprintName = "Testing"
                ReferencedContainer = "container:TouCAN.xcodeproj">
@@ -60,7 +60,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "44C0E1CB276FCADC00E6740C"
+            BlueprintIdentifier = "44912E4D27BD95B0000EE31D"
             BuildableName = "Testing.xctest"
             BlueprintName = "Testing"
             ReferencedContainer = "container:TouCAN.xcodeproj">
