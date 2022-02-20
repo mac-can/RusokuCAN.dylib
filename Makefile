@@ -52,6 +52,9 @@ install:
 test:
 	$(MAKE) -C Trial $@
 
+check:
+	$(MAKE) -C Trial $@ 2> checker.txt
+
 build_no:
 	@./build_no.sh
 	@cat Sources/build_no.h
