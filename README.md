@@ -155,7 +155,7 @@ General test settings can be change in the file `Settings.h`.
 
 ## Known Bugs and Caveats
 
-For a list of known bugs and caveats see tab [Issues](https://github.com/mac-can/RusokuCAN/issues) in the GitHub repo.
+For a list of known bugs and caveats see tab [Issues](https://github.com/mac-can/RusokuCAN.dylib/issues) in the GitHub repo.
 
 ## This and That
 
