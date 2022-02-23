@@ -1,6 +1,6 @@
 ### macOS&reg; User-Space Driver for TouCAN USB Interfaces from Rusoku
 
-_Copyright &copy; 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)_
+_Copyright &copy; 2020-2022 Uwe Vogt, UV Software, Berlin (info@mac-can.com)_
 
 # Running CAN on Mac&reg;
 
@@ -31,6 +31,9 @@ public:
     ~CTouCAN();
 
     // CCanApi overrides
+    static bool GetFirstChannel(SChannelInfo &info, void *param = NULL);
+    static bool GetNextChannel(SChannelInfo &info, void *param = NULL);
+
     static CANAPI_Return_t ProbeChannel(int32_t channel, const CANAPI_OpMode_t &opMode, const void *param, EChannelState &state);
     static CANAPI_Return_t ProbeChannel(int32_t channel, const CANAPI_OpMode_t &opMode, EChannelState &state);
 
@@ -129,7 +132,7 @@ Type `can_test --help` to display all program options.
 
 #### macOS Big Sur
 
-- macOS Big Sur (11.6.1) on a MacBook Pro (2019)
+- macOS Big Sur (11.6.3) on a MacBook Pro (2019)
 - Apple clang version 13.0.0 (clang-1300.0.29.30)
 - Xcode Version 13.2.1 (13C100)
 
@@ -146,19 +149,19 @@ Type `can_test --help` to display all program options.
 
 ### Testing
 
-The XCode project for the trial program includes a xctest target with one test suite for each CAN API V3 **C** interface function.
+The Xcode project for the trial program includes a Xctest target with one test suite for each CAN API V3 **C** interface function.
 To run the test suites or single test cases two CAN devices are required.
 General test settings can be change in the file `Settings.h`.
 
 ## Known Bugs and Caveats
 
-- For a list of known bugs and caveats see tab [Issues](https://github.com/mac-can/RusokuCAN/issues) in the GitHub repo.
+For a list of known bugs and caveats see tab [Issues](https://github.com/mac-can/RusokuCAN/issues) in the GitHub repo.
 
 ## This and That
 
 For reasons unknown to me, the artifacts build with Xcode detect the TouCAN USB adapter only under macOS 10.15 (Catalina) and higher.
 The artifacts build by Makefile also detect the adapter under macOS 10.13 (High Sierra).
-So I hope that the artifacts build by Makefile are backward compatible down to version 10.6 (Mountain Lion) of the world´s mostest advanced OS.
+So I hope that the artifacts build by Makefile are backward compatible down to version 10.8 (Mountain Lion) of the world´s mostest advanced OS.
 
 ### MacCAN-Core Repo
 
