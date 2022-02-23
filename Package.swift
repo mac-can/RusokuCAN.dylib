@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.5
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -33,7 +33,6 @@ let package = Package(
             path: "Sources",
             exclude: [
                 "TouCAN.cpp",
-                "MacCAN/MacCAN.cpp",
                 "MacCAN/README.md",
                 "MacCAN/LICENSE.BSD-2-Clause",
                 "MacCAN/LICENSE.GPL-3.0-or-later",
