@@ -2,7 +2,7 @@
 /*
  *  CAN Interface API, Version 3 (for Rusoku TouCAN Interface)
  *
- *  Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+ *  Copyright (C) 2020-2022  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
  *  This file is part of MacCAN-TouCAN.
  *
@@ -25,7 +25,7 @@
 #include "build_no.h"
 #define VERSION_MAJOR    0
 #define VERSION_MINOR    2
-#define VERSION_PATCH    2
+#define VERSION_PATCH    3
 #define VERSION_BUILD    BUILD_NO
 #define VERSION_STRING   TOSTRING(VERSION_MAJOR) "." TOSTRING(VERSION_MINOR) "." TOSTRING(VERSION_PATCH) " (" TOSTRING(BUILD_NO) ")"
 #if defined(_WIN64)
@@ -570,7 +570,7 @@ char *can_hardware(int handle)
 }
 
 EXPORT
-char *can_software(int handle)
+char *can_firmware(int handle)
 {
     static char string[CANPROP_MAX_BUFFER_SIZE] = "(unknown)";
 
@@ -743,9 +743,14 @@ static int lib_parameter(uint16_t param, void *value, size_t nbyte)
     case CANPROP_GET_SPEED:             // active bus speed of the CAN controller (can_speed_t)
     case CANPROP_GET_STATUS:            // current status register of the CAN controller (uint8_t)
     case CANPROP_GET_BUSLOAD:           // current bus load of the CAN controller (uint8_t)
+    case CANPROP_GET_NUM_CHANNELS:      // numbers of CAN channels on the CAN interface (uint8_t)
+    case CANPROP_GET_CAN_CHANNEL:       // active CAN channel on the CAN interface (uint8_t)
     case CANPROP_GET_TX_COUNTER:        // total number of sent messages (uint64_t)
     case CANPROP_GET_RX_COUNTER:        // total number of reveiced messages (uint64_t)
     case CANPROP_GET_ERR_COUNTER:       // total number of reveiced error frames (uint64_t)
+    case CANPROP_GET_RCV_QUEUE_SIZE:    // maximum number of message the receive queue can hold (uint32_t)
+    case CANPROP_GET_RCV_QUEUE_HIGH:    // maximum number of message the receive queue has hold (uint32_t)
+    case CANPROP_GET_RCV_QUEUE_OVFL:    // overflow counter of the receive queue (uint64_t)
         // note: a device parameter requires a valid handle.
         if (!init)
             rc = CANERR_NOTINIT;
@@ -838,10 +843,25 @@ static int drv_parameter(int handle, uint16_t param, void *value, size_t nbyte)
         break;
     case CANPROP_GET_BUSLOAD:           // current bus load of the CAN controller (uint8_t)
         if (nbyte >= sizeof(uint8_t)) {
-            if ((rc = can_busload(handle, &load, NULL)) == CANERR_NOERROR) {
-                *(uint8_t*)value = (uint8_t)load;
+            if ((rc = can_busload(handle, &load, NULL)) == CANERR_NOERROR) {  // FIXME: legacy resolution
+                if (nbyte >= sizeof(uint16_t))
+                    *(uint16_t*)value = (uint16_t)load * 100U;  // 0 - 10000 ==> 0.00% - 100.00%
+                else
+                    *(uint8_t*)value = (uint8_t)load;           // 0  -  100 ==> 0.00% - 100.00%
                 rc = CANERR_NOERROR;
             }
+        }
+        break;
+    case CANPROP_GET_NUM_CHANNELS:      // numbers of CAN channels on the CAN interface (uint8_t)
+        if (nbyte >= sizeof(uint8_t)) {
+            *(uint8_t*)value = (uint8_t)1;  // FIXME: replace magic number
+            rc = CANERR_NOERROR;
+        }
+        break;
+    case CANPROP_GET_CAN_CHANNEL:       // active CAN channel on the CAN interface (uint8_t)
+        if (nbyte >= sizeof(uint8_t)) {
+            *(uint8_t*)value = (uint8_t)0;  // FIXME: replace magic number
+            rc = CANERR_NOERROR;
         }
         break;
     case CANPROP_GET_TX_COUNTER:        // total number of sent messages (uint64_t)
@@ -859,6 +879,24 @@ static int drv_parameter(int handle, uint16_t param, void *value, size_t nbyte)
     case CANPROP_GET_ERR_COUNTER:       // total number of reveiced error frames (uint64_t)
         if (nbyte >= sizeof(uint64_t)) {
             *(uint64_t*)value = (uint64_t)can[handle].counters.err;
+            rc = CANERR_NOERROR;
+        }
+        break;
+    case CANPROP_GET_RCV_QUEUE_SIZE:    // maximum number of message the receive queue can hold (uint32_t)
+        if (nbyte >= sizeof(uint32_t)) {
+            *(uint32_t*)value = (uint32_t)CANQUE_QueueSize(can[handle].device.recvData.msgQueue);
+            rc = CANERR_NOERROR;
+        }
+        break;
+    case CANPROP_GET_RCV_QUEUE_HIGH:    // maximum number of message the receive queue has hold (uint32_t)
+        if (nbyte >= sizeof(uint32_t)) {
+            *(uint32_t*)value = (uint32_t)CANQUE_QueueHigh(can[handle].device.recvData.msgQueue);
+            rc = CANERR_NOERROR;
+        }
+        break;
+    case CANPROP_GET_RCV_QUEUE_OVFL:    // overflow counter of the receive queue (uint64_t)
+        if (nbyte >= sizeof(uint64_t)) {
+            *(uint64_t*)value = (uint64_t)CANQUE_OverflowCounter(can[handle].device.recvData.msgQueue);
             rc = CANERR_NOERROR;
         }
         break;

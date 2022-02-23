@@ -2,7 +2,7 @@
 //
 //  CAN Interface API, Version 3 (Testing)
 //
-//  Copyright (c) 2004-2021 Uwe Vogt, UV Software, Berlin (info@uv-software.com)
+//  Copyright (c) 2004-2022 Uwe Vogt, UV Software, Berlin (info@uv-software.com)
 //  All rights reserved.
 //
 //  This file is part of CAN API V3.
@@ -45,39 +45,30 @@
 //  You should have received a copy of the GNU General Public License
 //  along with CAN API V3.  If not, see <http://www.gnu.org/licenses/>.
 //
-#ifndef SETTINGS_H_INCLUDED
-#define SETTINGS_H_INCLUDED
+#ifndef TESTER_H_INCLUDED
+#define TESTER_H_INCLUDED
 
-#import "Tester.h"
-#import "Timer.h"
+//  HowTo: make a copy of header 'Template.h' and name it 'Driver.h'
+//         set define 'CDriverCAN' to your MacCAN Driver Under Test
+//         and adapt the driver specific test settings there
+#include "Driver.h"
 
-//  Device under Test (2 devices required)
-#define DUT1  (SInt32)CAN_DEVICE1
-#define DUT2  (SInt32)CAN_DEVICE2
+class CTester : CDriverCAN {
+public:
+    // constructor / destructor
+    CTester() {};
+    virtual ~CTester() {};
+    // methods
+    int SendSomeFrames(int handle, int32_t channel, int frames = 1, uint32_t canId = 0x100U);
+    int ReceiveSomeFrames(int handle, int32_t channel, int frames = 1, uint32_t canId = 0x200U);
+private:
+    int CheckReceivedId(const CANAPI_Message_t &message, int32_t canId);
+    int CheckReceivedDlc(const CANAPI_Message_t &message, uint8_t canDlc);
+    int CheckReceivedData(const CANAPI_Message_t &message, uint64_t &expected);
+public:
+    static uint8_t Dlc2Len(uint8_t dlc) { return CCanApi::Dlc2Len(dlc); }
+    static uint8_t Len2Dlc(uint8_t len) { return CCanApi::Len2Dlc(len); }};
 
-//  Default operation mode and bit-rate settings
-#define TEST_CANMODE  CANMODE_DEFAULT
-#define TEST_BTRINDEX  CANBTR_INDEX_250K
+#endif // TESTER_H_INCLUDED
 
-//  General test options:
-//  - number of CAN frames to be send during test cases
-#define TEST_FRAMES  8
-//  - number of CAN frames to be send during smoke test
-#define TEST_TRAFFIC  2048
-//  - number of CAN frames to be send until queue overrun
-#define TEST_QUEUE_FULL  65536
-#if (TX_ACKNOWLEDGE_UNSUPPORTED != 0)
-#define TEST_AFTER_BURNER  3000 /* [ms] */
-#endif
-//  - enable/disable sending of CAN frames during test cases
-#define SEND_TEST_FRAMES  1
-//  - enable/disable sending of CAN frames with non-default baudrate
-//    note: disable this option when a 3rd CAN device is on the bus.
-#define SEND_WITH_NONE_DEFAULT_BAUDRATE  0
-
-//  Useful stuff:
-#define INVALID_HANDLE  (-1)
-
-#endif // SETTINGS_H_INCLUDED
-
-// $Id: Settings.h 1037 2021-12-21 19:27:26Z makemake $  Copyright (c) UV Software, Berlin //
+// $Id: Tester.h 1083 2022-01-07 07:58:25Z makemake $  Copyright (c) UV Software, Berlin //

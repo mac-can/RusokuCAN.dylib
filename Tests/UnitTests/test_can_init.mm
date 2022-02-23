@@ -2,7 +2,7 @@
 //
 //  CAN Interface API, Version 3 (Testing)
 //
-//  Copyright (c) 2004-2021 Uwe Vogt, UV Software, Berlin (info@uv-software.com)
+//  Copyright (c) 2004-2022 Uwe Vogt, UV Software, Berlin (info@uv-software.com)
 //  All rights reserved.
 //
 //  This file is part of CAN API V3.
@@ -100,7 +100,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -158,7 +158,7 @@
     XCTAssertFalse(status.can_stopped);
 
     // @post:
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -205,7 +205,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -262,7 +262,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -391,6 +391,8 @@
 
     // @post:
     // @- start DUT1 with configured bit-rate settings
+    if (mode.fdoe) BITRATE_250K2M(bitrate);
+    // @note: 250kbps : 2'000kbps when CAN FD capable.
     rc = can_start(handle, &bitrate);
     XCTAssertEqual(CANERR_NOERROR, rc);
     // @- get status of DUT1 and check to be in RUNNING state
@@ -443,7 +445,7 @@
         XCTAssertEqual(CANERR_NOERROR, rc);
         XCTAssertEqual(CANMODE_MON, mode.byte);
 
-        // TODO: try to send a frame & receive some frames
+        // @todo: try to send a frame & receive some frames
         // @- shutdown DUT1
         rc = can_exit(handle);
         XCTAssertEqual(CANERR_NOERROR, rc);
@@ -485,7 +487,7 @@
         XCTAssertEqual(CANERR_NOERROR, rc);
         XCTAssertEqual(CANMODE_ERR, mode.byte);
 
-        // TODO: receive some error frames
+        // @todo: receive some error frames
         // @- shutdown DUT1
         rc = can_exit(handle);
         XCTAssertEqual(CANERR_NOERROR, rc);
@@ -527,7 +529,7 @@
         XCTAssertEqual(CANERR_NOERROR, rc);
         XCTAssertEqual(CANMODE_NRTR, mode.byte);
 
-        // TODO: try to request & receive some remote frames
+        // @todo: try to request & receive some remote frames
         // @- shutdown DUT1
         rc = can_exit(handle);
         XCTAssertEqual(CANERR_NOERROR, rc);
@@ -569,7 +571,7 @@
         XCTAssertEqual(CANERR_NOERROR, rc);
         XCTAssertEqual(CANMODE_NXTD, mode.byte);
 
-        // TODO: try to send & receive some extended frames
+        // @todo: try to send & receive some extended frames
         // @- shutdown DUT1
         rc = can_exit(handle);
         XCTAssertEqual(CANERR_NOERROR, rc);
@@ -582,18 +584,97 @@
 //
 // @expected: CANERR_NOERROR or CANERR_ILLPARA if CAN FD operation mode is not supported
 //
-//- (void)testCanFdOperationEnableDisable {
-//        TODO: insert coin here
-//}
+- (void)testCanFdOperationEnableDisable {
+    can_mode_t capa = { CANMODE_DEFAULT };
+    can_mode_t mode = { CANMODE_DEFAULT };
+    int handle = INVALID_HANDLE;
+    int rc = CANERR_FATAL;
+
+    // @pre:
+    // @- initialize DUT1 with configured settings
+    handle = can_init(DUT1, TEST_CANMODE, NULL);
+    XCTAssertLessThanOrEqual(0, handle);
+    // @- get operation capability from DUT1
+    rc = can_property(handle, CANPROP_GET_OP_CAPABILITY, (void*)&capa.byte, sizeof(UInt8));
+    XCTAssertEqual(CANERR_NOERROR, rc);
+    // @- shutdown DUT1
+    rc = can_exit(handle);
+    XCTAssertEqual(CANERR_NOERROR, rc);
+
+    // @test:
+    mode.fdoe = 1;
+    mode.brse = 0;
+    // @- initialize DUT1 with operation mode bit FDOE set
+    rc = can_init(DUT1, mode.byte, NULL);
+    if (capa.fdoe) {
+        handle = rc;
+        XCTAssertLessThanOrEqual(0, handle);
+        // @- get operation mode from DUT1
+        rc = can_property(handle, CANPROP_GET_OP_MODE, (void*)&mode.byte, sizeof(UInt8));
+        XCTAssertEqual(CANERR_NOERROR, rc);
+        XCTAssertEqual(CANMODE_FDOE, mode.byte);
+#if (CAN_FD_SUPPORTED != 0)
+        // @todo: try to send & receive some CAN FD long frames
+#endif
+        // @- shutdown DUT1
+        rc = can_exit(handle);
+        XCTAssertEqual(CANERR_NOERROR, rc);
+    } else {
+        XCTAssertEqual(CANERR_ILLPARA, rc);
+    }
+}
 
 // @xctest TC02.13: Check if interface can be initialized with operation mode bit FDOE and BRSE set (CAN FD operation with bit-rate switching enabled).
 //
 // @expected: CANERR_NOERROR or CANERR_ILLPARA if CAN FD operation mode or bit-rate switching is not supported
 //
-//- (void)testBitrateSwitchingEnableDisable {
-//        TODO: insert coin here
-//}
+- (void)testBitrateSwitchingEnableDisable {
+    can_mode_t capa = { CANMODE_DEFAULT };
+    can_mode_t mode = { CANMODE_DEFAULT };
+    int handle = INVALID_HANDLE;
+    int rc = CANERR_FATAL;
+
+    // @pre:
+    // @- initialize DUT1 with configured settings
+    handle = can_init(DUT1, TEST_CANMODE, NULL);
+    XCTAssertLessThanOrEqual(0, handle);
+    // @- get operation capability from DUT1
+    rc = can_property(handle, CANPROP_GET_OP_CAPABILITY, (void*)&capa.byte, sizeof(UInt8));
+    XCTAssertEqual(CANERR_NOERROR, rc);
+    // @- shutdown DUT1
+    rc = can_exit(handle);
+    XCTAssertEqual(CANERR_NOERROR, rc);
+
+    // @test:
+    mode.fdoe = 1;
+    mode.brse = 1;
+    // @- initialize DUT1 with operation mode bit FDOE and BRSE set
+    rc = can_init(DUT1, mode.byte, NULL);
+    if (capa.fdoe && capa.brse) {
+        handle = rc;
+        XCTAssertLessThanOrEqual(0, handle);
+        // @- get operation mode from DUT1
+        rc = can_property(handle, CANPROP_GET_OP_MODE, (void*)&mode.byte, sizeof(UInt8));
+        XCTAssertEqual(CANERR_NOERROR, rc);
+        XCTAssertEqual(CANMODE_FDOE | CANMODE_BRSE, mode.byte);
+#if (CAN_FD_SUPPORTED != 0)
+        // @todo: try to send & receive some CAN FD fast frames
+#endif
+        // @- shutdown DUT1
+        rc = can_exit(handle);
+        XCTAssertEqual(CANERR_NOERROR, rc);
+        
+        // @test:
+        mode.fdoe = 0;
+        mode.brse = 1;
+        // @- initialize DUT1 with operation mode bit BRSE set without bit FDOE
+        rc = can_init(DUT1, mode.byte, NULL);
+        XCTAssertEqual(CANERR_ILLPARA, rc);
+    } else {
+        XCTAssertEqual(CANERR_ILLPARA, rc);
+    }
+}
 
 @end
 
-// $Id: test_can_init.mm 1035 2021-12-21 12:03:27Z makemake $  Copyright (c) UV Software, Berlin //
+// $Id: test_can_init.mm 1086 2022-01-09 20:01:00Z haumea $  Copyright (c) UV Software, Berlin //

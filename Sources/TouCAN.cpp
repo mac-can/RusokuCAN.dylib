@@ -1,7 +1,7 @@
 //
 //  TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Interfaces
 //
-//  Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+//  Copyright (C) 2020-2022  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
 //
 //  This file is part of MacCAN-TouCAN.
 //
@@ -21,7 +21,7 @@
 #include "build_no.h"
 #define VERSION_MAJOR    0
 #define VERSION_MINOR    2
-#define VERSION_PATCH    2
+#define VERSION_PATCH    3
 #define VERSION_BUILD    BUILD_NO
 #define VERSION_STRING   TOSTRING(VERSION_MAJOR) "." TOSTRING(VERSION_MINOR) "." TOSTRING(VERSION_PATCH) " (" TOSTRING(BUILD_NO) ")"
 #if defined(_WIN64)
@@ -98,6 +98,48 @@ CTouCAN::CTouCAN() {
 EXPORT
 CTouCAN::~CTouCAN() {
     (void)TeardownChannel();
+}
+
+EXPORT
+bool CTouCAN::GetFirstChannel(SChannelInfo &info, void *param) {
+    bool result = false;
+    memset(&info, 0, sizeof(SChannelInfo));
+    info.m_nChannelNo = (-1);
+    // set index to the first entry in the interface list (if any)
+    CANAPI_Return_t rc = can_property((-1), CANPROP_SET_FIRST_CHANNEL, NULL, 0U);
+    if (CANERR_NOERROR == rc) {
+        // get channel no, device name, etc. at actual index in the interface list
+        if (((can_property((-1), CANPROP_GET_CHANNEL_NO, (void*)&info.m_nChannelNo, sizeof(int32_t))) == 0) &&
+            ((can_property((-1), CANPROP_GET_CHANNEL_NAME, (void*)&info.m_szDeviceName, CANPROP_MAX_BUFFER_SIZE)) == 0) &&
+            ((can_property((-1), CANPROP_GET_CHANNEL_DLLNAME, (void*)&info.m_szDeviceDllName, CANPROP_MAX_BUFFER_SIZE)) == 0) &&
+            ((can_property((-1), CANPROP_GET_CHANNEL_VENDOR_ID, (void*)&info.m_nLibraryId, sizeof(int32_t))) == 0) &&
+            ((can_property((-1), CANPROP_GET_CHANNEL_VENDOR_NAME, (void*)&info.m_szVendorName, CANPROP_MAX_BUFFER_SIZE)) == 0)) {
+            result = true;
+        }
+    }
+    (void)param;
+    return result;
+}
+
+EXPORT
+bool CTouCAN::GetNextChannel(SChannelInfo &info, void *param) {
+    bool result = false;
+    memset(&info, 0, sizeof(SChannelInfo));
+    info.m_nChannelNo = (-1);
+    // set index to the next entry in the interface list (if any)
+    CANAPI_Return_t rc = can_property((-1), CANPROP_SET_NEXT_CHANNEL, NULL, 0U);
+    if (CANERR_NOERROR == rc) {
+        // get channel no, device name, etc. at actual index in the interface list
+        if (((can_property((-1), CANPROP_GET_CHANNEL_NO, (void*)&info.m_nChannelNo, sizeof(int32_t))) == 0) &&
+            ((can_property((-1), CANPROP_GET_CHANNEL_NAME, (void*)&info.m_szDeviceName, CANPROP_MAX_BUFFER_SIZE)) == 0) &&
+            ((can_property((-1), CANPROP_GET_CHANNEL_DLLNAME, (void*)&info.m_szDeviceDllName, CANPROP_MAX_BUFFER_SIZE)) == 0) &&
+            ((can_property((-1), CANPROP_GET_CHANNEL_VENDOR_ID, (void*)&info.m_nLibraryId, sizeof(int32_t))) == 0) &&
+            ((can_property((-1), CANPROP_GET_CHANNEL_VENDOR_NAME, (void*)&info.m_szVendorName, CANPROP_MAX_BUFFER_SIZE)) == 0)) {
+            result = true;
+        }
+    }
+    (void)param;
+    return result;
 }
 
 EXPORT
@@ -252,7 +294,7 @@ char *CTouCAN::GetHardwareVersion() {
 EXPORT
 char *CTouCAN::GetFirmwareVersion() {
     // retrieve the firmware version of the CAN controller
-    return can_software(m_Handle);
+    return can_firmware(m_Handle);
 }
 
 EXPORT

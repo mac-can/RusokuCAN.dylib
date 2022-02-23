@@ -31,12 +31,12 @@ MACCAN_DIR = $(HOME_DIR)/Sources/MacCAN
 TOUCAN_DIR = $(HOME_DIR)/Sources/Driver
 WRAPPER_DIR = $(HOME_DIR)/Sources/Wrapper
 
-OBJECTS = $(OUTDIR)/TouCAN_Driver.o $(OUTDIR)/TouCAN_USB_Driver.o \
+OBJECTS = $(OUTDIR)/TouCAN.o \
+	$(OUTDIR)/TouCAN_Driver.o $(OUTDIR)/TouCAN_USB_Driver.o \
 	$(OUTDIR)/TouCAN_USB_Device.o $(OUTDIR)/TouCAN_USB.o \
-	$(OUTDIR)/MacCAN.o $(OUTDIR)/MacCAN_Debug.o $(OUTDIR)/MacCAN_Devices.o \
+	$(OUTDIR)/MacCAN_Debug.o $(OUTDIR)/MacCAN_Devices.o \
 	$(OUTDIR)/MacCAN_IOUsbKit.o $(OUTDIR)/MacCAN_MsgQueue.o \
-	$(OUTDIR)/can_btr.o $(OUTDIR)/can_api.o \
-	$(OUTDIR)/TouCAN.o
+	$(OUTDIR)/can_api.o $(OUTDIR)/can_btr.o
 
 
 ifeq ($(current_OS),Darwin) # macOS - libTouCAN.dylib
@@ -45,7 +45,7 @@ LIBRARY = libTouCAN
 
 MAJOR = 0
 MINOR = 2
-PATCH = 2
+PATCH = 3
 
 VERSION = $(MAJOR).$(MINOR).$(PATCH)
 TARGET  = $(LIBRARY).$(VERSION).dylib
@@ -53,24 +53,26 @@ STATIC  = $(LIBRARY).a
 
 INSTALL_NAME = $(TARGET)
 CURRENT_VERSION = $(MAJOR).$(MINOR).$(PATCH)
-COMPATIBILITY_VERSION = $(MAJOR).1.0
+COMPATIBILITY_VERSION = $(MAJOR).$(MINOR).0
 
 INSTALL = /usr/local/lib
 
 INCLUDE = /usr/local/include
 
-DEFINES = -DOPTION_CAN_2_0_ONLY=0 \
-	-DOPTION_TOUCAN_DYLIB=1 \
+DEFINES = -DOPTION_TOUCAN_DYLIB=1 \
+	-DOPTION_CANAPI_TOUCAN_DYLIB=0 \
 	-DOPTION_CANAPI_DRIVER=1 \
 	-DOPTION_CANAPI_RETVALS=0 \
 	-DOPTION_CANAPI_COMPANIONS=1 \
-	-DOPTION_MACCAN_LOGGER=1 \
-	-DOPTION_MACCAN_MULTICHANNEL=0 \
+	-DOPTION_MACCAN_PIPE_INFO=0 \
 	-DOPTION_MACCAN_PIPE_TIMEOUT=0 \
+	-DOPTION_MACCAN_MULTICHANNEL=0 \
+	-DOPTION_MACCAN_LOGGER=0 \
 	-DOPTION_MACCAN_DEBUG_LEVEL=0 \
 	-DOPTION_MACCAN_INSTRUMENTATION=0 \
 	-DOPTION_CANAPI_DEBUG_LEVEL=0 \
-	-DOPTION_CANAPI_INSTRUMENTATION=0
+	-DOPTION_CANAPI_INSTRUMENTATION=0 \
+	-DOPTION_CAN_2_0_ONLY=0
 
 HEADERS = -I$(SOURCE_DIR) \
 	-I$(CANAPI_DIR) \
@@ -146,7 +148,7 @@ clean:
 	$(RM) $(TARGET) $(STATIC) $(OUTDIR)/*.o $(OUTDIR)/*.d
 
 pristine:
-	$(RM) $(TARGET) $(STATIC) $(OUTDIR)/*.o $(OUTDIR)/*.d
+	$(RM) *.dylib *.a $(OUTDIR)/*.o $(OUTDIR)/*.d
 	$(RM) $(BINDIR)/*.dylib $(BINDIR)/*.a
 	$(RM) $(INCDIR)/*.h
 
@@ -157,6 +159,9 @@ ifeq ($(current_OS),Darwin)
 	$(RM) $(INSTALL)/$(LIBRARY).dylib ; $(LN) $(INSTALL)/$(TARGET) $(INSTALL)/$(LIBRARY).dylib
 endif
 
+
+$(OUTDIR)/TouCAN.o: $(SOURCE_DIR)/TouCAN.cpp
+	$(CXX) $(CXXFLAGS) -MMD -MF $*.d -o $@ -c $<
 
 $(OUTDIR)/TouCAN_Driver.o: $(TOUCAN_DIR)/TouCAN_Driver.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
@@ -170,9 +175,6 @@ $(OUTDIR)/TouCAN_USB_Device.o: $(TOUCAN_DIR)/TouCAN_USB_Device.c
 $(OUTDIR)/TouCAN_USB.o: $(TOUCAN_DIR)/TouCAN_USB.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
-$(OUTDIR)/MacCAN.o: $(MACCAN_DIR)/MacCAN.cpp
-	$(CXX) $(CXXFLAGS) -MMD -MF $*.d -o $@ -c $<
-
 $(OUTDIR)/MacCAN_Debug.o: $(MACCAN_DIR)/MacCAN_Debug.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
@@ -185,14 +187,11 @@ $(OUTDIR)/MacCAN_IOUsbKit.o: $(MACCAN_DIR)/MacCAN_IOUsbKit.c
 $(OUTDIR)/MacCAN_MsgQueue.o: $(MACCAN_DIR)/MacCAN_MsgQueue.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
-$(OUTDIR)/can_btr.o: $(CANAPI_DIR)/can_btr.c
-	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
-
 $(OUTDIR)/can_api.o: $(WRAPPER_DIR)/can_api.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
-$(OUTDIR)/TouCAN.o: $(SOURCE_DIR)/TouCAN.cpp
-	$(CXX) $(CXXFLAGS) -MMD -MF $*.d -o $@ -c $<
+$(OUTDIR)/can_btr.o: $(CANAPI_DIR)/can_btr.c
+	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
 
 $(STATIC): $(OBJECTS)

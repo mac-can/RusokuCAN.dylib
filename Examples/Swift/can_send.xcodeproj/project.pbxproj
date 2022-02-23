@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		0F7BCB3E267BC2E500C7BCD8 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F7BCB3D267BC2E500C7BCD8 /* main.swift */; };
-		0F7BCB41267BC33E00C7BCD8 /* TouCAN.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F7BCB3F267BC33E00C7BCD8 /* TouCAN.swift */; };
 		0F7BCB42267BC33E00C7BCD8 /* CANAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F7BCB40267BC33E00C7BCD8 /* CANAPI.swift */; };
 		0F7BCB44267BC36F00C7BCD8 /* libUVCANTOU.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F7BCB43267BC36F00C7BCD8 /* libUVCANTOU.a */; };
 /* End PBXBuildFile section */
@@ -28,7 +27,6 @@
 /* Begin PBXFileReference section */
 		0F7BCB32267BC1D200C7BCD8 /* can_send */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = can_send; sourceTree = BUILT_PRODUCTS_DIR; };
 		0F7BCB3D267BC2E500C7BCD8 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = main.swift; path = can_send/main.swift; sourceTree = "<group>"; };
-		0F7BCB3F267BC33E00C7BCD8 /* TouCAN.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TouCAN.swift; path = ../../Sources/Swift/TouCAN.swift; sourceTree = "<group>"; };
 		0F7BCB40267BC33E00C7BCD8 /* CANAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CANAPI.swift; path = ../../Sources/Swift/CANAPI.swift; sourceTree = "<group>"; };
 		0F7BCB43267BC36F00C7BCD8 /* libUVCANTOU.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libUVCANTOU.a; path = ../../Binaries/libUVCANTOU.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -66,7 +64,6 @@
 			isa = PBXGroup;
 			children = (
 				0F7BCB40267BC33E00C7BCD8 /* CANAPI.swift */,
-				0F7BCB3F267BC33E00C7BCD8 /* TouCAN.swift */,
 				0F7BCB3D267BC2E500C7BCD8 /* main.swift */,
 			);
 			name = Sources;
@@ -132,7 +129,6 @@
 			files = (
 				0F7BCB42267BC33E00C7BCD8 /* CANAPI.swift in Sources */,
 				0F7BCB3E267BC2E500C7BCD8 /* main.swift in Sources */,
-				0F7BCB41267BC33E00C7BCD8 /* TouCAN.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

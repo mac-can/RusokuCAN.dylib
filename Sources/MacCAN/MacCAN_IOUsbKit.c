@@ -2,7 +2,7 @@
 /*
  *  MacCAN - macOS User-Space Driver for USB-to-CAN Interfaces
  *
- *  Copyright (c) 2012-2021 Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+ *  Copyright (c) 2012-2022 Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *  All rights reserved.
  *
  *  This file is part of MacCAN-Core.
@@ -76,8 +76,8 @@
 #include <IOKit/usb/USB.h>
 
 #define VERSION_MAJOR     0
-#define VERSION_MINOR     2
-#define VERSION_PATCH     2
+#define VERSION_MINOR     3
+#define VERSION_PATCH     0
 
 /*#define OPTION_MACCAN_MULTICHANNEL  0  !* set globally: 0 = only one channel on multi-channel devices */
 /*#define OPTION_MACCAN_PIPE_TIMEOUT  0  !* set globally: 0 = do not use xxxPipeTO variant (e.g. macOS < 10.15) */
@@ -488,7 +488,7 @@ CANUSB_Return_t CANUSB_ReadPipe(CANUSB_Handle_t handle, UInt8 pipeRef, void *buf
     if (!IS_HANDLE_VALID(handle))
         return CANUSB_ERROR_HANDLE;
     /* check for NULL pointer */
-    if (!buffer)
+    if (!buffer || !size)
         return CANUSB_ERROR_NULLPTR;
 
     MACCAN_DEBUG_FUNC("lock #%i (%u)\n", handle, pipeRef);
@@ -887,6 +887,41 @@ Boolean CANUSB_IsDevicePresent(CANUSB_Index_t index) {
     if (usbDevice[index].fPresent &&
         (usbDevice[index].ioDevice != NULL))
         ret = true;
+    LEAVE_CRITICAL_SECTION(index);
+    MACCAN_DEBUG_FUNC("unlocked\n");
+    return ret;
+}
+
+Boolean CANUSB_IsDeviceInUse(CANUSB_Index_t index) {
+    Boolean ret = false;
+    IOReturn kr;
+
+    /* must be initialized */
+    if (!fInitialized)
+        return false;
+    /* must be a valid index */
+    if (!IS_INDEX_VALID(index))
+        return false;
+
+    MACCAN_DEBUG_FUNC("lock #%i\n", index);
+    ENTER_CRITICAL_SECTION(index);
+    if (usbDevice[index].fPresent &&
+        (usbDevice[index].ioDevice != NULL)) {
+#if (OPTION_MACCAN_MULTICHANNEL == 0)
+        if (usbDevice[index].usbInterface.fOpened &&
+#else
+        if (usbDevice[index].usbInterface.nOpened &&
+#endif
+            (usbDevice[index].usbInterface.ioInterface != NULL))
+            ret = true;
+        else {
+            /* check if the device is used by another process by trying to open it in exclusive mode*/
+            kr = (*usbDevice[index].ioDevice)->USBDeviceOpen(usbDevice[index].ioDevice);
+            if (kIOReturnSuccess == kr)  /* note: if not then close the device immediately! */
+                (void)(*usbDevice[index].ioDevice)->USBDeviceClose(usbDevice[index].ioDevice);
+            ret = (kIOReturnSuccess != kr) ? true : false;
+        }
+    }
     LEAVE_CRITICAL_SECTION(index);
     MACCAN_DEBUG_FUNC("unlocked\n");
     return ret;
@@ -1683,7 +1718,7 @@ static IOReturn FindInterface(IOUSBDeviceInterface **device, int index)
     UInt8                       interfaceProtocol;
     UInt8                       interfaceNumEndpoints;
     CFRunLoopSourceRef          runLoopSource;
-#ifdef OPTION_MACCAN_PIPE_INFO
+#if (OPTION_MACCAN_PIPE_INFO != 0)
     int                         pipeRef;
 #endif
 
@@ -1742,7 +1777,7 @@ static IOReturn FindInterface(IOUSBDeviceInterface **device, int index)
             (void)(*interface)->Release(interface);
             break;
         }
-#ifdef OPTION_MACCAN_PIPE_INFO
+#if (OPTION_MACCAN_PIPE_INFO != 0)
         MACCAN_DEBUG_CORE("      - Interface class %d, subclass %d, protocol %d\n", interfaceClass, interfaceSubClass, interfaceProtocol);
         MACCAN_DEBUG_CORE("      - Interface has %d endpoints:\n", interfaceNumEndpoints);
         /* Access each pipe in turn, starting with the pipe at index 1 */
@@ -1862,5 +1897,5 @@ exit_worker_thread:
     return NULL;
 }
 
-/* * $Id: MacCAN_IOUsbKit.c 1045 2021-12-23 15:49:37Z neptune $ *** (c) UV Software, Berlin ***
+/* * $Id: MacCAN_IOUsbKit.c 1090 2022-01-11 09:53:17Z haumea $ *** (c) UV Software, Berlin ***
  */

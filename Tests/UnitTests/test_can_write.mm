@@ -2,7 +2,7 @@
 //
 //  CAN Interface API, Version 3 (Testing)
 //
-//  Copyright (c) 2004-2021 Uwe Vogt, UV Software, Berlin (info@uv-software.com)
+//  Copyright (c) 2004-2022 Uwe Vogt, UV Software, Berlin (info@uv-software.com)
 //  All rights reserved.
 //
 //  This file is part of CAN API V3.
@@ -86,10 +86,12 @@
     message.dlc = mode.fdoe ? CANFD_MAX_DLC : CAN_MAX_DLC;
     memset(message.data, 0, CANFD_MAX_LEN);
 
-    // @test:
+    // @pre:
     // @- initialize DUT1 with configured settings
     handle = can_init(DUT1, mode.byte, NULL);
     XCTAssertLessThanOrEqual(0, handle);
+
+    // @test:
     // @- try to send a message from DUT1 with invalid handle -1
     rc = can_write(INVALID_HANDLE, &message, 0U);
     XCTAssertEqual(CANERR_HANDLE, rc);
@@ -107,7 +109,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -120,13 +122,15 @@
     // @- stop/reset DUT1
     rc = can_reset(handle);
     XCTAssertEqual(CANERR_NOERROR, rc);
-    // @- try to send a message from DUT1 with invalid handle INT32_MIN
-    rc = can_write(INT32_MIN, &message, 0U);
+    // @- try to send a message from DUT1 with invalid handle INT32_MAX
+    rc = can_write(INT32_MAX, &message, 0U);
     XCTAssertEqual(CANERR_HANDLE, rc);
     // @- get status of DUT1 and check to be in INIT state
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertTrue(status.can_stopped);
+
+    // @post:
     // @- shutdown DUT1
     rc = can_exit(handle);
     XCTAssertEqual(CANERR_NOERROR, rc);
@@ -142,6 +146,7 @@
     int handle = INVALID_HANDLE;
     int rc = CANERR_FATAL;
 
+    // @pre:
     // @- initialize DUT1 with configured settings
     handle = can_init(DUT1, TEST_CANMODE, NULL);
     XCTAssertLessThanOrEqual(0, handle);
@@ -161,9 +166,9 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    
+
     // @post:
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -214,8 +219,8 @@
     // @- try to send a message from DUT1 with invalid handle INT32_MIN
     rc = can_write(INT32_MIN, &message, 0U);
     XCTAssertEqual(CANERR_NOTINIT, rc);
-    // @- try to send a message from DUT1 with invalid handle INT32_MIN
-    rc = can_write(INT32_MIN, &message, 0U);
+    // @- try to send a message from DUT1 with invalid handle INT32_MAX
+    rc = can_write(INT32_MAX, &message, 0U);
     XCTAssertEqual(CANERR_NOTINIT, rc);
 
     // @post:
@@ -233,7 +238,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -290,7 +295,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertTrue(status.can_stopped);
-    
+
     // @post:
     // @- start DUT1 with configured bit-rate settings
     rc = can_start(handle, &bitrate);
@@ -299,7 +304,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -358,7 +363,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -380,7 +385,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertTrue(status.can_stopped);
-    
+
     // @post:
     // @- shutdown DUT1
     rc = can_exit(handle);
@@ -424,7 +429,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -444,7 +449,7 @@
     // @- shutdown DUT1
     rc = can_exit(handle);
     XCTAssertEqual(CANERR_NOERROR, rc);
-    
+
     // @test:
     // @- try to send a message from DUT1
     rc = can_write(handle, &message, 0U);
@@ -474,7 +479,7 @@
     message1.sts = 0;
     message1.dlc = mode.fdoe ? CANFD_MAX_DLC : CAN_MAX_DLC;
     memset(message1.data, 0, CANFD_MAX_LEN);
-    
+
     // @pre:
     mode.nxtd = 0;
     // @- initialize DUT1 with configured settings
@@ -588,7 +593,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    
+
     // @test:
     // @- try to send a message with invalid STD 0x800 from DUT1
     message.id = 0x800U;
@@ -648,7 +653,7 @@
     XCTAssertEqual(CANERR_ILLPARA, rc);
 
     // @post:
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -693,7 +698,7 @@
     message1.sts = 0;
     message1.dlc = mode.fdoe ? CANFD_MAX_DLC : CAN_MAX_DLC;
     memset(message1.data, 0, CANFD_MAX_LEN);
-    
+
     // @pre:
     mode.nxtd = 0;
     // @- initialize DUT1 with configured settings
@@ -807,7 +812,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    
+
     // @test:
     // @- try to send a message with invalid XTD 0x20000000 from DUT1
     message.id = 0x20000000U;
@@ -819,7 +824,7 @@
     XCTAssertEqual(CANERR_ILLPARA, rc);
 
     // @post:
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -864,7 +869,7 @@
     message1.sts = 0;
     message1.dlc = mode.fdoe ? CANFD_MAX_DLC : CAN_MAX_DLC;
     memset(message1.data, 0, CANFD_MAX_LEN);
-    
+
     // @pre:
     mode.nxtd = 0;
     // @- initialize DUT1 with configured settings
@@ -977,7 +982,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    
+
     // @test:
     // @- CAN 2.0:
     if (!mode.fdoe) {
@@ -1020,7 +1025,7 @@
     XCTAssertEqual(CANERR_ILLPARA, rc);
 
     // @post:
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -1093,7 +1098,7 @@
         rc = can_status(handle, &status.byte);
         XCTAssertEqual(CANERR_NOERROR, rc);
         XCTAssertFalse(status.can_stopped);
-        
+
         // @test:
         // @-- try to send a message with bit XTD set
         message.xtd = 1;
@@ -1105,7 +1110,7 @@
         XCTAssertFalse(status.can_stopped);
 
         // @post:
-        // @-- sunnyday traffic (optional):
+        // @-- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
         CTester tester;
         XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -1179,7 +1184,7 @@
         rc = can_status(handle, &status.byte);
         XCTAssertEqual(CANERR_NOERROR, rc);
         XCTAssertFalse(status.can_stopped);
-        
+
         // @test:
         // @-- try to send a message with bit RTR set
         message.rtr = 1;
@@ -1191,7 +1196,7 @@
         XCTAssertFalse(status.can_stopped);
 
         // @post:
-        // @-- sunnyday traffic (optional):
+        // @-- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
         CTester tester;
         XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -1265,7 +1270,7 @@
         rc = can_status(handle, &status.byte);
         XCTAssertEqual(CANERR_NOERROR, rc);
         XCTAssertFalse(status.can_stopped);
-        
+
         // @test:
         // @-- try to send a message with bit FDF set
         message.fdf = 1;
@@ -1278,7 +1283,7 @@
         XCTAssertFalse(status.can_stopped);
 
         // @post:
-        // @-- sunnyday traffic (optional):
+        // @-- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
         CTester tester;
         XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -1352,7 +1357,7 @@
         rc = can_status(handle, &status.byte);
         XCTAssertEqual(CANERR_NOERROR, rc);
         XCTAssertFalse(status.can_stopped);
-        
+
         // @test:
         // @-- try to send a message with bit BRS set
         message.fdf = 0;
@@ -1365,7 +1370,7 @@
         XCTAssertFalse(status.can_stopped);
 
         // @post:
-        // @-- sunnyday traffic (optional):
+        // @-- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
         CTester tester;
         XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -1432,14 +1437,15 @@
         rc = can_status(handle, &status.byte);
         XCTAssertEqual(CANERR_NOERROR, rc);
         XCTAssertTrue(status.can_stopped);
-        // @-- start DUT1 with configured bit-rate settings
+        // @-- start DUT1 with CAN FD bit-rate settings: 250kbps : 2'000kbps
+        BITRATE_250K2M(bitrate);
         rc = can_start(handle, &bitrate);
         XCTAssertEqual(CANERR_NOERROR, rc);
         // @-- get status of DUT1 and check to be in RUNNING state
         rc = can_status(handle, &status.byte);
         XCTAssertEqual(CANERR_NOERROR, rc);
         XCTAssertFalse(status.can_stopped);
-        
+
         // @test:
         // @-- try to send a message with bit FDF cleared and BRS set
         message.fdf = 0;
@@ -1452,7 +1458,9 @@
         XCTAssertFalse(status.can_stopped);
 
         // @post:
-        // @-- sunnyday traffic (optional):
+        // @-- send and receive some frames to/from DUT2 (optional)
+#if (0)
+        // FIXME: 2nd device must also be CAN FD capable!
 #if (SEND_TEST_FRAMES != 0)
         CTester tester;
         XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -1461,6 +1469,7 @@
         rc = can_status(handle, &status.byte);
         XCTAssertEqual(CANERR_NOERROR, rc);
         XCTAssertFalse(status.can_stopped);
+#endif
 #endif
         // @-- stop/reset DUT1
         rc = can_reset(handle);
@@ -1512,7 +1521,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    
+
     // @test:
     // @- try to send a message with bit STS set
     message.sts = 1;
@@ -1524,7 +1533,7 @@
     XCTAssertFalse(status.can_stopped);
 
     // @post:
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -1572,7 +1581,7 @@
     message1.sts = 0;
     message1.dlc = mode.fdoe ? CANFD_MAX_DLC : CAN_MAX_DLC;
     memset(message1.data, 0, CANFD_MAX_LEN);
-    
+
     // @pre:
     mode.nxtd = 0;
     // @- initialize DUT1 with configured settings
@@ -1648,4 +1657,4 @@
 
 @end
 
-// $Id: test_can_write.mm 1037 2021-12-21 19:27:26Z makemake $  Copyright (c) UV Software, Berlin //
+// $Id: test_can_write.mm 1086 2022-01-09 20:01:00Z haumea $  Copyright (c) UV Software, Berlin //

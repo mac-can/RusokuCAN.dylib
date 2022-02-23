@@ -2,3 +2,5 @@
 doc/
 # we don't use the message pipe
 MacCAN_MsgPipe.*
+# R.I.P. CMacCAN
+MacCAN.*

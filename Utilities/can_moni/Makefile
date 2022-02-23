@@ -129,5 +129,5 @@ $(OUTDIR)/can_msg.o: $(CANAPI_DIR)/can_msg.c
 $(TARGET): $(OBJECTS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBRARIES)
 	$(CP) $(TARGET) $(BINDIR)
-	@lipo -archs $(TARGET)
+	@lipo -archs $@
 	@echo "\033[1mTarget '"$@"' successfully build\033[0m"

@@ -21,6 +21,7 @@
 #include "MacCAN_Debug.h"
 
 //#define SECOND_CHANNEL
+#define ISSUE_198   (0)
 
 #define OPTION_NO   (0)
 #define OPTION_YES  (1)
@@ -35,7 +36,7 @@
 #endif
 static void sigterm(int signo);
 
-static void verbose(const can_mode_t mode, const can_bitrate_t bitrate, const can_speed_t speed);
+static void verbose(const can_mode_t &mode, const can_bitrate_t &bitrate, const can_speed_t &speed);
 
 static volatile int running = 1;
 
@@ -70,6 +71,7 @@ int main(int argc, const char * argv[]) {
     int32_t channel = (int32_t)TOUCAN_USB_CHANNEL0;
     uint16_t timeout = CANREAD_INFINITE;
     useconds_t delay = 0U;
+    CCanApi::SChannelInfo info;
     CCanApi::EChannelState state;
     char szVal[CANPROP_MAX_BUFFER_SIZE];
     uint16_t u16Val;
@@ -83,7 +85,7 @@ int main(int argc, const char * argv[]) {
     int option_exit = OPTION_NO;
     int option_echo = OPTION_YES;
     int option_stop = OPTION_NO;
-    int option_check = OPTION_NO;
+    int option_check = ISSUE_198;
     int option_retry = OPTION_NO;
     int option_repeat = OPTION_NO;
     int option_transmit = OPTION_NO;
@@ -122,7 +124,11 @@ int main(int argc, const char * argv[]) {
         if (!strncmp(argv[i], "U:", 2) && sscanf(argv[i], "U:%i", &opt) == 1) delay = (useconds_t)opt;
         /* receive messages */
         if (!strcmp(argv[i], "STOP")) option_stop = OPTION_YES;
+#if (ISSUE_198 == 0)
         if (!strcmp(argv[i], "CHECK")) option_check = OPTION_YES;
+#else
+        if (!strcmp(argv[i], "IGNORE")) option_check = OPTION_NO;
+#endif
         if (!strcmp(argv[i], "RETRY")) option_retry = OPTION_YES;
         if (!strcmp(argv[i], "REPEAT")) option_repeat = OPTION_YES;
         if (!strcmp(argv[i], "SILENT")) option_echo = OPTION_NO;
@@ -160,53 +166,71 @@ int main(int argc, const char * argv[]) {
         MACCAN_LOG_OPEN();
     MACCAN_LOG_PRINTF("# MacCAN-TouCAN - %s", ctime(&now));
     if (option_info) {
-        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_CANAPI, (void *)&u16Val, sizeof(uint16_t));
+        retVal = myDriver.GetProperty(CANPROP_GET_SPEC, (void *)&u16Val, sizeof(uint16_t));
         if (retVal == CCanApi::NoError)
-            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_CANAPI): value = %u.%u\n", (uint8_t)(u16Val >> 8), (uint8_t)u16Val);
+            fprintf(stdout, ">>> myDriver.GetProperty(CANPROP_GET_SPEC): value = %u.%u\n", (uint8_t)(u16Val >> 8), (uint8_t)u16Val);
         else
-            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_CANAPI) returned %i\n", retVal);
-        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_VERSION, (void *)&u16Val, sizeof(uint16_t));
+            fprintf(stderr, "+++ error: myDriver.GetProperty(CANPROP_GET_SPEC) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(CANPROP_GET_VERSION, (void *)&u16Val, sizeof(uint16_t));
         if (retVal == CCanApi::NoError)
-            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_VERSION): value = %u.%u\n", (uint8_t)(u16Val >> 8), (uint8_t)u16Val);
+            fprintf(stdout, ">>> myDriver.GetProperty(CANPROP_GET_VERSION): value = %u.%u\n", (uint8_t)(u16Val >> 8), (uint8_t)u16Val);
         else
-            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_VERSION) returned %i\n", retVal);
-        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_PATCH_NO, (void *)&u8Val, sizeof(uint8_t));
+            fprintf(stderr, "+++ error: myDriver.GetProperty(CANPROP_GET_VERSION) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(CANPROP_GET_PATCH_NO, (void *)&u8Val, sizeof(uint8_t));
         if (retVal == CCanApi::NoError)
-            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_PATCH_NO): value = %u\n", (uint8_t)u8Val);
+            fprintf(stdout, ">>> myDriver.GetProperty(CANPROP_GET_PATCH_NO): value = %u\n", u8Val);
         else
-            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_PATCH_NO) returned %i\n", retVal);
-        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_BUILD_NO, (void *)&u32Val, sizeof(uint32_t));
+            fprintf(stderr, "+++ error: myDriver.GetProperty(CANPROP_GET_PATCH_NO) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(CANPROP_GET_BUILD_NO, (void *)&u32Val, sizeof(uint32_t));
         if (retVal == CCanApi::NoError)
-            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_BUILD_NO): value = %" PRIx32 "\n", (uint32_t)u32Val);
+            fprintf(stdout, ">>> myDriver.GetProperty(CANPROP_GET_BUILD_NO): value = %" PRIx32 "\n", u32Val);
         else
-            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_BUILD_NO) returned %i\n", retVal);
-        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_LIBRARY_ID, (void *)&i32Val, sizeof(int32_t));
+            fprintf(stderr, "+++ error: myDriver.GetProperty(CANPROP_GET_BUILD_NO) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(CANPROP_GET_LIBRARY_ID, (void *)&i32Val, sizeof(int32_t));
         if (retVal == CCanApi::NoError)
-            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_LIBRARY_ID): value = %d\n", i32Val);
+            fprintf(stdout, ">>> myDriver.GetProperty(CANPROP_GET_LIBRARY_ID): value = %d\n", i32Val);
         else
-            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_LIBRARY_ID) returned %i\n", retVal);
-        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_LIBRARY_NAME, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
+            fprintf(stderr, "+++ error: myDriver.GetProperty(CANPROP_GET_LIBRARY_ID) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(CANPROP_GET_LIBRARY_DLLNAME, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
         if (retVal == CCanApi::NoError)
-            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_LIBRARY_NAME): value = '%s'\n", szVal);
+            fprintf(stdout, ">>> myDriver.GetProperty(CANPROP_GET_LIBRARY_DLLNAME): value = '%s'\n", szVal);
         else
-            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_LIBRARY_NAME) returned %i\n", retVal);
-        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_LIBRARY_VENDOR, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
+            fprintf(stderr, "+++ error: myDriver.GetProperty(CANPROP_GET_LIBRARY_DLLNAME) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(CANPROP_GET_LIBRARY_VENDOR, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
         if (retVal == CCanApi::NoError)
-            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_LIBRARY_VENDOR): value = '%s'\n", szVal);
+            fprintf(stdout, ">>> myDriver.GetProperty(CANPROP_GET_LIBRARY_VENDOR): value = '%s'\n", szVal);
         else
-            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_LIBRARY_VENDOR) returned %i\n", retVal);
+            fprintf(stderr, "+++ error: myDriver.GetProperty(CANPROP_GET_LIBRARY_VENDOR) returned %i\n", retVal);
         if (option_exit && !option_test)
             return 0;
     }
     if (option_test) {
-        for (int32_t ch = 0; ch < 8; ch++) {
-            retVal = CTouCAN::ProbeChannel(ch, opMode, state);
-            fprintf(stdout, ">>> myDriver.ProbeChannel(%i): state = %s", ch,
-                            (state == CTouCAN::ChannelOccupied) ? "occupied" :
-                            (state == CTouCAN::ChannelAvailable) ? "available" :
-                            (state == CTouCAN::ChannelNotAvailable) ? "not available" : "not testable");
-            fprintf(stdout, "%s", (retVal == CCanApi::IllegalParameter) ? " (waring: Op.-Mode not supported)\n" : "\n");
+#if (1)
+        bool result = CTouCAN::GetFirstChannel(info);
+        while (result) {
+            retVal = CTouCAN::ProbeChannel(info.m_nChannelNo, opMode, state);
+            fprintf(stdout, ">>> CCanAPI::ProbeChannel(%i): state = %s", info.m_nChannelNo,
+                            (state == CCanApi::ChannelOccupied) ? "occupied" :
+                            (state == CCanApi::ChannelAvailable) ? "available" :
+                            (state == CCanApi::ChannelNotAvailable) ? "not available" : "not testable");
+            fprintf(stdout, "%s", (retVal == CCanApi::IllegalParameter) ? " (warning: Op.-Mode not supported)\n" : "\n");
+            result = CTouCAN::GetNextChannel(info);
         }
+#else
+        retVal = myDriver.SetProperty(CANPROP_SET_FIRST_CHANNEL, (void *)NULL, 0U);
+        while (retVal == CCanApi::NoError) {
+            retVal = myDriver.GetProperty(CANPROP_GET_CHANNEL_NO, (void *)&i32Val, sizeof(int32_t));
+            if (retVal == CCanApi::NoError) {
+                retVal = CTouCAN::ProbeChannel(i32Val, opMode, state);
+                fprintf(stdout, ">>> CCanApi::ProbeChannel(%i): state = %s", i32Val,
+                                (state == CCanApi::ChannelOccupied) ? "occupied" :
+                                (state == CCanApi::ChannelAvailable) ? "available" :
+                                (state == CCanApi::ChannelNotAvailable) ? "not available" : "not testable");
+                fprintf(stdout, "%s", (retVal == CCanApi::IllegalParameter) ? " (warning: Op.-Mode not supported)\n" : "\n");
+            }
+            retVal = myDriver.SetProperty(CANPROP_SET_NEXT_CHANNEL, (void *)NULL, 0U);
+        }
+#endif
         if (option_exit)
             return 0;
     }
@@ -221,32 +245,42 @@ int main(int argc, const char * argv[]) {
     if (option_test) {
         retVal = myDriver.ProbeChannel(channel, opMode, state);
         fprintf(stdout, ">>> myDriver.ProbeChannel(%i): state = %s", channel,
-                        (state == CTouCAN::ChannelOccupied) ? "now occupied" :
-                        (state == CTouCAN::ChannelAvailable) ? "available" :
-                        (state == CTouCAN::ChannelNotAvailable) ? "not available" : "not testable");
-        fprintf(stdout, "%s", (retVal == CCanApi::IllegalParameter) ? " (waring: Op.-Mode not supported)\n" : "\n");
+                        (state == CCanApi::ChannelOccupied) ? "now occupied" :
+                        (state == CCanApi::ChannelAvailable) ? "available" :
+                        (state == CCanApi::ChannelNotAvailable) ? "not available" : "not testable");
+        fprintf(stdout, "%s", (retVal == CCanApi::IllegalParameter) ? " (warning: Op.-Mode not supported)\n" : "\n");
     }
     if (option_info) {
-        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_TYPE, (void *)&i32Val, sizeof(int32_t));
+        retVal = myDriver.GetProperty(CANPROP_GET_NUM_CHANNELS, (void*)&u8Val, sizeof(uint8_t));
         if (retVal == CCanApi::NoError)
-            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_TYPE): value = %d\n", i32Val);
-        else
-            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_TYPE) returned %i\n", retVal);
-        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_NAME, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
+            fprintf(stdout, ">>> myDriver.GetProperty(CANPROP_GET_NUM_CHANNELS): value = %d\n", u8Val);
+        //else [optional property]
+        //    fprintf(stderr, "+++ error: myDriver.GetProperty(CANPROP_GET_NUM_CHANNELS) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(CANPROP_GET_CAN_CHANNEL, (void*)&u8Val, sizeof(uint8_t));
         if (retVal == CCanApi::NoError)
-            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_NAME): value = '%s'\n", szVal);
-        else
-            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_NAME) returned %i\n", retVal);
-        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_DRIVER, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
+            fprintf(stdout, ">>> myDriver.GetProperty(CANPROP_GET_CAN_CHANNEL): value = %u\n", u8Val);
+        //else [optional property]
+        //    fprintf(stderr, "+++ error: myDriver.GetProperty(CANPROP_GET_CAN_CHANNEL) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(CANPROP_GET_DEVICE_TYPE, (void *)&i32Val, sizeof(int32_t));
         if (retVal == CCanApi::NoError)
-            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_DRIVER): value = '%s'\n", szVal);
+            fprintf(stdout, ">>> myDriver.GetProperty(CANPROP_GET_DEVICE_TYPE): value = %d\n", i32Val);
         else
-            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_DRIVER) returned %i\n", retVal);
-        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_VENDOR, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
+            fprintf(stderr, "+++ error: myDriver.GetProperty(CANPROP_GET_DEVICE_TYPE) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(CANPROP_GET_DEVICE_NAME, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
         if (retVal == CCanApi::NoError)
-            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_VENDOR): value = '%s'\n", szVal);
+            fprintf(stdout, ">>> myDriver.GetProperty(CANPROP_GET_DEVICE_NAME): value = '%s'\n", szVal);
         else
-            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_DEVICE_VENDOR) returned %i\n", retVal);
+            fprintf(stderr, "+++ error: myDriver.GetProperty(CANPROP_GET_DEVICE_NAME) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(CANPROP_GET_DEVICE_VENDOR, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
+        if (retVal == CCanApi::NoError)
+            fprintf(stdout, ">>> myDriver.GetProperty(CANPROP_GET_DEVICE_VENDOR): value = '%s'\n", szVal);
+        else
+            fprintf(stderr, "+++ error: myDriver.GetProperty(CANPROP_GET_DEVICE_VENDOR) returned %i\n", retVal);
+        retVal = myDriver.GetProperty(CANPROP_GET_DEVICE_DLLNAME, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
+        if (retVal == CCanApi::NoError)
+            fprintf(stdout, ">>> myDriver.GetProperty(CANPROP_GET_DEVICE_DLLNAME): value = '%s'\n", szVal);
+        else
+            fprintf(stderr, "+++ error: myDriver.GetProperty(CANPROP_GET_DEVICE_DLLNAME) returned %i\n", retVal);
         // vendor-specific properties
         retVal = myDriver.GetProperty(TOUCAN_PROPERTY_VENDOR_URL, (void *)szVal, CANPROP_MAX_BUFFER_SIZE);
         if (retVal == CCanApi::NoError)
@@ -259,13 +293,13 @@ int main(int argc, const char * argv[]) {
             fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_CLOCK_DOMAIN): value = %d\n", i32Val);
         else
             fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_CLOCK_DOMAIN) returned %i\n", retVal);
-        retVal = myDriver.GetProperty(TOUCAN_PROPERTY_OP_CAPABILITY, (void *)&u8Val, sizeof(uint8_t));
+        retVal = myDriver.GetProperty(CANPROP_GET_OP_CAPABILITY, (void *)&u8Val, sizeof(uint8_t));
         if (retVal == CCanApi::NoError)
-            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_OP_CAPABILITY): value = 0x%02X\n", (uint8_t)u8Val);
+            fprintf(stdout, ">>> myDriver.GetProperty(CANPROP_GET_OP_CAPABILITY): value = 0x%02X\n", u8Val);
         else
-            fprintf(stderr, "+++ error: myDriver.GetProperty(TOUCAN_PROPERTY_OP_CAPABILITY) returned %i\n", retVal);
-        if (myDriver.GetProperty(TOUCAN_PROPERTY_OP_MODE, (void *)&opMode.byte, sizeof(uint8_t)) == CCanApi::NoError)
-            fprintf(stdout, ">>> myDriver.Op.-Mode: 0x%02X\n", (uint8_t)opMode.byte);
+            fprintf(stderr, "+++ error: myDriver.GetProperty(CANPROP_GET_OP_CAPABILITY) returned %i\n", retVal);
+        if (myDriver.GetProperty(CANPROP_GET_OP_MODE, (void *)&u8Val, sizeof(uint8_t)) == CCanApi::NoError)
+            fprintf(stdout, ">>> myDriver.GetProperty(CANPROP_GET_OP_MODE): value = 0x%02X\n", u8Val);
     }
     retVal = myDriver.StartController(bitrate);
     if (retVal != CCanApi::NoError) {
@@ -391,10 +425,17 @@ retry:
     }
     if (option_stat || option_info) {
         uint64_t u64TxCnt, u64RxCnt, u64ErrCnt;
-        if ((myDriver.GetProperty(TOUCAN_PROPERTY_TX_COUNTER, (void *)&u64TxCnt, sizeof(uint64_t)) == CCanApi::NoError) &&
-            (myDriver.GetProperty(TOUCAN_PROPERTY_RX_COUNTER, (void *)&u64RxCnt, sizeof(uint64_t)) == CCanApi::NoError) &&
-            (myDriver.GetProperty(TOUCAN_PROPERTY_ERR_COUNTER, (void *)&u64ErrCnt, sizeof(uint64_t)) == CCanApi::NoError))
-            fprintf(stdout, ">>> myDriver.GetProperty(TOUCAN_PROPERTY_*_COUNTER): TX = %" PRIi64 " RX = %" PRIi64 " ERR = %" PRIi64 "\n", u64TxCnt, u64RxCnt, u64ErrCnt);
+        if ((myDriver.GetProperty(CANPROP_GET_TX_COUNTER, (void *)&u64TxCnt, sizeof(uint64_t)) == CCanApi::NoError) &&
+            (myDriver.GetProperty(CANPROP_GET_RX_COUNTER, (void *)&u64RxCnt, sizeof(uint64_t)) == CCanApi::NoError) &&
+            (myDriver.GetProperty(CANPROP_GET_ERR_COUNTER, (void *)&u64ErrCnt, sizeof(uint64_t)) == CCanApi::NoError))
+            fprintf(stdout, ">>> myDriver.GetProperty(CANPROP_GET_*_COUNTER): TX = %" PRIu64 " RX = %" PRIu64 " ERR = %" PRIu64 "\n", u64TxCnt, u64RxCnt, u64ErrCnt);
+    }
+    if (option_stat) {
+        uint32_t u32QueSize, u32QueHigh; uint64_t u64QueOvfl;
+        if ((myDriver.GetProperty(CANPROP_GET_RCV_QUEUE_SIZE, (void *)&u32QueSize, sizeof(uint32_t)) == CCanApi::NoError) &&
+            (myDriver.GetProperty(CANPROP_GET_RCV_QUEUE_HIGH, (void *)&u32QueHigh, sizeof(uint32_t)) == CCanApi::NoError) &&
+            (myDriver.GetProperty(CANPROP_GET_RCV_QUEUE_OVFL, (void *)&u64QueOvfl, sizeof(uint64_t)) == CCanApi::NoError))
+            fprintf(stdout, ">>> myDriver.GetProperty(CANPROP_GET_QUEUE_*): SIZE = %" PRIu32 " HIGH = %" PRIu32 " OVFL = %" PRIu64 "\n", u32QueSize, u32QueHigh, u64QueOvfl);
     }
     if (option_info) {
         char *hardware = myDriver.GetHardwareVersion();
@@ -433,7 +474,7 @@ end:
     return retVal;
 }
 
-static void verbose(const can_mode_t mode, const can_bitrate_t bitrate, const can_speed_t speed)
+static void verbose(const can_mode_t &mode, const can_bitrate_t &bitrate, const can_speed_t &speed)
 {
 #if (OPTION_CAN_2_0_ONLY == 0)
     fprintf(stdout, "Op.-Mode: 0x%02X (fdoe=%u,brse=%u,niso=%u,shrd=%u,nxtd=%u,nrtr=%u,err=%u,mon=%u)\n",

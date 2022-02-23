@@ -1,7 +1,8 @@
 //
 //  TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Interfaces
 //
-//  Copyright (C) 2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+//  Copyright (C) 2021-2022  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+//  All rights reserved.
 //
 //  This file is part of MacCAN-TouCAN.
 //
@@ -25,8 +26,8 @@
 //  Public License v3.0 (or any later version). The terms of the GNU General
 //  Public License v3.0 (or any later version) apply to this work, see above.
 //
-#ifndef TEMPLATE_H_INCLUDED
-#define TEMPLATE_H_INCLUDED
+#ifndef DRIVER_H_INCLUDED
+#define DRIVER_H_INCLUDED
 
 //  A Template for CAN API V3 Testing
 //
@@ -56,13 +57,14 @@
 
 //  (§7) define macro CAN_FD_SUPPORTED when CAN FD operation mode is supported
 #define CAN_FD_SUPPORTED  0
-#if (CAN_FD_SUPPORTED != 0)
 
-//  (§8) define macros for CAN Classic bit-rate settings (at least BITRATE_1M8M, BITRATE_500K4M, BITRATE_250K2M, BITRATE_125K1M)
+//  (§8) define macros for CAN FD bit-rate settings (at least BITRATE_1M8M, BITRATE_500K4M, BITRATE_250K2M, BITRATE_125K1M)
 #define BITRATE_1M8M(x)     do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
 #define BITRATE_500K4M(x)   do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
 #define BITRATE_250K2M(x)   do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
 #define BITRATE_125K1M(x)   do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
+
+#if (CAN_FD_SUPPORTED != 0)
 
 //  ($9) define macros for unsupported features in CAN Classic operation mode
 //#define BITRATE_SWITCHING_UNSUPPORTED  0
@@ -71,6 +73,6 @@
 //#define TX0x_y_WORKARAOUND  1
 
 #endif // CAN_FD_SUPPORTED
-#endif // TEMPLATE_H_INCLUDED
+#endif // DRIVER_H_INCLUDED
 
 // $Id: Template.h 1035 2021-12-21 12:03:27Z makemake $  Copyright (c) UV Software, Berlin //

@@ -1,7 +1,7 @@
 #
 #	TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Interfaces
 #
-#	Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+#	Copyright (C) 2020-2022  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
 #
 #	This file is part of MacCAN-TouCAN.
 #
@@ -23,34 +23,37 @@ all:
 	@./build_no.sh
 	@echo "\033[1mBuilding MacCAN-TouCAN...\033[0m"
 	$(MAKE) -C Trial $@
-	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Libraries/CANAPI $@
+	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Utilities/can_test $@
 	$(MAKE) -C Utilities/can_moni $@
 
 clean:
 	$(MAKE) -C Trial $@
-	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Libraries/CANAPI $@
+	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Utilities/can_test $@
 	$(MAKE) -C Utilities/can_moni $@
 
 pristine:
 	$(MAKE) -C Trial $@
-	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Libraries/CANAPI $@
+	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Utilities/can_test $@
 	$(MAKE) -C Utilities/can_moni $@
 
 install:
 #	$(MAKE) -C Trial $@
-	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Libraries/CANAPI $@
+	$(MAKE) -C Libraries/TouCAN $@
 #	$(MAKE) -C Utilities/can_test $@
 #	$(MAKE) -C Utilities/can_moni $@
 
 test:
 	$(MAKE) -C Trial $@
+
+check:
+	$(MAKE) -C Trial $@ 2> checker.txt
 
 build_no:
 	@./build_no.sh

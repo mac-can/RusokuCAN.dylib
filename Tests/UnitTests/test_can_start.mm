@@ -2,7 +2,7 @@
 //
 //  CAN Interface API, Version 3 (Testing)
 //
-//  Copyright (c) 2004-2021 Uwe Vogt, UV Software, Berlin (info@uv-software.com)
+//  Copyright (c) 2004-2022 Uwe Vogt, UV Software, Berlin (info@uv-software.com)
 //  All rights reserved.
 //
 //  This file is part of CAN API V3.
@@ -73,7 +73,7 @@
     can_status_t status = { CANSTAT_RESET };
     int handle = INVALID_HANDLE;
     int rc = CANERR_FATAL;
-    
+
     // @pre:
     // @- initialize DUT1 with configured settings
     handle = can_init(DUT1, TEST_CANMODE, NULL);
@@ -88,10 +88,10 @@
     rc = can_start(INVALID_HANDLE, &bitrate);
     XCTAssertEqual(CANERR_HANDLE, rc);
     // @- try to start DUT1 with invalid handle INT32_MIN
-    rc = can_start(INT32_MAX, &bitrate);
-    XCTAssertEqual(CANERR_HANDLE, rc);
-    // @- try to start DUT1 with invalid handle INT32_MIN
     rc = can_start(INT32_MIN, &bitrate);
+    XCTAssertEqual(CANERR_HANDLE, rc);
+    // @- try to start DUT1 with invalid handle INT32_MAX
+    rc = can_start(INT32_MAX, &bitrate);
     XCTAssertEqual(CANERR_HANDLE, rc);
     // @- get status of DUT1 and check to be in INIT state
     rc = can_status(handle, &status.byte);
@@ -106,7 +106,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -137,7 +137,7 @@
     can_status_t status = { CANSTAT_RESET };
     int handle = INVALID_HANDLE;
     int rc = CANERR_FATAL;
-    
+
     // @pre:
     // @- initialize DUT1 with configured settings
     handle = can_init(DUT1, TEST_CANMODE, NULL);
@@ -164,7 +164,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -195,7 +195,7 @@
     can_status_t status = { CANSTAT_RESET };
     int handle = INVALID_HANDLE;
     int rc = CANERR_FATAL;
-    
+
     // @test:
     // @- try to start DUT1 with configured bit-rate settings
     rc = can_start(handle, &bitrate);
@@ -216,7 +216,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -247,7 +247,7 @@
     can_status_t status = { CANSTAT_RESET };
     int handle = INVALID_HANDLE;
     int rc = CANERR_FATAL;
-    
+
     // @pre:
     // @- initialize DUT1 with configured settings
     handle = can_init(DUT1, TEST_CANMODE, NULL);
@@ -274,7 +274,7 @@
     XCTAssertFalse(status.can_stopped);
 
     // @post:
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -305,7 +305,7 @@
     can_status_t status = { CANSTAT_RESET };
     int handle = INVALID_HANDLE;
     int rc = CANERR_FATAL;
-    
+
     // @pre:
     // @- initialize DUT1 with configured settings
     handle = can_init(DUT1, TEST_CANMODE, NULL);
@@ -321,7 +321,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -338,7 +338,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertTrue(status.can_stopped);
-    
+
     // @test:
     // @- start DUT1 again with configured bit-rate settings
     rc = can_start(handle, &bitrate);
@@ -347,9 +347,9 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    
+
     // @post:
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
     XCTAssertEqual(TEST_FRAMES, tester.ReceiveSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -379,7 +379,7 @@
     can_status_t status = { CANSTAT_RESET };
     int handle = INVALID_HANDLE;
     int rc = CANERR_FATAL;
-    
+
     // @pre
     // @- initialize DUT1 with configured settings
     handle = can_init(DUT1, TEST_CANMODE, NULL);
@@ -395,7 +395,7 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -431,7 +431,7 @@
     can_status_t status = { CANSTAT_RESET };
     int handle = INVALID_HANDLE;
     int rc = CANERR_FATAL;
-    
+
     // @pre:
     // @- initialize DUT1 in CAN 2.0 operation mode
     handle = can_init(DUT1, CANMODE_DEFAULT, NULL);
@@ -443,7 +443,7 @@
 
     // @test:
     // @note: pre-defined BTR0BTR1 bit-timing table has 10 entries, index 0 to 9.
-    //        But the index must be given as negative value to 'bitbate.index'!
+    //        But the index must be given as negative value to 'library.index'!
     XCTAssertEqual(0, bitrate.index);
     // @- start DUT1 with CiA table index 0 (1000kbps)
     rc = can_start(handle, &bitrate);
@@ -452,9 +452,9 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    
+
     // @post:
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0) && (SEND_WITH_NONE_DEFAULT_BAUDRATE != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -488,7 +488,7 @@
     can_status_t status = { CANSTAT_RESET };
     int handle = INVALID_HANDLE;
     int rc = CANERR_FATAL;
-    
+
     // @pre:
     // @- initialize DUT1 in CAN 2.0 operation mode
     handle = can_init(DUT1, CANMODE_DEFAULT, NULL);
@@ -500,7 +500,7 @@
 
     // @test:
     // @note: pre-defined BTR0BTR1 bit-timing table has 10 entries, index 0 to 9.
-    //        But the index must be given as negative value to 'bitbate.index'!
+    //        But the index must be given as negative value to 'library.index'!
     XCTAssertEqual(-1, bitrate.index);
     // @- start DUT1 with CiA table index 1 (800kbps)
     rc = can_start(handle, &bitrate);
@@ -509,9 +509,9 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    
+
     // @post:
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0) && (SEND_WITH_NONE_DEFAULT_BAUDRATE != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -543,7 +543,7 @@
     can_status_t status = { CANSTAT_RESET };
     int handle = INVALID_HANDLE;
     int rc = CANERR_FATAL;
-    
+
     // @pre:
     // @- initialize DUT1 in CAN 2.0 operation mode
     handle = can_init(DUT1, CANMODE_DEFAULT, NULL);
@@ -555,7 +555,7 @@
 
     // @test:
     // @note: pre-defined BTR0BTR1 bit-timing table has 10 entries, index 0 to 9.
-    //        But the index must be given as negative value to 'bitbate.index'!
+    //        But the index must be given as negative value to 'library.index'!
     XCTAssertEqual(-2, bitrate.index);
     // @- start DUT1 with CiA table index 1 (500kbps)
     rc = can_start(handle, &bitrate);
@@ -564,9 +564,9 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    
+
     // @post:
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0) && (SEND_WITH_NONE_DEFAULT_BAUDRATE != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -597,7 +597,7 @@
     can_status_t status = { CANSTAT_RESET };
     int handle = INVALID_HANDLE;
     int rc = CANERR_FATAL;
-    
+
     // @pre:
     // @- initialize DUT1 in CAN 2.0 operation mode
     handle = can_init(DUT1, CANMODE_DEFAULT, NULL);
@@ -609,7 +609,7 @@
 
     // @test:
     // @note: pre-defined BTR0BTR1 bit-timing table has 10 entries, index 0 to 9.
-    //        But the index must be given as negative value to 'bitbate.index'!
+    //        But the index must be given as negative value to 'library.index'!
     XCTAssertEqual(-3, bitrate.index);
     // @- start DUT1 with CiA table index 3 (250kbps)
     rc = can_start(handle, &bitrate);
@@ -618,9 +618,9 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    
+
     // @post:
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0) && (SEND_WITH_NONE_DEFAULT_BAUDRATE != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -651,7 +651,7 @@
     can_status_t status = { CANSTAT_RESET };
     int handle = INVALID_HANDLE;
     int rc = CANERR_FATAL;
-    
+
     // @pre:
     // @- initialize DUT1 in CAN 2.0 operation mode
     handle = can_init(DUT1, CANMODE_DEFAULT, NULL);
@@ -663,7 +663,7 @@
 
     // @test:
     // @note: pre-defined BTR0BTR1 bit-timing table has 10 entries, index 0 to 9.
-    //        But the index must be given as negative value to 'bitbate.index'!
+    //        But the index must be given as negative value to 'library.index'!
     XCTAssertEqual(-4, bitrate.index);
     // @- start DUT1 with CiA table index 4 (125kbps)
     rc = can_start(handle, &bitrate);
@@ -672,9 +672,9 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    
+
     // @post:
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0) && (SEND_WITH_NONE_DEFAULT_BAUDRATE != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -705,7 +705,7 @@
     can_status_t status = { CANSTAT_RESET };
     int handle = INVALID_HANDLE;
     int rc = CANERR_FATAL;
-    
+
     // @pre:
     // @- initialize DUT1 in CAN 2.0 operation mode
     handle = can_init(DUT1, CANMODE_DEFAULT, NULL);
@@ -717,7 +717,7 @@
 
     // @test:
     // @note: pre-defined BTR0BTR1 bit-timing table has 10 entries, index 0 to 9.
-    //        But the index must be given as negative value to 'bitbate.index'!
+    //        But the index must be given as negative value to 'library.index'!
     XCTAssertEqual(-5, bitrate.index);
     // @- start DUT1 with CiA table index 5 (100kbps)
     rc = can_start(handle, &bitrate);
@@ -726,9 +726,9 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    
+
     // @post:
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0) && (SEND_WITH_NONE_DEFAULT_BAUDRATE != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -759,7 +759,7 @@
     can_status_t status = { CANSTAT_RESET };
     int handle = INVALID_HANDLE;
     int rc = CANERR_FATAL;
-    
+
     // @pre:
     // @- initialize DUT1 in CAN 2.0 operation mode
     handle = can_init(DUT1, CANMODE_DEFAULT, NULL);
@@ -771,7 +771,7 @@
 
     // @test:
     // @note: pre-defined BTR0BTR1 bit-timing table has 10 entries, index 0 to 9.
-    //        But the index must be given as negative value to 'bitbate.index'!
+    //        But the index must be given as negative value to 'library.index'!
     XCTAssertEqual(-6, bitrate.index);
     // @- start DUT1 with CiA table index 6 (50kbps)
     rc = can_start(handle, &bitrate);
@@ -780,9 +780,9 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    
+
     // @post:
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0) && (SEND_WITH_NONE_DEFAULT_BAUDRATE != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -813,7 +813,7 @@
     can_status_t status = { CANSTAT_RESET };
     int handle = INVALID_HANDLE;
     int rc = CANERR_FATAL;
-    
+
     // @pre:
     // @- initialize DUT1 in CAN 2.0 operation mode
     handle = can_init(DUT1, CANMODE_DEFAULT, NULL);
@@ -825,7 +825,7 @@
 
     // @test:
     // @note: pre-defined BTR0BTR1 bit-timing table has 10 entries, index 0 to 9.
-    //        But the index must be given as negative value to 'bitbate.index'!
+    //        But the index must be given as negative value to 'library.index'!
     XCTAssertEqual(-7, bitrate.index);
     // @- start DUT1 with CiA table index 7 (20kbps)
     rc = can_start(handle, &bitrate);
@@ -834,9 +834,9 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    
+
     // @post:
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0) && (SEND_WITH_NONE_DEFAULT_BAUDRATE != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -867,7 +867,7 @@
     can_status_t status = { CANSTAT_RESET };
     int handle = INVALID_HANDLE;
     int rc = CANERR_FATAL;
-    
+
     // @pre:
     // @- initialize DUT1 in CAN 2.0 operation mode
     handle = can_init(DUT1, CANMODE_DEFAULT, NULL);
@@ -879,7 +879,7 @@
 
     // @test:
     // @note: pre-defined BTR0BTR1 bit-timing table has 10 entries, index 0 to 9.
-    //        But the index must be given as negative value to 'bitbate.index'!
+    //        But the index must be given as negative value to 'library.index'!
     XCTAssertEqual(-8, bitrate.index);
     // @- start DUT1 with CiA table index 8 (10kbps)
     rc = can_start(handle, &bitrate);
@@ -888,9 +888,9 @@
     rc = can_status(handle, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
-    
+
     // @post:
-    // @- sunnyday traffic (optional):
+    // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0) && (SEND_WITH_NONE_DEFAULT_BAUDRATE != 0)
     CTester tester;
     XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -921,7 +921,7 @@
     can_status_t status = { CANSTAT_RESET };
     int handle = INVALID_HANDLE;
     int rc = CANERR_FATAL;
-    
+
     // @pre:
     // @- initialize DUT1 in CAN 2.0 operation mode
     handle = can_init(DUT1, CANMODE_DEFAULT, NULL);
@@ -933,7 +933,7 @@
 
     // @test:
     // @note: pre-defined BTR0BTR1 bit-timing table has 10 entries, index 0 to 9.
-    //        But the index must be given as negative value to 'bitbate.index'!
+    //        But the index must be given as negative value to 'library.index'!
     //        Remark: The CiA bit-timing table has only 9 entries!
 #if (BITRATE_5K_UNSUPPORTED != 0)
     bitrate.index = -9;
@@ -941,6 +941,22 @@
     bitrate.index = -10;
 #endif
     // @- try to start DUT1 with invalid index value -10
+    rc = can_start(handle, &bitrate);
+    XCTAssertEqual(CANERR_BAUDRATE, rc);
+    // @- try to start DUT1 with invalid index value INT8_MIN
+    bitrate.index = INT8_MIN;
+    rc = can_start(handle, &bitrate);
+    XCTAssertEqual(CANERR_BAUDRATE, rc);
+    // @- try to start DUT1 with invalid index value INT16_MIN
+    bitrate.index = INT16_MIN;
+    rc = can_start(handle, &bitrate);
+    XCTAssertEqual(CANERR_BAUDRATE, rc);
+    // @- try to start DUT1 with invalid index value INT32_MIN+1
+    bitrate.index = INT32_MIN+1;
+    rc = can_start(handle, &bitrate);
+    XCTAssertEqual(CANERR_BAUDRATE, rc);
+    // @- try to start DUT1 with invalid index value INT32_MIN
+    bitrate.index = INT32_MIN;
     rc = can_start(handle, &bitrate);
     XCTAssertEqual(CANERR_BAUDRATE, rc);
 
@@ -994,24 +1010,11 @@
     rc = can_start(handle, &bitrate);
     XCTAssertEqual(CANERR_BAUDRATE, rc);
 
+    // @todo: - try to start DUT1 with invalid index value 9
+    // @todo: - try to start DUT1 with invalid index value 10
+    // @todo: - try to start DUT1 with invalid index value 1000000000
     // @- try to start DUT1 with invalid index value INT32_MAX
     bitrate.index = INT32_MAX;
-    rc = can_start(handle, &bitrate);
-    XCTAssertEqual(CANERR_BAUDRATE, rc);
-    // @- try to start DUT1 with invalid index value INT8_MIN
-    bitrate.index = INT8_MIN;
-    rc = can_start(handle, &bitrate);
-    XCTAssertEqual(CANERR_BAUDRATE, rc);
-    // @- try to start DUT1 with invalid index value INT16_MIN
-    bitrate.index = INT16_MIN;
-    rc = can_start(handle, &bitrate);
-    XCTAssertEqual(CANERR_BAUDRATE, rc);
-    // @- try to start DUT1 with invalid index value INT32_MIN+1
-    bitrate.index = INT32_MIN+1;
-    rc = can_start(handle, &bitrate);
-    XCTAssertEqual(CANERR_BAUDRATE, rc);
-    // @- try to start DUT1 with invalid index value INT32_MIN
-    bitrate.index = INT32_MIN;
     rc = can_start(handle, &bitrate);
     XCTAssertEqual(CANERR_BAUDRATE, rc);
 
@@ -1020,7 +1023,7 @@
     XCTAssertEqual(CANERR_NOERROR, rc);
 }
 
-// @xctest TC03.17: Re-Start CAN controller with the same CiA bit-tining index after it was stopped.
+// @xctest TC03.17: Re-Start CAN controller with the same CiA bit-timing index after it was stopped.
 //
 // @expected: CANERR_NOERROR
 //
@@ -1029,7 +1032,7 @@
     can_status_t status = { CANSTAT_RESET };
     int handle = INVALID_HANDLE;
     int rc = CANERR_FATAL;
-    
+
     // @test: loop over CiA bit-timing table indexes 0 to 8
     for (SInt32 index = CANBTR_INDEX_1M; index >= CANBTR_INDEX_10K; index--) {
 #if (BITRATE_800K_UNSUPPORTED != 0)
@@ -1052,7 +1055,7 @@
         rc = can_status(handle, &status.byte);
         XCTAssertEqual(CANERR_NOERROR, rc);
         XCTAssertFalse(status.can_stopped);
-        // @- sunnyday traffic (optional):
+        // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0) && (SEND_WITH_NONE_DEFAULT_BAUDRATE != 0)
         CTester tester;
         XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -1077,7 +1080,7 @@
         rc = can_status(handle, &status.byte);
         XCTAssertEqual(CANERR_NOERROR, rc);
         XCTAssertFalse(status.can_stopped);
-        // @- sunnyday traffic (optional):
+        // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0) && (SEND_WITH_NONE_DEFAULT_BAUDRATE != 0)
         XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
         XCTAssertEqual(TEST_FRAMES, tester.ReceiveSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -1099,7 +1102,7 @@
     }
 }
 
-// @xctest TC03.18: Re-Start CAN controller with a different CiA bit-tining index after it was stopped.
+// @xctest TC03.18: Re-Start CAN controller with a different CiA bit-timing index after it was stopped.
 //
 // @expected: CANERR_NOERROR
 //
@@ -1108,7 +1111,7 @@
     can_status_t status = { CANSTAT_RESET };
     int handle = INVALID_HANDLE;
     int rc = CANERR_FATAL;
-    
+
     // @test: loop over CiA bit-timing table indexes 0 to 8
     for (SInt32 index = CANBTR_INDEX_1M; index >= CANBTR_INDEX_10K; index--) {
 #if (BITRATE_800K_UNSUPPORTED != 0)
@@ -1131,7 +1134,7 @@
         rc = can_status(handle, &status.byte);
         XCTAssertEqual(CANERR_NOERROR, rc);
         XCTAssertFalse(status.can_stopped);
-        // @- sunnyday traffic (optional):
+        // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0) && (SEND_WITH_NONE_DEFAULT_BAUDRATE != 0)
         CTester tester;
         XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -1163,7 +1166,7 @@
         rc = can_status(handle, &status.byte);
         XCTAssertEqual(CANERR_NOERROR, rc);
         XCTAssertFalse(status.can_stopped);
-        // @- sunnyday traffic (optional):
+        // @- send and receive some frames to/from DUT2 (optional)
 #if (SEND_TEST_FRAMES != 0) && (SEND_WITH_NONE_DEFAULT_BAUDRATE != 0)
         XCTAssertEqual(TEST_FRAMES, tester.SendSomeFrames(handle, DUT2, TEST_FRAMES));
         XCTAssertEqual(TEST_FRAMES, tester.ReceiveSomeFrames(handle, DUT2, TEST_FRAMES));
@@ -1254,4 +1257,4 @@
 
 @end
 
-// $Id: test_can_start.mm 1037 2021-12-21 19:27:26Z makemake $  Copyright (c) UV Software, Berlin //
+// $Id: test_can_start.mm 1086 2022-01-09 20:01:00Z haumea $  Copyright (c) UV Software, Berlin //

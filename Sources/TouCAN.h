@@ -1,7 +1,7 @@
 //
 //  TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Interfaces
 //
-//  Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+//  Copyright (C) 2020-2022 Uwe Vogt, UV Software, Berlin (info@mac-can.com)
 //
 //  This file is part of MacCAN-TouCAN.
 //
@@ -35,7 +35,7 @@
 #endif
 #define TOUCAN_LIBRARY_VENDOR  "UV Software, Berlin"
 #define TOUCAN_LIBRARY_LICENSE  "GNU General Public License, Version 3"
-#define TOUCAN_LIBRARY_COPYRIGHT  "Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin"
+#define TOUCAN_LIBRARY_COPYRIGHT  "Copyright (C) 2020-2022  Uwe Vogt, UV Software, Berlin"
 #define TOUCAN_LIBRARY_HAZARD_NOTE  "If you connect your CAN device to a real CAN network when using this library,\n" \
                                     "you might damage your application."
 /// \}
@@ -64,6 +64,9 @@ public:
         GeneralError = VendorSpecific
     };
     // CCanApi overrides
+    static bool GetFirstChannel(SChannelInfo &info, void *param = NULL);
+    static bool GetNextChannel(SChannelInfo &info, void *param = NULL);
+
     static CANAPI_Return_t ProbeChannel(int32_t channel, const CANAPI_OpMode_t &opMode, const void *param, EChannelState &state);
     static CANAPI_Return_t ProbeChannel(int32_t channel, const CANAPI_OpMode_t &opMode, EChannelState &state);
 
@@ -117,9 +120,15 @@ public:
 #define TOUCAN_PROPERTY_SPEED               (CANPROP_GET_SPEED)
 #define TOUCAN_PROPERTY_STATUS              (CANPROP_GET_STATUS)
 #define TOUCAN_PROPERTY_BUSLOAD             (CANPROP_GET_BUSLOAD)
+#define TOUCAN_PROPERTY_NUM_CHANNELS        (CANPROP_GET_NUM_CHANNELS)
+#define TOUCAN_PROPERTY_CAN_CHANNEL         (CANPROP_GET_CAN_CHANNEL)
+//#define TOUCAN_PROPERTY_CAN_CLOCKS        (CANPROP_GET_CAN_CLOCKS)
 #define TOUCAN_PROPERTY_TX_COUNTER          (CANPROP_GET_TX_COUNTER)
 #define TOUCAN_PROPERTY_RX_COUNTER          (CANPROP_GET_RX_COUNTER)
 #define TOUCAN_PROPERTY_ERR_COUNTER         (CANPROP_GET_ERR_COUNTER)
+#define TOUCAN_PROPERTY_RCV_QUEUE_SIZE      (CANPROP_GET_RCV_QUEUE_SIZE)
+#define TOUCAN_PROPERTY_RCV_QUEUE_HIGH      (CANPROP_GET_RCV_QUEUE_HIGH)
+#define TOUCAN_PROPERTY_RCV_QUEUE_OVFL      (CANPROP_GET_RCV_QUEUE_OVFL)
 #define TOUCAN_PROPERTY_CAN_CLOCK           (TOUCAN_GET_CAN_CLOCK)
 #define TOUCAN_PROPERTY_HARDWARE_VERSION    (TOUCAN_GET_HARDWARE_VERSION)
 #define TOUCAN_PROPERTY_FIRMWARE_VERSION    (TOUCAN_GET_FIRMWARE_VERSION)
