@@ -310,8 +310,11 @@ int can_start(int handle, const can_bitrate_t *bitrate)
         bool fdoe = false;
         bool brse = false;
 #endif
+        // note: only one valid CAN clock provided by the TouCAN device
+        if (bitrate->btr.frequency != (int32_t)can[handle].device.canClock)
+            return CANERR_BAUDRATE;
         // note: bit-rate settings are checked by the conversion function
-        if (btr_bitrate2speed(bitrate, fdoe, brse, &tmpSpeed) < 0)
+        if (btr_bitrate2speed(bitrate, fdoe, brse, &tmpSpeed) < 0)  // TODO: replace this by 'btr_check_bitrate()'
             return CANERR_BAUDRATE;
         touBitrate.brp   = bitrate->btr.nominal.brp;
         touBitrate.tseg1 = bitrate->btr.nominal.tseg1;
@@ -901,49 +904,49 @@ static int drv_parameter(int handle, uint16_t param, void *value, size_t nbyte)
         }
         break;
     /* TouCAN specific properties */
-    case TOUCAN_GET_CAN_CLOCK:          // TouCAN USB: CAN clock in [Hz] (int23_t)
+    case TOUCAN_GET_CAN_CLOCK:          // TouCAN USB: CAN clock in [Hz] (int32_t)
         if ((size_t)nbyte >= sizeof(int32_t)) {
             *(int32_t*)value = (int32_t)can[handle].device.canClock;
             rc = CANERR_NOERROR;
         }
         break;
-    case TOUCAN_GET_HARDWARE_VERSION:   // TouCAN USB: hardware version as "0xggrrss00" (uint23_t)
+    case TOUCAN_GET_HARDWARE_VERSION:   // TouCAN USB: hardware version as "0xggrrss00" (uint32_t)
         if ((size_t)nbyte >= sizeof(uint32_t)) {
             *(uint32_t*)value = (uint32_t)can[handle].device.deviceInfo.hardware;
             rc = CANERR_NOERROR;
         }
         break;
-    case TOUCAN_GET_FIRMWARE_VERSION:   // TouCAN USB: firmware version as "0xggrrss00" (uint23_t)
+    case TOUCAN_GET_FIRMWARE_VERSION:   // TouCAN USB: firmware version as "0xggrrss00" (uint32_t)
         if ((size_t)nbyte >= sizeof(uint32_t)) {
             *(uint32_t*)value = (uint32_t)can[handle].device.deviceInfo.firmware;
             rc = CANERR_NOERROR;
         }
         break;
-    case TOUCAN_GET_BOOTLOADER_VERSION: // TouCAN USB: boot-loader version as "0xggrrss00" (uint23_t)
+    case TOUCAN_GET_BOOTLOADER_VERSION: // TouCAN USB: boot-loader version as "0xggrrss00" (uint32_t)
         if ((size_t)nbyte >= sizeof(uint32_t)) {
             *(uint32_t*)value = (uint32_t)can[handle].device.deviceInfo.bootloader;
             rc = CANERR_NOERROR;
         }
         break;
-    case TOUCAN_GET_SERIAL_NUMBER:      // TouCAN USB: serial no. in hex (uint23_t)
+    case TOUCAN_GET_SERIAL_NUMBER:      // TouCAN USB: serial no. in hex (uint32_t)
         if ((size_t)nbyte >= sizeof(uint32_t)) {
             *(uint32_t*)value = (uint32_t)can[handle].device.deviceInfo.serialNo;
             rc = CANERR_NOERROR;
         }
         break;
-    case TOUCAN_GET_VID_PID:            // TouCAN USB: VID & PID (uint23_t)
+    case TOUCAN_GET_VID_PID:            // TouCAN USB: VID & PID (uint32_t)
         if ((size_t)nbyte >= sizeof(uint32_t)) {
             *(uint32_t*)value = (uint32_t)can[handle].device.deviceInfo.vid_pid;
             rc = CANERR_NOERROR;
         }
         break;
-    case TOUCAN_GET_DEVICE_ID:          // TouCAN USB: device id. (uint23_t)
+    case TOUCAN_GET_DEVICE_ID:          // TouCAN USB: device id. (uint32_t)
         if ((size_t)nbyte >= sizeof(uint32_t)) {
             *(uint32_t*)value = (uint32_t)can[handle].device.deviceInfo.deviceId;
             rc = CANERR_NOERROR;
         }
         break;
-    case TOUCAN_GET_VENDOR_URL:         // TouCAN USB: URL of Rusoku's website (uint23_t)
+    case TOUCAN_GET_VENDOR_URL:         // TouCAN USB: URL of Rusoku's website (uint32_t)
             if ((nbyte > strlen(can[handle].device.website)) && (nbyte <= CANPROP_MAX_BUFFER_SIZE)) {
                 strcpy((char*)value, can[handle].device.website);
                 rc = CANERR_NOERROR;
