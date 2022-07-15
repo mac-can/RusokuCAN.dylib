@@ -456,26 +456,45 @@
     // @note: pre-defined BTR0BTR1 bit-timing table has 10 entries, index 0 to 9.
     // @      But the index must be given as negative value to 'bitrate.index'!
     // @      Remark: The CiA bit-timing table has only 9 entries!
-#if (FEATURE_BITRATE_IDX_5K == FEATURE_SUPPORTED)
-    for (SInt32 index = CANBTR_INDEX_1M; index >= SJA1000_INDEX_5K; index--) {
-#else
-    for (SInt32 index = CANBTR_INDEX_1M; index >= CANBTR_INDEX_10K; index--) {
-#endif
-        // @sub(1): CiA index 0 (1Mbps)
-        // @sub(2): CiA index 1 (800kbps, not supported by all CAN controllers)
-        // @sub(3): CiA index 2 (500kbps)
-        // @sub(4): CiA index 3 (250kbps)
-        // @sub(5): CiA index 4 (125kbps)
-        // @sub(6): CiA index 5 (100kbps)
-        // @sub(7): CiA index 6 (50kbps)
-        // @sub(8): CiA index 7 (20kbps)
-        // @sub(9): CiA index 8 (10kbps)
-        // @sub(10):    index 9 (5kbps, not supported by CAN API implementations)
+    for (int i = 0; i < 10; i++) {
+        switch (i) {
+            // @sub(1): CiA index 0 (1Mbps)
+            case 0: bitrate.index = CANBTR_INDEX_1M; break;
+            // @sub(2): CiA index 1 (800kbps, not supported by all CAN controllers)
+            case 1: bitrate.index = CANBTR_INDEX_800K; break;
+            // @sub(3): CiA index 2 (500kbps)
+            case 2: bitrate.index = CANBTR_INDEX_500K; break;
+            // @sub(4): CiA index 3 (250kbps)
+            case 3: bitrate.index = CANBTR_INDEX_250K; break;
+            // @sub(5): CiA index 4 (125kbps)
+            case 4: bitrate.index = CANBTR_INDEX_125K; break;
+            // @sub(6): CiA index 5 (100kbps)
+            case 5: bitrate.index = CANBTR_INDEX_100K; break;
+            // @sub(7): CiA index 6 (50kbps)
+            case 6: bitrate.index = CANBTR_INDEX_50K; break;
+            // @sub(8): CiA index 7 (20kbps)
+            case 7: bitrate.index = CANBTR_INDEX_20K; break;
+            // @sub(9): CiA index 8 (10kbps)
+            case 8: bitrate.index = CANBTR_INDEX_10K; break;
+            // @sub(10):    index 9 (5kbps, not supported by all CAN API SDK's)
+            case 9: bitrate.index = SJA1000_INDEX_5K; break;
+            default: return;  // Get out of here!
+        }
 #if (FEATURE_BITRATE_800K != FEATURE_SUPPORTED)
-        if (index == CANBTR_INDEX_800K)
+        if (bitrate.index == CANBTR_INDEX_800K)
             continue;
 #endif
-        NSLog(@"Execute sub-testcase %d:\n", 1-index);
+#if (FEATURE_BITRATE_IDX_5K != FEATURE_SUPPORTED)
+        if (bitrate.index == SJA1000_INDEX_5K)
+            continue;
+#endif
+#if (TC03_7_ISSUE_TOUCAN_BITRATE_10K == WORKAROUND_ENABLED)
+        if (bitrate.index == CANBTR_INDEX_10K) {
+            NSLog(@"Sub-testcase %d skipped due to known hardware bug\n", i+1);
+            continue;
+        }
+#endif
+        NSLog(@"Execute sub-testcase %d:\n", i+1);
 
         // @pre:
         // @-- initialize DUT1 in CAN 2.0 operation mode
@@ -487,7 +506,6 @@
         XCTAssertTrue(status.can_stopped);
 
         // @test:
-        bitrate.index = index;
         // @-- start DUT1 with selected index from CiA table
         rc = can_start(handle, &bitrate);
         XCTAssertEqual(CANERR_NOERROR, rc);
@@ -635,28 +653,46 @@
     // @note: pre-defined BTR0BTR1 bit-timing table has 10 entries, index 0 to 9.
     // @      But the index must be given as negative value to 'bitrate.index'!
     // @      Remark: The CiA bit-timing table has only 9 entries!
-#if (FEATURE_BITRATE_IDX_5K == FEATURE_SUPPORTED)
-    for (SInt32 index = CANBTR_INDEX_1M; index >= SJA1000_INDEX_5K; index--) {
-#else
-    for (SInt32 index = CANBTR_INDEX_1M; index >= CANBTR_INDEX_10K; index--) {
-#endif
-        // @sub(1): CiA index 0 (1Mbps)
-        // @sub(2): CiA index 1 (800kbps, not supported by all CAN controllers)
-        // @sub(3): CiA index 2 (500kbps)
-        // @sub(4): CiA index 3 (250kbps)
-        // @sub(5): CiA index 4 (125kbps)
-        // @sub(6): CiA index 5 (100kbps)
-        // @sub(7): CiA index 6 (50kbps)
-        // @sub(8): CiA index 7 (20kbps)
-        // @sub(9): CiA index 8 (10kbps)
-        // @sub(10):    index 9 (5kbps, not supported by CAN API implementations)
+    for (int i = 0; i < 10; i++) {
+        switch (i) {
+            // @sub(1): CiA index 0 (1Mbps)
+            case 0: bitrate.index = CANBTR_INDEX_1M; break;
+            // @sub(2): CiA index 1 (800kbps, not supported by all CAN controllers)
+            case 1: bitrate.index = CANBTR_INDEX_800K; break;
+            // @sub(3): CiA index 2 (500kbps)
+            case 2: bitrate.index = CANBTR_INDEX_500K; break;
+            // @sub(4): CiA index 3 (250kbps)
+            case 3: bitrate.index = CANBTR_INDEX_250K; break;
+            // @sub(5): CiA index 4 (125kbps)
+            case 4: bitrate.index = CANBTR_INDEX_125K; break;
+            // @sub(6): CiA index 5 (100kbps)
+            case 5: bitrate.index = CANBTR_INDEX_100K; break;
+            // @sub(7): CiA index 6 (50kbps)
+            case 6: bitrate.index = CANBTR_INDEX_50K; break;
+            // @sub(8): CiA index 7 (20kbps)
+            case 7: bitrate.index = CANBTR_INDEX_20K; break;
+            // @sub(9): CiA index 8 (10kbps)
+            case 8: bitrate.index = CANBTR_INDEX_10K; break;
+            // @sub(10):    index 9 (5kbps, not supported by all CAN API SDK's)
+            case 9: bitrate.index = SJA1000_INDEX_5K; break;
+            default: return;  // Get out of here!
+        }
 #if (FEATURE_BITRATE_800K != FEATURE_SUPPORTED)
-        if (index == CANBTR_INDEX_800K)
+        if (bitrate.index == CANBTR_INDEX_800K)
             continue;
 #endif
-        NSLog(@"Execute sub-testcase %d:\n", 1-index);
+#if (FEATURE_BITRATE_IDX_5K != FEATURE_SUPPORTED)
+        if (bitrate.index == SJA1000_INDEX_5K)
+            continue;
+#endif
+#if (TC03_17_ISSUE_TOUCAN_BITRATE_10K == WORKAROUND_ENABLED)
+        if (bitrate.index == CANBTR_INDEX_10K) {
+            NSLog(@"Sub-testcase %d skipped due to known hardware bug\n", i+1);
+            continue;
+        }
+#endif
+        NSLog(@"Execute sub-testcase %d:\n", i+1);
 
-        bitrate.index = index;
         // @-- initialize DUT1 in CAN 2.0 operation mode
         handle = can_init(DUT1, CANMODE_DEFAULT, NULL);
         XCTAssertLessThanOrEqual(0, handle);
@@ -729,23 +765,40 @@
     int rc = CANERR_FATAL;
 
     // @test: loop over CiA bit-timing table indexes 0 to 8
-    for (SInt32 index = CANBTR_INDEX_1M; index >= CANBTR_INDEX_10K; index--) {
-        // @sub(1): CiA index 0 (1Mbps)
-        // @sub(2): CiA index 1 (800kbps, not supported by all CAN controllers)
-        // @sub(3): CiA index 2 (500kbps)
-        // @sub(4): CiA index 3 (250kbps)
-        // @sub(5): CiA index 4 (125kbps)
-        // @sub(6): CiA index 5 (100kbps)
-        // @sub(7): CiA index 6 (50kbps)
-        // @sub(8): CiA index 7 (20kbps)
-        // @sub(9): CiA index 8 (10kbps)
+    for (int i = 0; i < 9; i++) {
+        switch (i) {
+            // @sub(1): CiA index 0 (1Mbps)
+            case 0: bitrate.index = CANBTR_INDEX_1M; break;
+            // @sub(2): CiA index 1 (800kbps, not supported by all CAN controllers)
+            case 1: bitrate.index = CANBTR_INDEX_800K; break;
+            // @sub(3): CiA index 2 (500kbps)
+            case 2: bitrate.index = CANBTR_INDEX_500K; break;
+            // @sub(4): CiA index 3 (250kbps)
+            case 3: bitrate.index = CANBTR_INDEX_250K; break;
+            // @sub(5): CiA index 4 (125kbps)
+            case 4: bitrate.index = CANBTR_INDEX_125K; break;
+            // @sub(6): CiA index 5 (100kbps)
+            case 5: bitrate.index = CANBTR_INDEX_100K; break;
+            // @sub(7): CiA index 6 (50kbps)
+            case 6: bitrate.index = CANBTR_INDEX_50K; break;
+            // @sub(8): CiA index 7 (20kbps)
+            case 7: bitrate.index = CANBTR_INDEX_20K; break;
+            // @sub(9): CiA index 8 (10kbps)
+            case 8: bitrate.index = CANBTR_INDEX_10K; break;
+            default: return;  // Get out of here!
+        }
 #if (FEATURE_BITRATE_800K != FEATURE_SUPPORTED)
-        if (index == CANBTR_INDEX_800K)
+        if (bitrate.index == CANBTR_INDEX_800K)
             continue;
 #endif
-        NSLog(@"Execute sub-testcase %d:\n", 1-index);
+#if (TC03_18_ISSUE_TOUCAN_BITRATE_10K == WORKAROUND_ENABLED)
+        if (bitrate.index == CANBTR_INDEX_10K) {
+            NSLog(@"Sub-testcase %d skipped due to known hardware bug\n", i+1);
+            continue;
+        }
+#endif
+        NSLog(@"Execute sub-testcase %d:\n", i+1);
 
-        bitrate.index = index;
         // @-- initialize DUT1 in CAN 2.0 operation mode
         handle = can_init(DUT1, CANMODE_DEFAULT, NULL);
         XCTAssertLessThanOrEqual(0, handle);
@@ -779,12 +832,26 @@
         XCTAssertTrue(status.can_stopped);
 
         // @-- new CiA bit-timing table index = 8 - old
-        bitrate.index = CANBTR_INDEX_10K - index;
-#if (FEATURE_BITRATE_800K != FEATURE_SUPPORTED)
-        // @note: CiA index 1 (800kbps) is not supported by all CAN controllers.
-        if ((CANBTR_INDEX_20K <= index) && (index <= CANBTR_INDEX_500K))
-            bitrate.index -= 1;
+        switch (i) {
+            case 8: bitrate.index = CANBTR_INDEX_1M; break;
+#if (FEATURE_BITRATE_800K == FEATURE_SUPPORTED)
+            case 7: bitrate.index = CANBTR_INDEX_800K; break;
+#else
+            case 7: bitrate.index = CANBTR_INDEX_500K; break;
 #endif
+            case 6: bitrate.index = CANBTR_INDEX_500K; break;
+            case 5: bitrate.index = CANBTR_INDEX_250K; break;
+            case 4: bitrate.index = CANBTR_INDEX_125K; break;
+            case 3: bitrate.index = CANBTR_INDEX_100K; break;
+            case 2: bitrate.index = CANBTR_INDEX_50K; break;
+            case 1: bitrate.index = CANBTR_INDEX_20K; break;
+#if (TC03_18_ISSUE_TOUCAN_BITRATE_10K != WORKAROUND_ENABLED)
+            case 0: bitrate.index = CANBTR_INDEX_10K; break;
+#else
+            case 0: bitrate.index = CANBTR_INDEX_20K; break;
+#endif
+            default: return;  // Get out of here!
+        }
         // @-- start DUT1 again with a different bit-rate settings
         rc = can_start(handle, &bitrate);
         XCTAssertEqual(CANERR_NOERROR, rc);
@@ -846,6 +913,12 @@
             case 7: BITRATE_10K(bitrate); break;
             default: return;  // Get out of here!
         }
+#if (TC03_19_ISSUE_TOUCAN_BITRATE_10K == WORKAROUND_ENABLED)
+        if (i == 7) {
+            NSLog(@"Sub-testcase %d skipped due to known hardware bug\n", i+1);
+            continue;
+        }
+#endif
         NSLog(@"Execute sub-testcase %d:\n", i+1);
 
         // @-- initialize DUT1 in CAN 2.0 operation mode
@@ -941,7 +1014,7 @@
             case 14: bitrate.btr.nominal.sjw = NOM_SJW_MAX+1; break;
             // @sub(16): set field 'sjw' to UINT16_MAX
             case 15: bitrate.btr.nominal.sjw = UINT16_MAX; break;
-            // @sub(17): set field 'sam' to 2
+            // @sub(17): set field 'sam' to 2 (note: SAM not supported by all CAN controller)
 #if (TC03_20_ISSUE_KVASER_NOSAMP != WORKAROUND_ENABLED)
             // @issue(KvaserCAN): only SAM = 0 supported by Kvaser devices (noSamp = 1)
             case 16: bitrate.btr.nominal.sam = 2; break;
@@ -949,10 +1022,14 @@
             // @workaround: tread SAM = 1 as invalid (noSamp = 3)
             case 16: bitrate.btr.nominal.sam = 1; break;
 #endif
-            // @sub(18): set field 'sam' to UINT8_MAX
+            // @sub(18): set field 'sam' to UINT8_MAX (note: SAM not supported by all CAN controller)
             case 17: bitrate.btr.nominal.sam = UINT8_MAX; break;
             default: return;  // Get out of here!
         }
+#if (FEATURE_BITRATE_FD_SAM != FEATURE_SUPPORTED)
+        if ((i == 16) || (i == 17))
+            continue;
+#endif
         NSLog(@"Execute sub-testcase %d:\n", i+1);
 
         // @-- try to start DUT1 with invalid CAN 2.0 bit-rate settings
@@ -1026,6 +1103,12 @@
             case 7: BITRATE_10K(bitrate); break;
             default: return;  // Get out of here!
         }
+#if (TC03_21_ISSUE_TOUCAN_BITRATE_10K == WORKAROUND_ENABLED)
+        if (i == 7) {
+            NSLog(@"Sub-testcase %d skipped due to known hardware bug\n", i+1);
+            continue;
+        }
+#endif
         NSLog(@"Execute sub-testcase %d:\n", i+1);
 
         // @-- initialize DUT1 in CAN 2.0 operation mode
@@ -1121,6 +1204,12 @@
             case 7: BITRATE_10K(bitrate); break;
             default: return;  // Get out of here!
         }
+#if (TC03_22_ISSUE_TOUCAN_BITRATE_10K == WORKAROUND_ENABLED)
+        if (i == 7) {
+            NSLog(@"Sub-testcase %d skipped due to known hardware bug\n", i+1);
+            continue;
+        }
+#endif
         NSLog(@"Execute sub-testcase %d:\n", i+1);
 
         // @-- initialize DUT1 in CAN 2.0 operation mode
@@ -1165,7 +1254,11 @@
             case 3: BITRATE_100K(bitrate); break;
             case 2: BITRATE_50K(bitrate); break;
             case 1: BITRATE_20K(bitrate); break;
+#if (TC03_22_ISSUE_TOUCAN_BITRATE_10K != WORKAROUND_ENABLED)
             case 0: BITRATE_10K(bitrate); break;
+#else
+            case 0: BITRATE_20K(bitrate); break;
+#endif
             default: return;  // Get out of here!
         }
         // @-- start DUT1 again with different bit-rate settings
@@ -1693,28 +1786,40 @@
         // @note: pre-defined BTR0BTR1 bit-timing table has 10 entries, index 0 to 9.
         // @      But the index must be given as negative value to 'bitrate.index'!
         // @      Remark: The CiA bit-timing table has only 9 entries!
-#if (FEATURE_BITRATE_IDX_5K == FEATURE_SUPPORTED)
-    for (SInt32 index = CANBTR_INDEX_1M; index >= SJA1000_INDEX_5K; index--) {
-#else
-    for (SInt32 index = CANBTR_INDEX_1M; index >= CANBTR_INDEX_10K; index--) {
-#endif
-            // @sub(1): CiA index 0 (1Mbps)
-            // @sub(2): CiA index 1 (800kbps, not supported by all CAN controllers)
-            // @sub(3): CiA index 2 (500kbps)
-            // @sub(4): CiA index 3 (250kbps)
-            // @sub(5): CiA index 4 (125kbps)
-            // @sub(6): CiA index 5 (100kbps)
-            // @sub(7): CiA index 6 (50kbps)
-            // @sub(8): CiA index 7 (20kbps)
-            // @sub(9): CiA index 8 (10kbps)
-            // @sub(10):    index 9 (5kbps, not supported by CAN API implementations)
+        for (int i = 0; i < 10; i++) {
+            switch (i) {
+                // @sub(1): CiA index 0 (1Mbps)
+                case 0: bitrate.index = CANBTR_INDEX_1M; break;
+                // @sub(2): CiA index 1 (800kbps, not supported by all CAN controllers)
+                case 1: bitrate.index = CANBTR_INDEX_800K; break;
+                // @sub(3): CiA index 2 (500kbps)
+                case 2: bitrate.index = CANBTR_INDEX_500K; break;
+                // @sub(4): CiA index 3 (250kbps)
+                case 3: bitrate.index = CANBTR_INDEX_250K; break;
+                // @sub(5): CiA index 4 (125kbps)
+                case 4: bitrate.index = CANBTR_INDEX_125K; break;
+                // @sub(6): CiA index 5 (100kbps)
+                case 5: bitrate.index = CANBTR_INDEX_100K; break;
+                // @sub(7): CiA index 6 (50kbps)
+                case 6: bitrate.index = CANBTR_INDEX_50K; break;
+                // @sub(8): CiA index 7 (20kbps)
+                case 7: bitrate.index = CANBTR_INDEX_20K; break;
+                // @sub(9): CiA index 8 (10kbps)
+                case 8: bitrate.index = CANBTR_INDEX_10K; break;
+                // @sub(10):    index 9 (5kbps, not supported by all CAN API SDK's)
+                case 9: bitrate.index = SJA1000_INDEX_5K; break;
+                default: return;  // Get out of here!
+            }
 #if (FEATURE_BITRATE_800K != FEATURE_SUPPORTED)
-            if (index == CANBTR_INDEX_800K)
+            if (bitrate.index == CANBTR_INDEX_800K)
                 continue;
 #endif
-            NSLog(@"Execute sub-testcase %d:\n", 1-index);
+#if (FEATURE_BITRATE_IDX_5K != FEATURE_SUPPORTED)
+            if (bitrate.index == SJA1000_INDEX_5K)
+                continue;
+#endif
+            NSLog(@"Execute sub-testcase %d:\n", i+1);
 
-            bitrate.index = index;
             // @-- try to start DUT1 with selected bit-timing index
             rc = can_start(handle, &bitrate);
 #if (TX03_27_ISSUE_PCBUSB_BTRIDX_IN_FD != WORKAROUND_ENABLED)
@@ -1986,4 +2091,4 @@
 
 @end
 
-// $Id: test_can_start.mm 1071 2022-07-14 11:36:02Z makemake $  Copyright (c) UV Software, Berlin //
+// $Id: test_can_start.mm 1072 2022-07-15 23:10:54Z eris $  Copyright (c) UV Software, Berlin //

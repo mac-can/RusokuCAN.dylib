@@ -618,6 +618,11 @@
             case 7: BITRATE_10K(bitrate); break;
             default: return;  // Get out of here!
         }
+#if (TC11_10_ISSUE_TOUCAN_BITRATE_10K == WORKAROUND_ENABLED)
+        NSLog(@"Sub-testcase %d skipped due to known hardware bug\n", i+1);
+        if (i == 7)
+            continue;
+#endif
         NSLog(@"Execute sub-testcase %d:\n", i+1);
 
         can_bitrate_t result = {};
@@ -810,4 +815,4 @@
 
 @end
 
-// $Id: test_can_bitrate.mm 1071 2022-07-14 11:36:02Z makemake $  Copyright (c) UV Software, Berlin //
+// $Id: test_can_bitrate.mm 1072 2022-07-15 23:10:54Z eris $  Copyright (c) UV Software, Berlin //
