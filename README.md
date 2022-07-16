@@ -126,13 +126,13 @@ Type `can_test --help` to display all program options.
 
 #### macOS Monterey
 
-- macOS Monterey (12.1) on a Mac mini (M1, 2020)
-- Apple clang version 13.0.0 (clang-1300.0.29.30)
-- Xcode Version 13.2.1 (13C100)
+- macOS Monterey (12.4) on a Mac mini (M1, 2020)
+- Apple clang version 13.1.6 (clang-1316.0.21.2.5)
+- Xcode Version 13.4.1 (13F100)
 
 #### macOS Big Sur
 
-- macOS Big Sur (11.6.3) on a MacBook Pro (2019)
+- macOS Big Sur (11.6.7) on a MacBook Pro (2019)
 - Apple clang version 13.0.0 (clang-1300.0.29.30)
 - Xcode Version 13.2.1 (13C100)
 

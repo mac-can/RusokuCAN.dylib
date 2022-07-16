@@ -71,16 +71,22 @@ LDFLAGS += -arch arm64 -arch x86_64
 endif
 
 CHECKER  = warning,information
-IGNORE   = -i MacCAN.cpp -i MacCAN_MsgPipe.c -i can_msg.c -i can_dev.c
+IGNORE   = -i MacCAN_MsgPipe.c -i can_msg.c -i can_dev.c
 ifeq ($(HUNTER),BUGS)
 CHECKER += --bug-hunting
 endif
-endif
 
+ifeq ($(XCTEST),FULL)
+TESTING = 
+else
+TESTING = -only-testing Testing/Testing/testSmokeTest
+endif
 
 CXX = clang++
 CC = clang
 LD = clang++
+endif
+
 RM = rm -f
 CP = cp -f
 
@@ -115,6 +121,10 @@ install:
 
 test: info outdir $(TARGET)
 	./$(TARGET) INFO EXIT
+
+xctest:
+	xcodebuild test -project TouCAN.xcodeproj -scheme Testing $(TESTING)
+
 
 $(OUTDIR)/main.o: $(MAIN_DIR)/main.cpp
 	$(CXX) $(CXXFLAGS) -MMD -MF $*.d -o $@ -c $<
