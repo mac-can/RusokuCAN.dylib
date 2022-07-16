@@ -123,7 +123,7 @@ test: info outdir $(TARGET)
 	./$(TARGET) INFO EXIT
 
 xctest:
-	xcodebuild test -project TouCAN.xcodeproj -scheme Testing $(TESTING)
+	xcodebuild clean build test -project TouCAN.xcodeproj -scheme Testing $(TESTING)
 
 
 $(OUTDIR)/main.o: $(MAIN_DIR)/main.cpp
