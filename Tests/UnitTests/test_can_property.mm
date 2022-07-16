@@ -53,6 +53,11 @@
 
 @end
 
+#ifndef CAN_FD_SUPPORTED
+#define CAN_FD_SUPPORTED  FEATURE_SUPPORTED
+#warning CAN_FD_SUPPORTED not set, default=FEATURE_SUPPORTED
+#endif
+
 #define MAX_PROPERTIES  33
 
 #define LIB_PARAM  true
@@ -1303,4 +1308,4 @@ static struct property {
 
 @end
 
-// $Id: test_can_property.mm 1069 2022-07-12 19:43:56Z makemake $  Copyright (c) UV Software, Berlin //
+// $Id: test_can_property.mm 1073 2022-07-16 13:06:44Z makemake $  Copyright (c) UV Software, Berlin //

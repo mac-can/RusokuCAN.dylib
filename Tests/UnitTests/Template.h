@@ -60,7 +60,16 @@
 #define CAN_DEVICE1  <channel>0
 #define CAN_DEVICE2  <channel>1
 
-//  (§4) define macros for CAN Classic bit-rate settings (at least BITRATE_1M, BITRATE_500K, BITRATE_250K, BITRATE_125K, BITRATE_100K, BITRATE_50K, BITRATE_20K, BITRATE_10K)
+//  ($4) define macros for unsupported features (at least the mandatory macros, cf. compiler warnings)
+#define FEATURE_BITRATE_800K  FEATURE_[UN]SUPPORTED
+#define FEATURE_BITRATE_SAM   FEATURE_[UN]SUPPORTED
+#define FEATURE_BITRATE_SJA1000  FEATURE_[UN]SUPPORTED
+#define FEATURE_BITRATE_FD_SAM   FEATURE_[UN]SUPPORTED
+#define FEATURE_BITRATE_FD_SJA1000  FEATURE_[UN]SUPPORTED
+#define FEATURE_WRITE_ACKNOWLEDGED  FEATURE_[UN]SUPPORTED
+#define FEATURE_STATUS_BIT_QUE_OVR  FEATURE_[UN]SUPPORTED
+
+//  (§5) define macros for CAN Classic bit-rate settings (at least BITRATE_1M, BITRATE_500K, BITRATE_250K, BITRATE_125K, BITRATE_100K, BITRATE_50K, BITRATE_20K, BITRATE_10K)
 #define BITRATE_1M(x)    do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; } while(0)
 #define BITRATE_800K(x)  do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; } while(0)
 #define BITRATE_500K(x)  do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; } while(0)
@@ -71,19 +80,11 @@
 #define BITRATE_20K(x)   do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; } while(0)
 #define BITRATE_10K(x)   do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; } while(0)
 
-//  ($5) define macros for unsupported features in CAN Classic operation mode (at least FEATURE_BITRATE_800K, FEATURE_BITRATE_IDX_5K, ..)
-#define FEATURE_BITRATE_800K  0
-#define FEATURE_BITRATE_IDX_5K  0
-#define FEATURE_BITRATE_FD_SAM  0
-#define FEATURE_BITRATE_FD_SJA1000  0
-#define FEATURE_WRITE_ACKNOWLEDGED  0
-#define FEATURE_STATUS_BIT_QUE_OVR  0
-
 //  (§6) define macros for workarounds in CAN Classic operation mode (e.g. TC01_3_ISSUE)
-//#define TX0x_y_ISSUE  1
+//#define TC0x_y_ISSUE_  WORKAROUND_ENABLED
 
 //  (§7) define macro CAN_FD_SUPPORTED if CAN FD operation mode is supported
-#define CAN_FD_SUPPORTED  0
+#define CAN_FD_SUPPORTED  FEATURE_[UN]SUPPORTED
 
 //  (§8) define macros for CAN FD bit-rate settings (at least BITRATE_FD_1M8M, BITRATE_FD_500K4M, BITRATE_FD_250K2M, BITRATE_FD_125K1M, BITRATE_FD_1M, BITRATE_FD_500K, BITRATE_FD_250K, BITRATE_FD_125K)
 #define BITRATE_FD_1M(x)      do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; } while(0)
@@ -95,14 +96,11 @@
 #define BITRATE_FD_250K2M(x)  do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
 #define BITRATE_FD_125K1M(x)  do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
 
-#if (CAN_FD_SUPPORTED != 0)
-//  ($9) define macros for unsupported features in CAN FD operation mode
-//#define BITRATE_SWITCHING_UNSUPPORTED  0
-
-//  (§10) define macros for workarounds in CAN FD operation mode (e.g. TC01_3_ISSUE)
-//#define TX0x_y_ISSUE  1
+#if (CAN_FD_SUPPORTED == FEATURE_SUPPORTED)
+//  (§9) define macros for workarounds in CAN FD operation mode (e.g. TC01_3_ISSUE)
+//#define TC0x_y_ISSUE_  WORKAROUND_ENABLED
 
 #endif // CAN_FD_SUPPORTED
 #endif // TEMPLATE_H_INCLUDED
 
-// $Id: Template.h 1069 2022-07-12 19:43:56Z makemake $  Copyright (c) UV Software, Berlin //
+// $Id: Template.h 1074 2022-07-16 13:25:02Z makemake $  Copyright (c) UV Software, Berlin //

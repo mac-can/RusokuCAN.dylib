@@ -49,6 +49,36 @@
 #import "can_api.h"
 #import <XCTest/XCTest.h>
 
+#ifndef CAN_FD_SUPPORTED
+#define CAN_FD_SUPPORTED  FEATURE_SUPPORTED
+#warning CAN_FD_SUPPORTED not set, default=FEATURE_SUPPORTED
+#endif
+
+#ifndef FEATURE_BITRATE_800K
+#define FEATURE_BITRATE_800K  FEATURE_SUPPORTED
+#warning FEATURE_BITRATE_800K not set, default=FEATURE_SUPPORTED
+#endif
+
+#ifndef FEATURE_BITRATE_SJA1000
+#define FEATURE_BITRATE_SJA1000  FEATURE_SUPPORTED
+#warning FEATURE_BITRATE_SJA1000 not set, default=FEATURE_SUPPORTED
+#endif
+
+#ifndef FEATURE_BITRATE_SAM
+#define FEATURE_BITRATE_SAM  FEATURE_SUPPORTED
+#warning FEATURE_BITRATE_SAM not set, default=FEATURE_SUPPORTED
+#endif
+
+#ifndef FEATURE_BITRATE_FD_SAM
+#define FEATURE_BITRATE_FD_SAM  FEATURE_UNSUPPORTED
+#warning FEATURE_BITRATE_FD_SAM not set, default=FEATURE_UNSUPPORTED
+#endif
+
+#ifndef FEATURE_BITRATE_FD_SJA1000
+#define FEATURE_BITRATE_FD_SJA1000  FEATURE_UNSUPPORTED
+#warning FEATURE_BITRATE_FD_SJA1000 not set, default=FEATURE_UNSUPPORTED
+#endif
+
 #define NOM_BRP_MIN    CANBTR_NOMINAL_BRP_MIN
 #define NOM_BRP_MAX    CANBTR_NOMINAL_BRP_MAX
 #define NOM_TSEG1_MIN  CANBTR_NOMINAL_TSEG1_MIN
@@ -484,7 +514,7 @@
         if (bitrate.index == CANBTR_INDEX_800K)
             continue;
 #endif
-#if (FEATURE_BITRATE_IDX_5K != FEATURE_SUPPORTED)
+#if (FEATURE_BITRATE_SJA1000 != FEATURE_SUPPORTED)
         if (bitrate.index == SJA1000_INDEX_5K)
             continue;
 #endif
@@ -566,7 +596,7 @@
     for (int i = 0; i < 14; i++) {
         switch (i) {
             // @sub(1): invalid index -10
-#if (FEATURE_BITRATE_IDX_5K == FEATURE_SUPPORTED)
+#if (FEATURE_BITRATE_SJA1000 == FEATURE_SUPPORTED)
             case 0: bitrate.index = SJA1000_INDEX_5K - 1; break;
 #else
             case 0: bitrate.index = CANBTR_INDEX_10K - 1; break;
@@ -681,7 +711,7 @@
         if (bitrate.index == CANBTR_INDEX_800K)
             continue;
 #endif
-#if (FEATURE_BITRATE_IDX_5K != FEATURE_SUPPORTED)
+#if (FEATURE_BITRATE_SJA1000 != FEATURE_SUPPORTED)
         if (bitrate.index == SJA1000_INDEX_5K)
             continue;
 #endif
@@ -1026,7 +1056,7 @@
             case 17: bitrate.btr.nominal.sam = UINT8_MAX; break;
             default: return;  // Get out of here!
         }
-#if (FEATURE_BITRATE_FD_SAM != FEATURE_SUPPORTED)
+#if (FEATURE_BITRATE_SAM != FEATURE_SUPPORTED)
         if ((i == 16) || (i == 17))
             continue;
 #endif
@@ -1814,7 +1844,7 @@
             if (bitrate.index == CANBTR_INDEX_800K)
                 continue;
 #endif
-#if (FEATURE_BITRATE_IDX_5K != FEATURE_SUPPORTED)
+#if (FEATURE_BITRATE_SJA1000 != FEATURE_SUPPORTED)
             if (bitrate.index == SJA1000_INDEX_5K)
                 continue;
 #endif
@@ -2091,4 +2121,4 @@
 
 @end
 
-// $Id: test_can_start.mm 1072 2022-07-15 23:10:54Z eris $  Copyright (c) UV Software, Berlin //
+// $Id: test_can_start.mm 1073 2022-07-16 13:06:44Z makemake $  Copyright (c) UV Software, Berlin //

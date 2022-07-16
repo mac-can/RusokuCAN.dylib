@@ -49,6 +49,21 @@
 #import "can_api.h"
 #import <XCTest/XCTest.h>
 
+#ifndef CAN_FD_SUPPORTED
+#define CAN_FD_SUPPORTED  FEATURE_SUPPORTED
+#warning CAN_FD_SUPPORTED not set, default=FEATURE_SUPPORTED
+#endif
+
+#ifndef FEATURE_WRITE_ACKNOWLEDGED
+#define FEATURE_WRITE_ACKNOWLEDGED  FEATURE_UNSUPPORTED
+#warning FEATURE_WRITE_ACKNOWLEDGED not set, default=FEATURE_UNSUPPORTED
+#endif
+
+#ifndef FEATURE_STATUS_BIT_QUE_OVR
+#define FEATURE_STATUS_BIT_QUE_OVR  FEATURE_SUPPORTED
+#warning FEATURE_STATUS_BIT_QUE_OVR not set, default=FEATURE_SUPPORTED
+#endif
+
 #define TIMESTAMP_DELAY_10MS  10U
 #define TIMESTAMP_DELAY_7MS   7U
 #define TIMESTAMP_DELAY_5MS   5U
@@ -538,7 +553,7 @@
         if (CANERR_NOERROR != rc)
             break;
     }
-#if (FEATURE_WRITE_ACKNOWLEDGED == FEATURE_UNSUPPORTED)
+#if (FEATURE_WRITE_ACKNOWLEDGED != FEATURE_SUPPORTED)
     // @note: a delay (after burner) to guarantee that all CAN messages are really sent
     //        is required when messages are not acknowlegded by the CAN controller.
     CTimer::Delay(TEST_AFTER_BURNER*CTimer::MSEC);
@@ -1000,4 +1015,4 @@
 }
 @end
 
-// $Id: test_can_read.mm 1071 2022-07-14 11:36:02Z makemake $  Copyright (c) UV Software, Berlin //
+// $Id: test_can_read.mm 1073 2022-07-16 13:06:44Z makemake $  Copyright (c) UV Software, Berlin //
