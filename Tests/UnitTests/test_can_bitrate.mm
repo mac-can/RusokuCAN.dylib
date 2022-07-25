@@ -49,6 +49,11 @@
 #import "can_api.h"
 #import <XCTest/XCTest.h>
 
+#ifndef CAN_FD_SUPPORTED
+#define CAN_FD_SUPPORTED  FEATURE_SUPPORTED
+#warning CAN_FD_SUPPORTED not set, default=FEATURE_SUPPORTED
+#endif
+
 @interface test_can_bitrate : XCTestCase
 
 @end
@@ -314,14 +319,8 @@
     int rc = CANERR_FATAL;
 
     // @test:
-    // @- try to get bit-rate of DUT1 with invalid handle -1
-    rc = can_bitrate(INVALID_HANDLE, &bitrate, NULL);
-    XCTAssertEqual(CANERR_NOTINIT, rc);
-    // @- try to get bit-rate of DUT1 with invalid handle INT32_MIN
-    rc = can_bitrate(INT32_MIN, &bitrate, NULL);
-    XCTAssertEqual(CANERR_NOTINIT, rc);
-    // @- try to get bit-rate of DUT1 with invalid handle INT32_MAX
-    rc = can_bitrate(INT32_MAX, &bitrate, NULL);
+    // @- try to get bit-rate of DUT1
+    rc = can_bitrate(DUT1, &bitrate, NULL);
     XCTAssertEqual(CANERR_NOTINIT, rc);
 
     // @post:
@@ -454,11 +453,6 @@
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
 #endif
-    // @- get status of DUT1 and check to be in RUNNING state
-    rc = can_status(handle, &status.byte);
-    XCTAssertEqual(CANERR_NOERROR, rc);
-    XCTAssertFalse(status.can_stopped);
-
     // @test:
     // @- get bit-rate of DUT1
     rc = can_bitrate(handle, &bitrate, NULL);
@@ -619,9 +613,10 @@
             default: return;  // Get out of here!
         }
 #if (TC11_10_ISSUE_TOUCAN_BITRATE_10K == WORKAROUND_ENABLED)
-        NSLog(@"Sub-testcase %d skipped due to known hardware bug\n", i+1);
-        if (i == 7)
+        if (i == 7) {
+            NSLog(@"Sub-testcase %d skipped due to known hardware bug\n", i+1);
             continue;
+        }
 #endif
         NSLog(@"Execute sub-testcase %d:\n", i+1);
 
@@ -644,7 +639,7 @@
         rc = can_bitrate(handle, &result, NULL);
         XCTAssertEqual(CANERR_NOERROR, rc);
 #if (TC11_10_ISSUE_KVASER_BUSPARAMS != WORKAROUND_ENABLED) && (COMPARE_BITRATE_BY_TIME_QUANTA != FEATURE_SUPPORTED)
-        // @issue(KvaserCAN): if CAN clock unknown on user level, then it is adapted by the wrapper.
+        // @issue(KvaserCAN): because CAN clock is unknown on user level, the given value is adapted by the driver/wrapper.
         XCTAssertEqual(bitrate.btr.frequency, result.btr.frequency);
         XCTAssertEqual(bitrate.btr.nominal.brp, result.btr.nominal.brp);
 #else
@@ -689,14 +684,12 @@
 #if (CAN_FD_SUPPORTED == FEATURE_SUPPORTED)
 // @xctest TC11.11: Get CAN bit-rate settings when CAN controller started with various CAN FD bit-rate settings and check for correctness
 //
-// @note:  This test case requires two CAN FD capable devices!
-//
 // @expected CANERR_NOERROR
 //
 - (void)testWithVariousCanFdBitrateSettings {
     uint8_t mode = (CANMODE_FDOE | CANMODE_BRSE);
     
-    // @note: this test requires two CAN FD capable devices
+    // @note: this test requires two CAN FD capable devices!
     if ((can_test(DUT1, mode, NULL, NULL) == CANERR_NOERROR) &&
         (can_test(DUT2, mode, NULL, NULL) == CANERR_NOERROR)) {
         can_bitrate_t bitrate = { TEST_BTRINDEX };
@@ -746,7 +739,7 @@
             rc = can_bitrate(handle, &result, NULL);
             XCTAssertEqual(CANERR_NOERROR, rc);
 #if (TC11_11_ISSUE_KVASER_BUSPARAMS != WORKAROUND_ENABLED) && (COMPARE_BITRATE_BY_TIME_QUANTA != FEATURE_SUPPORTED)
-            // @issue(KvaserCAN): if CAN clock unknown on user level then it is adapted by the wrapper.
+            // @issue(KvaserCAN): because CAN clock is unknown on user level, the given value is adapted by the driver/wrapper.
             XCTAssertEqual(bitrate.btr.frequency, result.btr.frequency);
             XCTAssertEqual(bitrate.btr.nominal.brp, result.btr.nominal.brp);
 #else
@@ -762,7 +755,7 @@
             // @-- compare data phase settings in bit-rate switching enabled
             if (mode & CANMODE_BRSE) {
 #if (TC11_11_ISSUE_KVASER_BUSPARAMS != WORKAROUND_ENABLED) && (COMPARE_BITRATE_BY_TIME_QUANTA != FEATURE_SUPPORTED)
-                // @issue(KvaserCAN): if CAN clock unknown on user level then it is adapted by the wrapper.
+                // @issue(KvaserCAN): because CAN clock is unknown on user level, the given value is adapted by the driver/wrapper.
                 XCTAssertEqual(bitrate.btr.frequency, result.btr.frequency);
                 XCTAssertEqual(bitrate.btr.data.brp, result.btr.data.brp);
 #else
@@ -777,7 +770,7 @@
                 XCTAssertEqual(bitrate.btr.data.sjw, result.btr.data.sjw);
             } else {
 #if (TC11_11_ISSUE_KVASER_DATAPHASE != WORKAROUND_ENABLED)
-                // @issue(KvaserCAN): if TSeg1 or TSeg2 above their limits then they are adapted by the wrapper.
+                // @issue(KvaserCAN): if TSeg1 or TSeg2 are above their limits and BRS not set, then they are adapted by the driver/wrapper.
                 XCTAssertEqual(bitrate.btr.data.brp, result.btr.data.brp);
                 XCTAssertEqual(bitrate.btr.data.tseg1, result.btr.data.tseg1);
                 XCTAssertEqual(bitrate.btr.data.tseg2, result.btr.data.tseg2);
@@ -815,4 +808,4 @@
 
 @end
 
-// $Id: test_can_bitrate.mm 1072 2022-07-15 23:10:54Z eris $  Copyright (c) UV Software, Berlin //
+// $Id: test_can_bitrate.mm 1084 2022-07-25 13:39:18Z makemake $  Copyright (c) UV Software, Berlin //

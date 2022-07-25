@@ -1,0 +1,8 @@
+#.gitignore
+TestSpecs
+Temporary
+temporary
+temp
+tmp
+*.txt
+*.log

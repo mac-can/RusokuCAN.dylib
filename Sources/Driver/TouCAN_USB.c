@@ -1,7 +1,7 @@
 /*
  * TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Adapters
  *
- * Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+ * Copyright (C) 2020-2022  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
  * The following source code was copied from Rusoku's CANAL-DLL for Windows
  * and modified to run under macOS 10.13 and later.
@@ -580,19 +580,19 @@ int TouCAN_get_vendor(CANUSB_Handle_t handle, unsigned int size, char *str) {
 
 }
 
-int TouCAN_get_interface_transmit_delay(CANUSB_Handle_t handle, UInt8 channel,UInt32 *delay) {
-    return (int)TOUCAN_ERROR_OFFSET;
-}
+//int TouCAN_get_interface_transmit_delay(CANUSB_Handle_t handle, UInt8 channel,UInt32 *delay) {
+//    return (int)TOUCAN_ERROR_OFFSET;
+//}
 
-int TouCAN_set_interface_transmit_delay(CANUSB_Handle_t handle, UInt8 channel,UInt32 *delay) {
-    return (int)TOUCAN_ERROR_OFFSET;
-}
+//int TouCAN_set_interface_transmit_delay(CANUSB_Handle_t handle, UInt8 channel,UInt32 *delay) {
+//    return (int)TOUCAN_ERROR_OFFSET;
+//}
 
 ///////////////////////////////////////// LIST, MASK ////////////////////////////////////////////
-int TouCAN_set_filter_std_list_mask(CANUSB_Handle_t handle, Filter_Type_TypeDef type, UInt32 list, UInt32 mask) {
-    return (int)TOUCAN_ERROR_OFFSET;
-}
+//int TouCAN_set_filter_std_list_mask(CANUSB_Handle_t handle, Filter_Type_TypeDef type, UInt32 list, UInt32 mask) {
+//    return (int)TOUCAN_ERROR_OFFSET;
+//}
 
-int TouCAN_set_filter_ext_list_mask(CANUSB_Handle_t handle, Filter_Type_TypeDef type, UInt32 list, UInt32 mask) {
-    return (int)TOUCAN_ERROR_OFFSET;
-}
+//int TouCAN_set_filter_ext_list_mask(CANUSB_Handle_t handle, Filter_Type_TypeDef type, UInt32 list, UInt32 mask) {
+//    return (int)TOUCAN_ERROR_OFFSET;
+//}

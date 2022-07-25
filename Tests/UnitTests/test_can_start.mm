@@ -49,6 +49,36 @@
 #import "can_api.h"
 #import <XCTest/XCTest.h>
 
+#ifndef CAN_FD_SUPPORTED
+#define CAN_FD_SUPPORTED  FEATURE_SUPPORTED
+#warning CAN_FD_SUPPORTED not set, default=FEATURE_SUPPORTED
+#endif
+
+#ifndef FEATURE_BITRATE_800K
+#define FEATURE_BITRATE_800K  FEATURE_SUPPORTED
+#warning FEATURE_BITRATE_800K not set, default=FEATURE_SUPPORTED
+#endif
+
+#ifndef FEATURE_BITRATE_SJA1000
+#define FEATURE_BITRATE_SJA1000  FEATURE_SUPPORTED
+#warning FEATURE_BITRATE_SJA1000 not set, default=FEATURE_SUPPORTED
+#endif
+
+#ifndef FEATURE_BITRATE_SAM
+#define FEATURE_BITRATE_SAM  FEATURE_SUPPORTED
+#warning FEATURE_BITRATE_SAM not set, default=FEATURE_SUPPORTED
+#endif
+
+#ifndef FEATURE_BITRATE_FD_SAM
+#define FEATURE_BITRATE_FD_SAM  FEATURE_UNSUPPORTED
+#warning FEATURE_BITRATE_FD_SAM not set, default=FEATURE_UNSUPPORTED
+#endif
+
+#ifndef FEATURE_BITRATE_FD_SJA1000
+#define FEATURE_BITRATE_FD_SJA1000  FEATURE_UNSUPPORTED
+#warning FEATURE_BITRATE_FD_SJA1000 not set, default=FEATURE_UNSUPPORTED
+#endif
+
 #define NOM_BRP_MIN    CANBTR_NOMINAL_BRP_MIN
 #define NOM_BRP_MAX    CANBTR_NOMINAL_BRP_MAX
 #define NOM_TSEG1_MIN  CANBTR_NOMINAL_TSEG1_MIN
@@ -216,7 +246,7 @@
 
     // @test:
     // @- try to start DUT1 with configured bit-rate settings
-    rc = can_start(handle, &bitrate);
+    rc = can_start(DUT1, &bitrate);
     XCTAssertEqual(CANERR_NOTINIT, rc);
     
     // @post:
@@ -484,7 +514,7 @@
         if (bitrate.index == CANBTR_INDEX_800K)
             continue;
 #endif
-#if (FEATURE_BITRATE_IDX_5K != FEATURE_SUPPORTED)
+#if (FEATURE_BITRATE_SJA1000 != FEATURE_SUPPORTED)
         if (bitrate.index == SJA1000_INDEX_5K)
             continue;
 #endif
@@ -566,7 +596,7 @@
     for (int i = 0; i < 14; i++) {
         switch (i) {
             // @sub(1): invalid index -10
-#if (FEATURE_BITRATE_IDX_5K == FEATURE_SUPPORTED)
+#if (FEATURE_BITRATE_SJA1000 == FEATURE_SUPPORTED)
             case 0: bitrate.index = SJA1000_INDEX_5K - 1; break;
 #else
             case 0: bitrate.index = CANBTR_INDEX_10K - 1; break;
@@ -681,7 +711,7 @@
         if (bitrate.index == CANBTR_INDEX_800K)
             continue;
 #endif
-#if (FEATURE_BITRATE_IDX_5K != FEATURE_SUPPORTED)
+#if (FEATURE_BITRATE_SJA1000 != FEATURE_SUPPORTED)
         if (bitrate.index == SJA1000_INDEX_5K)
             continue;
 #endif
@@ -1026,7 +1056,7 @@
             case 17: bitrate.btr.nominal.sam = UINT8_MAX; break;
             default: return;  // Get out of here!
         }
-#if (FEATURE_BITRATE_FD_SAM != FEATURE_SUPPORTED)
+#if (FEATURE_BITRATE_SAM != FEATURE_SUPPORTED)
         if ((i == 16) || (i == 17))
             continue;
 #endif
@@ -1293,13 +1323,12 @@
 #if (CAN_FD_SUPPORTED == FEATURE_SUPPORTED)
 // @xctest TC03.23: Start CAN controller with valid CAN FD bit-rate settings
 //
-// @note:  This test case requires two CAN FD capable devices!
-//
 // @expected CANERR_NOERROR
 //
 - (void)testCheckValidCanFdBitrateSettings {
     uint8_t mode = (CANMODE_FDOE | CANMODE_BRSE);
 
+    // @note: this test requires two CAN FD capable devices!
     if ((can_test(DUT1, mode, NULL, NULL) == CANERR_NOERROR) &&
         (can_test(DUT2, mode, NULL, NULL) == CANERR_NOERROR)) {
         can_bitrate_t bitrate = { TEST_BTRINDEX };
@@ -1375,14 +1404,12 @@
 #if (CAN_FD_SUPPORTED == FEATURE_SUPPORTED)
 // @xctest TC03.24: Start CAN controller with invalid CAN FD bit-rate settings
 //
-// @note:  This test case requires two CAN FD capable devices!
-//
 // @expected CANERR_BAUDRATE
 //
 - (void)testCheckInvalidCanFdBitrateSettings {
     uint8_t mode = (CANMODE_FDOE | CANMODE_BRSE);
 
-    // @note: this test requires two CAN FD capable devices
+    // @note: this test requires two CAN FD capable devices!
     if ((can_test(DUT1, mode, NULL, NULL) == CANERR_NOERROR) &&
         (can_test(DUT2, mode, NULL, NULL) == CANERR_NOERROR)) {
         can_bitrate_t bitrate = { TEST_BTRINDEX };
@@ -1531,14 +1558,12 @@
 #if (CAN_FD_SUPPORTED == FEATURE_SUPPORTED)
 // @xctest TC03.25: Re-Start CAN controller with same CAN FD bit-rate settings after it was stopped
 //
-// @note:  This test case requires two CAN FD capable devices!
-//
 // @expected CANERR_NOERROR
 //
 - (void)testWithSameCanFdBitrateSettingsAfterCanStopped {
     uint8_t mode = (CANMODE_FDOE | CANMODE_BRSE);
 
-    // @note: this test requires two CAN FD capable devices
+    // @note: this test requires two CAN FD capable devices!
     if ((can_test(DUT1, mode, NULL, NULL) == CANERR_NOERROR) &&
         (can_test(DUT2, mode, NULL, NULL) == CANERR_NOERROR)) {
         can_bitrate_t bitrate = { TEST_BTRINDEX };
@@ -1638,14 +1663,12 @@
 #if (CAN_FD_SUPPORTED == FEATURE_SUPPORTED)
 // @xctest TC03.26: Re-Start CAN controller with different CAN FD bit-rate settings after it was stopped
 //
-// @note:  This test case requires two CAN FD capable devices!
-//
 // @expected CANERR_NOERROR
 //
 - (void)testWithDifferentCanFdBitrateSettingsAfterCanStopped {
     uint8_t mode = (CANMODE_FDOE | CANMODE_BRSE);
 
-    // @note: this test requires two CAN FD capable devices
+    // @note: this test requires two CAN FD capable devices!
     if ((can_test(DUT1, mode, NULL, NULL) == CANERR_NOERROR) &&
         (can_test(DUT2, mode, NULL, NULL) == CANERR_NOERROR)) {
         can_bitrate_t bitrate = { TEST_BTRINDEX };
@@ -1758,14 +1781,12 @@
 #if (CAN_FD_SUPPORTED == FEATURE_SUPPORTED)
 // @xctest TC03.27: Start CAN controller with CiA bit-timing index in CAN FD operation mode w/o bit-rate switching
 //
-// @note:  This test case requires two CAN FD capable devices!
-//
 // @expected CANERR_BAUDRATE
 //
 - (void)testWithCiaIndexInCanFdMode {
     uint8_t mode = CANMODE_FDOE;
 
-    // @note: this test requires two CAN FD capable devices
+    // @note: this test requires two CAN FD capable devices!
     if ((can_test(DUT1, mode, NULL, NULL) == CANERR_NOERROR) &&
         (can_test(DUT2, mode, NULL, NULL) == CANERR_NOERROR)) {
         can_bitrate_t bitrate = { TEST_BTRINDEX };
@@ -1814,7 +1835,7 @@
             if (bitrate.index == CANBTR_INDEX_800K)
                 continue;
 #endif
-#if (FEATURE_BITRATE_IDX_5K != FEATURE_SUPPORTED)
+#if (FEATURE_BITRATE_SJA1000 != FEATURE_SUPPORTED)
             if (bitrate.index == SJA1000_INDEX_5K)
                 continue;
 #endif
@@ -1822,31 +1843,7 @@
 
             // @-- try to start DUT1 with selected bit-timing index
             rc = can_start(handle, &bitrate);
-#if (TX03_27_ISSUE_PCBUSB_BTRIDX_IN_FD != WORKAROUND_ENABLED)
             XCTAssertEqual(CANERR_BAUDRATE, rc);
-#else
-            // @note: PCANBasic Wrapper returns a vendor-specific error code.
-            XCTAssertGreaterThanOrEqual(CANERR_VENDOR, rc);
-            // @issue(PCBUSB): The interface is uninitialized by the previous call.
-            if (CANERR_NOTINIT == rc) {
-                NSLog(@"Test aborted: PCBUSB-Uninitialize issue (#303)!");
-    #if (0)
-                // - DUT1 seems to have hung up (another bug?)
-                rc = can_exit(handle);
-                XCTAssertEqual(CANERR_NOERROR, rc);
-                // - re-initialize DUT1 in CAN FD operation mode w/o BRSE
-                handle = can_init(DUT1, mode, NULL);
-                XCTAssertLessThanOrEqual(0, handle);
-                // - get status of DUT1 and check to be in INIT state
-                rc = can_status(handle, &status.byte);
-                XCTAssertEqual(CANERR_NOERROR, rc);
-                XCTAssertTrue(status.can_stopped);
-                break;
-    #else
-                return;
-    #endif
-            }
-#endif
             // @-- get status of DUT1 and check to be in INIT state
             rc = can_status(handle, &status.byte);
             XCTAssertEqual(CANERR_NOERROR, rc);
@@ -1894,14 +1891,12 @@
 #if (CAN_FD_SUPPORTED == FEATURE_SUPPORTED)
 // @xctest TC03.28: Start CAN controller with CAN 2.0 bit-rate settings in CAN FD operation mode w/o bit-rate switching
 //
-// @note:  This test case requires two CAN FD capable devices!
-//
 // @expected CANERR_NOERROR
 //
 - (void)testWithCan20BitrateSettingsInCanFdMode {
     uint8_t mode = CANMODE_FDOE;
 
-    // @note: this test requires two CAN FD capable devices
+    // @note: this test requires two CAN FD capable devices!
     if ((can_test(DUT1, mode, NULL, NULL) == CANERR_NOERROR) &&
         (can_test(DUT2, mode, NULL, NULL) == CANERR_NOERROR)) {
         can_bitrate_t bitrate = { TEST_BTRINDEX };
@@ -1987,8 +1982,6 @@
 #if (CAN_FD_SUPPORTED == FEATURE_SUPPORTED)
 // @xctest TC03.29: Start CAN controller with CAN FD bit-rate settings in CAN 2.0 operation mode
 //
-// @note:  This test case requires two CAN FD capable devices!
-//
 // @expected CANERR_BAUDRATE
 //
 - (void)testWithCanFdBitrateSettingsInCan20Mode {
@@ -2037,8 +2030,8 @@
         // @-- start DUT1 with CAN FD bit-rate settings
         rc = can_start(handle, &bitrate);
         if (opCapa.fdoe) {
-#if (TX03_29_ISSUE_PCBUSB_BR_FD_IN_2_0 != WORKAROUND_ENABLED)
-            // @issue(PCBUSB): only SJA1000 frequency allowed in CAN 2.0 mode
+#if (TC03_29_ISSUE_PCBUSB_BR_FD_IN_2_0 != WORKAROUND_ENABLED)
+            // @issue(PeakCAN): only SJA1000 frequency allowed in CAN 2.0 mode
             XCTAssertEqual(CANERR_NOERROR, rc);
             // @--- get status of DUT1 and check to be in RUNNING state
             rc = can_status(handle, &status.byte);
@@ -2091,4 +2084,4 @@
 
 @end
 
-// $Id: test_can_start.mm 1072 2022-07-15 23:10:54Z eris $  Copyright (c) UV Software, Berlin //
+// $Id: test_can_start.mm 1083 2022-07-25 12:40:16Z makemake $  Copyright (c) UV Software, Berlin //

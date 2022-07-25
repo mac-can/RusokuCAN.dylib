@@ -78,23 +78,23 @@ HEADERS = -I$(SOURCE_DIR) \
 	-I$(TOUCAN_DIR) \
 	-I$(WRAPPER_DIR)
 
-CFLAGS += -O2 -Wall -Wno-parentheses \
-	-fno-strict-aliasing \
+CFLAGS += -O2 -Wall -Wextra -Wno-parentheses \
+	-fmessage-length=0 -fno-strict-aliasing \
 	$(DEFINES) \
 	$(HEADERS)
 
-CXXFLAGS += -g -Wall -Wextra -pthread \
+CXXFLAGS += -O2 -g -Wall -Wextra -pthread \
 	$(DEFINES) \
 	$(HEADERS)
 
 LIBRARIES =
 
-LDFLAGS += -lpthread \
+LDFLAGS  += -lpthread \
 	-nostartfiles -dynamiclib -fvisibility=hidden \
 	-Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation \
-	-install_name $(INSTALL_NAME) \
-	-current_version $(CURRENT_VERSION) \
-	-compatibility_version $(COMPATIBILITY_VERSION)
+	-Wl,-install_name,$(INSTALL_NAME) \
+	-Wl,-current_version,$(CURRENT_VERSION) \
+	-Wl,-compatibility_version,$(COMPATIBILITY_VERSION)
 
 LTFLAGS += -static
 
@@ -103,13 +103,13 @@ CFLAGS += -arch arm64 -arch x86_64
 CXXFLAGS += -arch arm64 -arch x86_64
 LDFLAGS += -arch arm64 -arch x86_64
 endif
-endif
-
 
 CXX = clang++
 CC = clang
 LD = clang
 LT = libtool
+endif
+
 RM = rm -f
 CP = cp -f
 LN = ln -s
@@ -151,7 +151,7 @@ pristine:
 
 install:
 	@echo "Copying library file..."
-	$(CP) $(TARGET) $(INSTALL)
+	$(RM) $(INSTALL)/$(TARGET); $(CP) $(TARGET) $(INSTALL)
 ifeq ($(current_OS),Darwin)
 	$(RM) $(INSTALL)/$(LIBRARY).dylib ; $(LN) $(INSTALL)/$(TARGET) $(INSTALL)/$(LIBRARY).dylib
 endif

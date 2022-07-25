@@ -55,7 +55,7 @@ CFLAGS += -O2 -Wall -Wno-parentheses \
 	$(DEFINES) \
 	$(HEADERS)
 
-CXXFLAGS += -g -Wall -Wextra -pthread \
+CXXFLAGS += -O2 -g -Wall -Wextra -pthread \
 	$(DEFINES) \
 	$(HEADERS)
 
@@ -123,7 +123,7 @@ test: info outdir $(TARGET)
 	./$(TARGET) INFO EXIT
 
 xctest:
-	xcodebuild test -project TouCAN.xcodeproj -scheme Testing $(TESTING)
+	xcodebuild clean build test -project TouCAN.xcodeproj -scheme Testing $(TESTING)
 
 
 $(OUTDIR)/main.o: $(MAIN_DIR)/main.cpp

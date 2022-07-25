@@ -49,6 +49,11 @@
 #import "can_api.h"
 #import <XCTest/XCTest.h>
 
+#ifndef CAN_FD_SUPPORTED
+#define CAN_FD_SUPPORTED  FEATURE_SUPPORTED
+#warning CAN_FD_SUPPORTED not set, default=FEATURE_SUPPORTED
+#endif
+
 @interface Testing : XCTestCase
 
 @end
@@ -149,4 +154,4 @@
 
 @end
 
-// $Id: Testing.mm 1070 2022-07-13 18:14:51Z makemake $  Copyright (c) UV Software, Berlin //
+// $Id: Testing.mm 1073 2022-07-16 13:06:44Z makemake $  Copyright (c) UV Software, Berlin //
