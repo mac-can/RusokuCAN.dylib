@@ -2,7 +2,7 @@
 /*
  *  CAN Interface API, Version 3 (for Rusoku TouCAN Interface)
  *
- *  Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+ *  Copyright (C) 2020-2022  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
  *  This file is part of MacCAN-TouCAN.
  *
@@ -34,17 +34,17 @@
 
 /*  -----------  options  ------------------------------------------------
  */
-/* note: all options move into header TouCAN_Defines.h */
+/* note: all options moved into header TouCAN_Defines.h */
 
 
 /*  -----------  defines  ------------------------------------------------
  */
-/* note: all defines move into header TouCAN_Defines.h */
+/* note: all defines moved into header TouCAN_Defines.h */
 
 
 /*  -----------  types  --------------------------------------------------
  */
-/* note: all type definitions move into header TouCAN_Defines.h */
+/* note: all type definitions moved into header TouCAN_Defines.h */
 
 
 #endif /* CAN_DEFS_H_INCLUDED */
