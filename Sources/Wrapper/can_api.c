@@ -208,8 +208,7 @@ int can_init(int32_t channel, uint8_t mode, const void *param)
 EXPORT
 int can_exit(int handle)
 {
-    int rc = CANERR_FATAL;              // return value
-    int i;
+    int rc, i;                          // return value
 
     if (!init)                          // must be initialized
         return CANERR_NOTINIT;
@@ -252,8 +251,7 @@ int can_exit(int handle)
 EXPORT
 int can_kill(int handle)
 {
-    int rc = CANERR_FATAL;              // return value
-    int i;
+    int rc, i;                          // return value
 
     if (!init)                          // must be initialized
         return CANERR_NOTINIT;
