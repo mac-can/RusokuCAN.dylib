@@ -16,6 +16,8 @@ or as a _VSCP CANAL_ compatible library ([_libCANAL_](#libCANAL)),
 as well as my beloved CAN utilities [`can_moni`](#can_moni) and [`can_test`](#can_test),
 and some C/C++, Swift, and Python example programs.
 
+_CAN API V3_ is a wrapper specification to have a uniform CAN Interface API for various CAN interfaces from different vendors running under multiple operating systems.
+See header file `CANAPI.h` for the CAN API V3 wrapper specification.
 
 ### TouCAN API
 
@@ -70,7 +72,7 @@ public:
 
 ### Build Targets
 
-_Important note_: To build any of the following build targets run the `build_no.sh` script to generate a pseudo build number.
+_Important note_: To build any of the following build targets run the script `build_no.sh` to generate a pseudo build number.
 ```
 uv-pc013mac:~ eris$ cd ~/Projects/MacCAN/TouCAN
 uv-pc013mac:TouCAN eris$ ./build_no.sh
@@ -126,13 +128,13 @@ Type `can_test --help` to display all program options.
 
 #### macOS Monterey
 
-- macOS Monterey (12.4) on a Mac mini (M1, 2020)
+- macOS Monterey (12.5) on a Mac mini (M1, 2020)
 - Apple clang version 13.1.6 (clang-1316.0.21.2.5)
 - Xcode Version 13.4.1 (13F100)
 
 #### macOS Big Sur
 
-- macOS Big Sur (11.6.7) on a MacBook Pro (2019)
+- macOS Big Sur (11.6.8) on a MacBook Pro (2019)
 - Apple clang version 13.0.0 (clang-1300.0.29.30)
 - Xcode Version 13.2.1 (13C100)
 
@@ -142,14 +144,14 @@ Type `can_test --help` to display all program options.
 - Apple LLVM version 10.0.0 (clang-1000.11.45.5)
 - Xcode Version 10.1 (10B61)
 
-### CAN Hardware
+### Supported CAN Hardware
 
 - TouCAN USB (Model F4FS1, Hardware 1.0.0, Firmware 1.0.1)
 - TouCAN USB (Model F4FS1, Hardware 1.0.0, Firmware 1.0.4)
 
 ### Testing
 
-The Xcode project for the trial program includes a Xctest target with one test suite for each CAN API V3 **C** interface function.
+The Xcode project for the trial program includes a xctest target with one test suite for each CAN API V3 **C** interface function.
 To run the test suites or single test cases two CAN devices are required.
 General test settings can be change in the file `Settings.h`.
 
@@ -162,10 +164,6 @@ For a list of known bugs and caveats see tab [Issues](https://github.com/mac-can
 For reasons unknown to me, the artifacts build with Xcode detect the TouCAN USB adapter only under macOS 10.15 (Catalina) and higher.
 The artifacts build by Makefile also detect the adapter under macOS 10.13 (High Sierra).
 So I hope that the artifacts build by Makefile are backward compatible down to version 10.8 (Mountain Lion) of the world´s mostest advanced OS.
-
-### MacCAN-Core Repo
-
-The MacCAN-Core sources are maintained in a SVN repo to synchronized them between the different MacCAN driver repos.
 
 ### Licenses
 
@@ -195,7 +193,7 @@ The terms of the GNU General Public License v3.0 (or any later version) apply to
 Mac and macOS are trademarks of Apple Inc., registered in the U.S. and other countries. \
 Windows is a registered trademark of Microsoft Corporation in the United States and/or other countries. \
 Linux is a registered trademark of Linus Torvalds. \
-All other company, product and service names mentioned herein are trademarks, registered trademarks or service marks of their respective owners.
+All other company, product and service names mentioned herein may be trademarks, registered trademarks or service marks of their respective owners.
 
 ### Hazard Note
 
