@@ -55,7 +55,7 @@ CFLAGS += -O2 -Wall -Wno-parentheses \
 	$(DEFINES) \
 	$(HEADERS)
 
-CXXFLAGS += -g -Wall -Wextra -pthread \
+CXXFLAGS += -O2 -g -Wall -Wextra -pthread \
 	$(DEFINES) \
 	$(HEADERS)
 

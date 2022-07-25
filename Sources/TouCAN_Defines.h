@@ -1,7 +1,7 @@
 /*
  *  CAN Interface API, Version 3 (for Rusoku TouCAN Interface)
  *
- *  Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+ *  Copyright (C) 2020-2022  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
  *  This file is part of CAN API V3.
  *
@@ -75,7 +75,6 @@ extern "C" {
 /** @name  CAN API Property Value
  *  @brief TouCAN parameter to be read or written
  *  @{ */
-#define TOUCAN_GET_CAN_CLOCK           (CANPROP_GET_VENDOR_PROP + 0U)     /**< CAN clock in [Hz] (int23_t) */
 #define TOUCAN_GET_HARDWARE_VERSION    (CANPROP_GET_VENDOR_PROP + 0x10U)  /**< hardware version as "0xggrrss00" (uint23_t) */
 #define TOUCAN_GET_FIRMWARE_VERSION    (CANPROP_GET_VENDOR_PROP + 0x11U)  /**< firmware version as "0xggrrss00" (uint23_t) */
 #define TOUCAN_GET_BOOTLOADER_VERSION  (CANPROP_GET_VENDOR_PROP + 0x12U)  /**< boot-loader version as "0xggrrss00" (uint23_t) */

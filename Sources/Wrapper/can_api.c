@@ -746,6 +746,7 @@ static int lib_parameter(uint16_t param, void *value, size_t nbyte)
     case CANPROP_GET_BUSLOAD:           // current bus load of the CAN controller (uint8_t)
     case CANPROP_GET_NUM_CHANNELS:      // numbers of CAN channels on the CAN interface (uint8_t)
     case CANPROP_GET_CAN_CHANNEL:       // active CAN channel on the CAN interface (uint8_t)
+    case CANPROP_GET_CAN_CLOCK:         // frequency of the CAN controller clock in [Hz] (int32_t)
     case CANPROP_GET_TX_COUNTER:        // total number of sent messages (uint64_t)
     case CANPROP_GET_RX_COUNTER:        // total number of reveiced messages (uint64_t)
     case CANPROP_GET_ERR_COUNTER:       // total number of reveiced error frames (uint64_t)
@@ -865,6 +866,12 @@ static int drv_parameter(int handle, uint16_t param, void *value, size_t nbyte)
             rc = CANERR_NOERROR;
         }
         break;
+    case CANPROP_GET_CAN_CLOCK:         // frequency of the CAN controller clock in [Hz] (int32_t)
+        if (nbyte >= sizeof(int32_t)) {
+            *(int32_t*)value = (int32_t)can[handle].device.canClock;
+            rc = CANERR_NOERROR;
+        }
+        break;
     case CANPROP_GET_TX_COUNTER:        // total number of sent messages (uint64_t)
         if (nbyte >= sizeof(uint64_t)) {
             *(uint64_t*)value = (uint64_t)can[handle].counters.tx;
@@ -902,12 +909,6 @@ static int drv_parameter(int handle, uint16_t param, void *value, size_t nbyte)
         }
         break;
     /* TouCAN specific properties */
-    case TOUCAN_GET_CAN_CLOCK:          // TouCAN USB: CAN clock in [Hz] (int32_t)
-        if ((size_t)nbyte >= sizeof(int32_t)) {
-            *(int32_t*)value = (int32_t)can[handle].device.canClock;
-            rc = CANERR_NOERROR;
-        }
-        break;
     case TOUCAN_GET_HARDWARE_VERSION:   // TouCAN USB: hardware version as "0xggrrss00" (uint32_t)
         if ((size_t)nbyte >= sizeof(uint32_t)) {
             *(uint32_t*)value = (uint32_t)can[handle].device.deviceInfo.hardware;
