@@ -84,6 +84,10 @@
     // @- initialize DUT1 with configured settings
     handle = can_init(DUT1, TEST_CANMODE, NULL);
     XCTAssertLessThanOrEqual(0, handle);
+    // @- get status of DUT1 and check to be in INIT state
+    rc = can_status(handle, &status.byte);
+    XCTAssertEqual(CANERR_NOERROR, rc);
+    XCTAssertTrue(status.can_stopped);
 
     // @test:
     // @- try to get bus-load with invalid handle -1
@@ -144,6 +148,10 @@
     // @- initialize DUT1 with configured settings
     handle = can_init(DUT1, TEST_CANMODE, NULL);
     XCTAssertLessThanOrEqual(0, handle);
+    // @- get status of DUT1 and check to be in INIT state
+    rc = can_status(handle, &status.byte);
+    XCTAssertEqual(CANERR_NOERROR, rc);
+    XCTAssertTrue(status.can_stopped);
 
     // @test:
     // @- get bus-load of DUT1 with NULL for parameter 'load'
@@ -205,6 +213,10 @@
     // @- initialize DUT1 with configured settings
     handle = can_init(DUT1, TEST_CANMODE, NULL);
     XCTAssertLessThanOrEqual(0, handle);
+    // @- get status of DUT1 and check to be in INIT state
+    rc = can_status(handle, &status.byte);
+    XCTAssertEqual(CANERR_NOERROR, rc);
+    XCTAssertTrue(status.can_stopped);
 
     // @test:
     // @- get bus-load of DUT1 with NULL for parameter 'status'
@@ -265,6 +277,10 @@
     // @- initialize DUT1 with configured settings
     handle = can_init(DUT1, TEST_CANMODE, NULL);
     XCTAssertLessThanOrEqual(0, handle);
+    // @- get status of DUT1 and check to be in INIT state
+    rc = can_status(handle, &status.byte);
+    XCTAssertEqual(CANERR_NOERROR, rc);
+    XCTAssertTrue(status.can_stopped);
 
     // @test:
     // @- get bus-load of DUT1 with NULL for both parameter
@@ -323,14 +339,8 @@
     int rc = CANERR_FATAL;
 
     // @test:
-    // @- try to get bus-load of DUT1 with invalid handle -1
-    rc = can_busload(INVALID_HANDLE, &load, &status.byte);
-    XCTAssertEqual(CANERR_NOTINIT, rc);
-    // @- try to get bus-load of DUT1 with invalid handle INT32_MIN
-    rc = can_busload(INT32_MAX, &load, &status.byte);
-    XCTAssertEqual(CANERR_NOTINIT, rc);
-    // @- try to get bus-load of DUT1 with invalid handle INT32_MIN
-    rc = can_busload(INT32_MIN, &load, &status.byte);
+    // @- try to get bus-load of DUT1
+    rc = can_busload(DUT1, &load, &status.byte);
     XCTAssertEqual(CANERR_NOTINIT, rc);
 
     // @post:
@@ -602,62 +612,76 @@
     XCTAssertEqual(CANERR_NOTINIT, rc);
 }
 
-// @xctest TC10.10: tbd.
+// @xctest TC10.10: Get CAN bus load when in bus off state
 //
-// @expected CANERR_
+// @expected CANERR_NOERROR but status flag 'bus_off' set
 //
 //- (void)testWhenStatusBusOff {
 // @todo: insert coin here
+//
+// @note: already covered by TC09.8 (Get CAN controller status when in bus off state)
 //}
 
-// @xctest TC10.11: tbd.
+// @xctest TC10.11: Get CAN bus load when warning level reached
 //
-// @expected CANERR_
+// @expected CANERR_NOERROR but status flag 'warning_level' set
 //
 //- (void)testWhenStatusWarningLevel {
 // @todo: insert coin here
+//
+// @note: already covered by TC09.9 (Get CAN controller status when warning level reached)
 //}
 
-// @xctest TC10.12: tbd.
+// @xctest TC10.12: Get CAN bus load when errors on bus (LEC)
 //
-// @expected CANERR_
+// @expected CANERR_NOERROR but status flag 'bus_error' set
 //
 //- (void)testWhenStatusBusBrror {
 // @todo: insert coin here
+//
+// @note: already covered by TC09.10 (Get CAN controller status when errors on bus)
 //}
 
-// @xctest TC10.13: tbd.
+// @xctest TC10.13: Get CAN bus load when transmitter is busy
 //
-// @expected CANERR_
+// @expected CANERR_NOERROR but status flag 'transmitter_busy' set
 //
 //- (void)testWhenStatusTransmitterBusy {
 // @todo: insert coin here
+//
+// @note: already covered by TC09.11 (Get CAN controller status when transmitter is busy)
 //}
 
-// @xctest TC10.14: tbd.
+// @xctest TC10.14: Get CAN bus load when reception queue is empty
 //
-// @expected CANERR_
+// @expected CANERR_NOERROR but status flag 'receiver_empty' set
 //
 //- (void)testWhenStatusReceiverEmpty {
 // @todo: insert coin here
+//
+// @note: already covered by TC09.12 (Get CAN controller status when reception queue is empty)
 //}
 
-// @xctest TC10.15: tbd.
+// @xctest TC10.15: Get CAN bus load after message lost
 //
-// @expected CANERR_
+// @expected CANERR_NOERROR but status flag 'message_lost' set
 //
 //- (void)testWhenStatusMessageLost {
 // @todo: insert coin here
+//
+// @note: already covered by TC09.13 (Get CAN controller status after message lost)
 //}
 
-// @xctest TC10.16: tbd.
+// @xctest TC10.16: Get CAN bus load after reception queue overrun
 //
-// @expected CANERR_
+// @expected CANERR_NOERROR but status flag 'queue_overrun' set
 //
 //- (void)testWhenStatusQueueOverrun {
 // @todo: insert coin here
+//
+// @note: already covered by TC09.14 (Get CAN controller status after reception queue overrun)
 //}
 
 @end
 
-// $Id: test_can_busload.mm 1073 2022-07-16 13:06:44Z makemake $  Copyright (c) UV Software, Berlin //
+// $Id: test_can_busload.mm 1083 2022-07-25 12:40:16Z makemake $  Copyright (c) UV Software, Berlin //

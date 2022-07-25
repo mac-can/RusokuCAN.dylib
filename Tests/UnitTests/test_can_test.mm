@@ -99,6 +99,10 @@
     // @- initialize DUT1 with configured settings
     handle = can_init(DUT1, TEST_CANMODE, NULL);
     XCTAssertLessThanOrEqual(0, handle);
+    // @- get status of DUT1 and check to be in INIT state
+    rc = can_status(handle, &status.byte);
+    XCTAssertEqual(CANERR_NOERROR, rc);
+    XCTAssertTrue(status.can_stopped);
 
     // @test:
     // @- probe DUT1 with configured settings
@@ -158,8 +162,8 @@
 //
 - (void)testWhenInterfaceOccupiedByAnotherProcess {
     // @note: this scenario is not testable:
-    //        1) up to now I didn´t found an I/O service to detect this
-    //        2) the other process must be started manually (or forked)
+    // @      1) up to now I didn´t found an I/O service to detect this
+    // @      2) the other process must be started manually (or forked)
     XCTAssertTrue(true);
 }
 
@@ -218,7 +222,7 @@
     XCTAssertEqual(CANBRD_NOT_TESTABLE, state);
 
     // @note: channel numbers are defined by the CAN device vendor.
-    //        Therefore, no assumptions can be made for positive values!
+    // @      Therefore, no assumptions can be made for positive values!
 }
 
 // @xctest TC01.6: Probe interface with its full operation mode capability
@@ -457,4 +461,4 @@
 
 @end
 
-// $Id: test_can_test.mm 1073 2022-07-16 13:06:44Z makemake $  Copyright (c) UV Software, Berlin //
+// $Id: test_can_test.mm 1083 2022-07-25 12:40:16Z makemake $  Copyright (c) UV Software, Berlin //

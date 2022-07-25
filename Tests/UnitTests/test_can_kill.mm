@@ -459,6 +459,8 @@
     rc = can_status(handle2, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
+    // @issue(PeakCAN): a delay of 100ms is required here
+    PCBUSB_INIT_DELAY();
     // @todo: start a thread for DUT2 with blocking read
 
     // @test:
@@ -491,4 +493,4 @@
 
 @end
 
-// $Id: test_can_kill.mm 1073 2022-07-16 13:06:44Z makemake $  Copyright (c) UV Software, Berlin //
+// $Id: test_can_kill.mm 1076 2022-07-17 16:39:09Z makemake $  Copyright (c) UV Software, Berlin //

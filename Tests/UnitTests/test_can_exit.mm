@@ -151,7 +151,6 @@
     // @- try to shutdown DUT1 with invalid handle INT32_MAX
     rc = can_exit(INT32_MAX);
     XCTAssertEqual(CANERR_NOTINIT, rc);
-    // @todo: loop over list of valid handles
 
     // @post:
     // @- initialize DUT1 with configured settings
@@ -401,6 +400,8 @@
     rc = can_status(handle2, &status.byte);
     XCTAssertEqual(CANERR_NOERROR, rc);
     XCTAssertFalse(status.can_stopped);
+    // @issue(PeakCAN): a delay of 100ms is required here
+    PCBUSB_INIT_DELAY();
 
     // @test:
     // @- shutdown all interfaces
@@ -416,4 +417,4 @@
 
 @end
 
-// $Id: test_can_exit.mm 1073 2022-07-16 13:06:44Z makemake $  Copyright (c) UV Software, Berlin //
+// $Id: test_can_exit.mm 1083 2022-07-25 12:40:16Z makemake $  Copyright (c) UV Software, Berlin //
