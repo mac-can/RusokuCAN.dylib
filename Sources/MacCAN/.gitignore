@@ -1,6 +1,8 @@
 .svn/
 doc/
-# we don't use the message pipe
-MacCAN_MsgPipe.*
 # R.I.P. CMacCAN
 MacCAN.*
+# Ceci n'est une pipe.
+MacCAN_MsgPipe.*
+# TODO: driver-independent CAN message type
+MacCAN_Types.h
