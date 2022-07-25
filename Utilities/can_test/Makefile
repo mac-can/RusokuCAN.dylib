@@ -1,7 +1,7 @@
 #
 #	CAN Tester for Rusoku TouCAN USB Interfaces
 #
-#	Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+#	Copyright (C) 2020-2022  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
 #
 #	This program is free software: you can redistribute it and/or modify
 #	it under the terms of the GNU General Public License as published by
@@ -49,12 +49,12 @@ HEADERS = -I$(MAIN_DIR) \
 	-I$(MACCAN_DIR) \
 	-I$(TOUCAN_DIR)
 
-CFLAGS += -O2 -Wall -Wno-parentheses \
+CFLAGS += -O2 -Wall -Wextra -Wno-parentheses \
 	-fno-strict-aliasing \
 	$(DEFINES) \
 	$(HEADERS)
 
-CXXFLAGS += -g -Wall -Wextra -pthread \
+CXXFLAGS += -O2 -g -Wall -Wextra -pthread \
 	$(DEFINES) \
 	$(HEADERS)
 
@@ -68,12 +68,12 @@ CFLAGS += -arch arm64 -arch x86_64
 CXXFLAGS += -arch arm64 -arch x86_64
 LDFLAGS += -arch arm64 -arch x86_64
 endif
-endif
-
 
 CXX = clang++
 CC = clang
 LD = clang++
+endif
+
 RM = rm -f
 CP = cp -f
 
