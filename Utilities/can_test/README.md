@@ -1,4 +1,4 @@
-__CAN Tester for Rusoku TouCAN USB Interfaces, Version 0.2.4__ \
+__CAN Tester for Rusoku TouCAN USB Interfaces, Version 0.2.5__ \
 Copyright &copy; 2007,2012-2022 by Uwe Vogt, UV Software, Berlin
 
 ```
