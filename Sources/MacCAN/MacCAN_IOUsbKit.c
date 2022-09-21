@@ -76,12 +76,25 @@
 #include <IOKit/usb/USB.h>
 
 #define VERSION_MAJOR     0
-#define VERSION_MINOR     3
-#define VERSION_PATCH     2
+#define VERSION_MINOR     4
+#define VERSION_PATCH     0
 
 /*#define OPTION_MACCAN_MULTICHANNEL  0  !* set globally: 0 = only one channel on multi-channel devices */
 /*#define OPTION_MACCAN_PIPE_TIMEOUT  0  !* set globally: 0 = do not use xxxPipeTO variant (e.g. macOS < 10.15) */
 /*#define OPTION_MACCAN_PIPE_INFO  !* activate it, if needed */
+
+#ifdef OPTION_MACCAN_PIPE_TIMEOUT
+#if !defined(__MAC_11_0)
+#undef OPTION_MACCAN_PIPE_TIMEOUT      /* xxxPipeTO() not available in macOS < 11 */
+#endif
+#endif
+#ifndef OPTION_MACCAN_CLEAR_BOTH_ENDS
+#if defined(__MAC_11_0)
+#define OPTION_MACCAN_CLEAR_BOTH_ENDS  1  /* clear halt endpoint: 1 = both ends, 0 = only one end */
+#else
+#define OPTION_MACCAN_CLEAR_BOTH_ENDS  0  /* ClearPipeStallBothEnds() not available in macOS < 11 */
+#endif
+#endif
 
 #define IS_INDEX_VALID(idx)  ((0 <= (idx)) && ((idx) < CANUSB_MAX_DEVICES))
 #define IS_HANDLE_VALID(hnd)  IS_INDEX_VALID(hnd)
@@ -477,8 +490,8 @@ CANUSB_Return_t CANUSB_ReadPipe(CANUSB_Handle_t handle, UInt8 pipeRef, void *buf
 #if (OPTION_MACCAN_PIPE_TIMEOUT == 0)
     (void)timeout;
 #else
-    UInt32 noDataTimeout = (UInt32)timeout;
-    UInt32 completionTimeout = (UInt32)(((UInt32)timeout * (UInt32)110) / (UInt32)100);
+    UInt32 noDataTimeout = (UInt32)(((UInt32)timeout * (UInt32)2) / (UInt32)5);
+    UInt32 completionTimeout = (UInt32)timeout;
 #endif
     /* must be initialized */
     if (!fInitialized)
@@ -533,8 +546,8 @@ CANUSB_Return_t CANUSB_WritePipe(CANUSB_Handle_t handle, UInt8 pipeRef, const vo
 #if (OPTION_MACCAN_PIPE_TIMEOUT == 0)
     (void)timeout;
 #else
-    UInt32 noDataTimeout = (UInt32)timeout;
-    UInt32 completionTimeout = (UInt32)timeout + (UInt32)100;
+    UInt32 noDataTimeout = (UInt32)timeout - (UInt32)(((UInt32)timeout * (UInt32)2) / (UInt32)5);
+    UInt32 completionTimeout = (UInt32)timeout;
 #endif
     /* must be initialized */
     if (!fInitialized)
@@ -558,15 +571,13 @@ CANUSB_Return_t CANUSB_WritePipe(CANUSB_Handle_t handle, UInt8 pipeRef, const vo
         kr = (*usbDevice[handle].usbInterface.ioInterface)->GetPipeStatus(usbDevice[handle].usbInterface.ioInterface,
                                                                           pipeRef);
         if (kIOReturnSuccess != kr) {
-            MACCAN_DEBUG_ERROR("+++ Status of pipe #%d (%08x)\n", pipeRef, kr);
+            MACCAN_DEBUG_ERROR("+++ Unable to get status of pipe #%d (%08x)\n", pipeRef, kr);
             LEAVE_CRITICAL_SECTION(handle);
             MACCAN_DEBUG_FUNC("unlocked\n");
             return CANUSB_ERROR_RESOURCE;
         }
-        if (kIOUSBPipeStalled != kr)
-            ;
 #if (OPTION_MACCAN_PIPE_TIMEOUT == 0)
-        /* note: activate define if WritePipeTO() is not available in IOUSBInterfaceStructXYZ for the device. */
+        /* note: deactivate define if WritePipeTO() is not available in IOUSBInterfaceStructXYZ for the device. */
         kr = (*usbDevice[handle].usbInterface.ioInterface)->WritePipe(usbDevice[handle].usbInterface.ioInterface,
                                                                       pipeRef, (void*)buffer, size);
 #else
@@ -580,6 +591,64 @@ CANUSB_Return_t CANUSB_WritePipe(CANUSB_Handle_t handle, UInt8 pipeRef, const vo
 #endif
         if (kIOReturnSuccess != kr) {
             MACCAN_DEBUG_ERROR("+++ Unable to write pipe #%d (%08x)\n", pipeRef, kr);
+            LEAVE_CRITICAL_SECTION(handle);
+            MACCAN_DEBUG_FUNC("unlocked\n");
+            return CANUSB_ERROR_RESOURCE;
+        }
+    } else {
+        MACCAN_DEBUG_ERROR("+++ Sorry, device #%i is not opened or not available\n", handle);
+        ret = !usbDevice[handle].fPresent ? CANUSB_ERROR_HANDLE : CANUSB_ERROR_NOTINIT;
+    }
+    LEAVE_CRITICAL_SECTION(handle);
+    MACCAN_DEBUG_FUNC("unlocked\n");
+    return ret;
+}
+    
+CANUSB_Return_t CANUSB_ResetPipe(CANUSB_Handle_t handle, UInt8 pipeRef) {
+    IOReturn kr;
+    int ret = 0;
+
+    /* must be initialized */
+    if (!fInitialized)
+        return CANUSB_ERROR_NOTINIT;
+    /* must be a valid handle */
+    if (!IS_HANDLE_VALID(handle))
+        return CANUSB_ERROR_HANDLE;
+
+    MACCAN_DEBUG_FUNC("lock #%i (%u)\n", handle, pipeRef);
+    ENTER_CRITICAL_SECTION(handle);
+    if (usbDevice[handle].fPresent &&
+#if (OPTION_MACCAN_MULTICHANNEL == 0)
+        (usbDevice[handle].usbInterface.fOpened) &&
+#else
+        (usbDevice[handle].usbInterface.nOpened != 0U) &&
+#endif
+        (usbDevice[handle].usbInterface.ioInterface != NULL)) {
+        kr = (*usbDevice[handle].usbInterface.ioInterface)->AbortPipe(usbDevice[handle].usbInterface.ioInterface,
+                                                                      pipeRef);
+        if (kIOReturnSuccess != kr) {
+            MACCAN_DEBUG_ERROR("+++ Unable to abort pipe #%d (%08x)\n", pipeRef, kr);
+            LEAVE_CRITICAL_SECTION(handle);
+            MACCAN_DEBUG_FUNC("unlocked\n");
+            return CANUSB_ERROR_RESOURCE;
+        }
+#if (OPTION_MACCAN_CLEAR_BOTH_ENDS == 0)
+        kr = (*usbDevice[handle].usbInterface.ioInterface)->ClearPipeStall(usbDevice[handle].usbInterface.ioInterface,
+                                                                           pipeRef);
+#else
+        kr = (*usbDevice[handle].usbInterface.ioInterface)->ClearPipeStallBothEnds(usbDevice[handle].usbInterface.ioInterface,
+                                                                                   pipeRef);
+#endif
+        if (kIOReturnSuccess != kr) {
+            MACCAN_DEBUG_ERROR("+++ Unable to clear pipe #%d (%08x)\n", pipeRef, kr);
+            LEAVE_CRITICAL_SECTION(handle);
+            MACCAN_DEBUG_FUNC("unlocked\n");
+            return CANUSB_ERROR_RESOURCE;
+        }
+        kr = (*usbDevice[handle].usbInterface.ioInterface)->GetPipeStatus(usbDevice[handle].usbInterface.ioInterface,
+                                                                          pipeRef);
+        if (kIOReturnSuccess != kr) {
+            MACCAN_DEBUG_ERROR("+++ Unable to get status of pipe #%d (%08x)\n", pipeRef, kr);
             LEAVE_CRITICAL_SECTION(handle);
             MACCAN_DEBUG_FUNC("unlocked\n");
             return CANUSB_ERROR_RESOURCE;
@@ -1896,5 +1965,5 @@ exit_worker_thread:
     return NULL;
 }
 
-/* * $Id: MacCAN_IOUsbKit.c 1199 2022-06-19 19:02:00Z makemake $ *** (c) UV Software, Berlin ***
+/* * $Id: MacCAN_IOUsbKit.c 1215 2022-07-22 21:02:37Z makemake $ *** (c) UV Software, Berlin ***
  */
