@@ -2,7 +2,7 @@
 /*
  *  TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Adapters
  *
- *  Copyright (C) 2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+ *  Copyright (C) 2021-2023  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
  *  This file is part of MacCAN-TouCAN.
  *
@@ -31,6 +31,7 @@
 #include <assert.h>
 
 #include "MacCAN_Debug.h"
+#include <inttypes.h>
 
 #define TOUCAN_MSG_STD_FRAME  (UInt8)0x00  // CANAL_IDFLAG_STANDARD
 #define TOUCAN_MSG_XTD_FRAME  (UInt8)0x01  // CANAL_IDFLAG_EXTENDED
@@ -189,6 +190,16 @@ CANUSB_Return_t TouCAN_USB_TeardownChannel(TouCAN_Device_t *device) {
         MACCAN_DEBUG_ERROR("+++ %s (device #%u): reception loop could not be aborted (%i)\n", device->name, device->handle, retVal);
         return retVal;
     }
+    /* now we are off :( */
+    MACCAN_DEBUG_DRIVER("Statistical data:\n");
+    MACCAN_DEBUG_DRIVER("%8"PRIu64" CAN frame(s) written to endpoint\n", device->sendData.msgCounter);
+    MACCAN_DEBUG_DRIVER("%8"PRIu64" error(s) while writing to endpoint\n", device->sendData.errCounter);
+    MACCAN_DEBUG_DRIVER("%8"PRIu64" CAN frame(s) received and enqueued\n", device->recvData.msgCounter);
+    //MACCAN_DEBUG_DRIVER("%8"PRIu64" status frame(s) received and ...\n", device->recvData.stsCounter);
+    //MACCAN_DEBUG_DRIVER("%8"PRIu64" error frame(s) received and ...\n", device->recvData.errCounter);
+    MACCAN_DEBUG_DRIVER("%10.1f%% highest level of the receive queue\n", ((float)CANQUE_QueueHigh(device->recvData.msgQueue) * 100.0) \
+                                                                       /  (float)CANQUE_QueueSize(device->recvData.msgQueue));
+    MACCAN_DEBUG_DRIVER("%8"PRIu64" overrun event(s) of the receive queue\n", CANQUE_OverflowCounter(device->recvData.msgQueue));
     return retVal;
 }
 
@@ -287,6 +298,11 @@ CANUSB_Return_t TouCAN_USB_WriteMessage(TouCAN_Device_t *device, const TouCAN_Ca
     // TODO: implement a transmit queue to speed up sending
     (void) timeout;
 
+    /* counting */
+    if (retVal == CANUSB_SUCCESS)
+        device->sendData.msgCounter++;
+    else
+        device->sendData.errCounter++;
     return retVal;
 }
 
@@ -493,7 +509,8 @@ static void ReceptionCallback(void *refCon, UInt8 *buffer, UInt32 length) {
             (message.sts && context->msgParam.suppressSts)) {
             /* suppress certain CAN messages depending on the operation mode*/
         } else {
-            (void)CANQUE_Enqueue(context->msgQueue, &message);
+            if (CANQUE_Enqueue(context->msgQueue, &message) == CANUSB_SUCCESS)
+                context->msgCounter++;
         }
         index += TOUCAN_USB_RX_DATA_FRAME_SIZE;
         length -= TOUCAN_USB_RX_DATA_FRAME_SIZE;
