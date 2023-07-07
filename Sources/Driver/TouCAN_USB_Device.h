@@ -2,7 +2,7 @@
 /*
  *  TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Interfaces
  *
- *  Copyright (C) 2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+ *  Copyright (C) 2021-2023  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
  *  This file is part of MacCAN-TouCAN.
  *
@@ -89,7 +89,7 @@ extern CANUSB_Return_t TouCAN_ProbeUsbDevice(CANUSB_Index_t channel, uint16_t *p
 extern CANUSB_Return_t TouCAN_OpenUsbDevice(CANUSB_Index_t channel, TouCAN_Device_t *device);
 extern CANUSB_Return_t TouCAN_CloseUsbDevice(TouCAN_Device_t *device);
 
-extern CANUSB_Return_t TouCAN_StartReception(TouCAN_Device_t *device, CANUSB_Callback_t callback);
+extern CANUSB_Return_t TouCAN_StartReception(TouCAN_Device_t *device, CANUSB_AsyncPipeCbk_t callback);
 extern CANUSB_Return_t TouCAN_AbortReception(TouCAN_Device_t *device);
 
 #ifdef __cplusplus
