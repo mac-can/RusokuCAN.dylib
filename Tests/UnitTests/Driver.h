@@ -52,14 +52,14 @@
 #define FEATURE_STATUS_BIT_QUE_OVR  FEATURE_SUPPORTED
 
 //  (§5) define macros for CAN Classic bit-rate settings (at least BITRATE_1M, BITRATE_500K, BITRATE_250K, BITRATE_125K, BITRATE_100K, BITRATE_50K, BITRATE_20K, BITRATE_10K)
-#define BITRATE_1M(x)    do{ x.btr.frequency=50000000; x.btr.nominal.brp=5;   x.btr.nominal.tseg1=7;  x.btr.nominal.tseg2=2; x.btr.nominal.sjw=2; x.btr.nominal.sam=0; } while(0)
-#define BITRATE_500K(x)  do{ x.btr.frequency=50000000; x.btr.nominal.brp=5;   x.btr.nominal.tseg1=14; x.btr.nominal.tseg2=5; x.btr.nominal.sjw=4; x.btr.nominal.sam=0; } while(0)
-#define BITRATE_250K(x)  do{ x.btr.frequency=50000000; x.btr.nominal.brp=10;  x.btr.nominal.tseg1=14; x.btr.nominal.tseg2=5; x.btr.nominal.sjw=4; x.btr.nominal.sam=0; } while(0)
-#define BITRATE_125K(x)  do{ x.btr.frequency=50000000; x.btr.nominal.brp=20;  x.btr.nominal.tseg1=15; x.btr.nominal.tseg2=5; x.btr.nominal.sjw=4; x.btr.nominal.sam=0; } while(0)
-#define BITRATE_100K(x)  do{ x.btr.frequency=50000000; x.btr.nominal.brp=25;  x.btr.nominal.tseg1=15; x.btr.nominal.tseg2=5; x.btr.nominal.sjw=4; x.btr.nominal.sam=0; } while(0)
-#define BITRATE_50K(x)   do{ x.btr.frequency=50000000; x.btr.nominal.brp=50;  x.btr.nominal.tseg1=15; x.btr.nominal.tseg2=5; x.btr.nominal.sjw=4; x.btr.nominal.sam=0; } while(0)
-#define BITRATE_20K(x)   do{ x.btr.frequency=50000000; x.btr.nominal.brp=125; x.btr.nominal.tseg1=15; x.btr.nominal.tseg2=5; x.btr.nominal.sjw=4; x.btr.nominal.sam=0; } while(0)
-#define BITRATE_10K(x)   do{ x.btr.frequency=50000000; x.btr.nominal.brp=250; x.btr.nominal.tseg1=15; x.btr.nominal.tseg2=5; x.btr.nominal.sjw=4; x.btr.nominal.sam=0; } while(0)
+#define BITRATE_1M(x)    TOUCAN_BR_1M(x)  
+#define BITRATE_500K(x)  TOUCAN_BR_500K(x)
+#define BITRATE_250K(x)  TOUCAN_BR_250K(x)
+#define BITRATE_125K(x)  TOUCAN_BR_125K(x)
+#define BITRATE_100K(x)  TOUCAN_BR_100K(x)
+#define BITRATE_50K(x)   TOUCAN_BR_50K(x) 
+#define BITRATE_20K(x)   TOUCAN_BR_20K(x) 
+#define BITRATE_10K(x)   TOUCAN_BR_10K(x) 
 
 //  (§6) define macros for workarounds in CAN Classic operation mode (e.g. TC01_3_ISSUE)
 #define TC03_7_ISSUE_TOUCAN_BITRATE_10K  ISSUE_TOUCAN_BITRATE_10K_WORKAROUND
@@ -69,21 +69,21 @@
 #define TC03_21_ISSUE_TOUCAN_BITRATE_10K  ISSUE_TOUCAN_BITRATE_10K_WORKAROUND
 #define TC03_22_ISSUE_TOUCAN_BITRATE_10K  ISSUE_TOUCAN_BITRATE_10K_WORKAROUND
 #define TC11_10_ISSUE_TOUCAN_BITRATE_10K  ISSUE_TOUCAN_BITRATE_10K_WORKAROUND
-#define ISSUE_TOUCAN_BITRATE_10K_WORKAROUND  0  // set to none-zero value to skip the hardware bug
+#define ISSUE_TOUCAN_BITRATE_10K_WORKAROUND  1  // set to none-zero value to skip the hardware bug
 //#define TC0x_y_ISSUE_  WORKAROUND_ENABLED
 
 //  (§7) define macro CAN_FD_SUPPORTED if CAN FD operation mode is supported
 #define CAN_FD_SUPPORTED  FEATURE_UNSUPPORTED
 
 //  (§8) define macros for CAN FD bit-rate settings (at least BITRATE_FD_1M8M, BITRATE_FD_500K4M, BITRATE_FD_250K2M, BITRATE_FD_125K1M, BITRATE_FD_1M, BITRATE_FD_500K, BITRATE_FD_250K, BITRATE_FD_125K)
-#define BITRATE_FD_1M(x)      do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
-#define BITRATE_FD_500K(x)    do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
-#define BITRATE_FD_250K(x)    do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
-#define BITRATE_FD_125K(x)    do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
-#define BITRATE_FD_1M8M(x)    do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
-#define BITRATE_FD_500K4M(x)  do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
-#define BITRATE_FD_250K2M(x)  do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
-#define BITRATE_FD_125K1M(x)  do{ x.btr.frequency=0; x.btr.nominal.brp=0; x.btr.nominal.tseg1=0; x.btr.nominal.tseg2=0; x.btr.nominal.sjw=0; x.btr.nominal.sam=0; x.btr.data.brp=0; x.btr.data.tseg1=0; x.btr.data.tseg2=0; x.btr.data.sjw=0; } while(0)
+#define BITRATE_FD_1M(x)      TOUCAN_FD_BR_1M(x)    
+#define BITRATE_FD_500K(x)    TOUCAN_FD_BR_500K(x)  
+#define BITRATE_FD_250K(x)    TOUCAN_FD_BR_250K(x)  
+#define BITRATE_FD_125K(x)    TOUCAN_FD_BR_125K(x)  
+#define BITRATE_FD_1M8M(x)    TOUCAN_FD_BR_1M8M(x)  
+#define BITRATE_FD_500K4M(x)  TOUCAN_FD_BR_500K4M(x)
+#define BITRATE_FD_250K2M(x)  TOUCAN_FD_BR_250K2M(x)
+#define BITRATE_FD_125K1M(x)  TOUCAN_FD_BR_125K1M(x)
 
 #if (CAN_FD_SUPPORTED == FEATURE_SUPPORTED)
 //  (§9) define macros for workarounds in CAN FD operation mode (e.g. TC01_3_ISSUE)
