@@ -1,7 +1,7 @@
 #
 #	TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Interfaces
 #
-#	Copyright (C) 2020-2022  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+#	Copyright (C) 2020-2023  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
 #
 #	This file is part of MacCAN-TouCAN.
 #
@@ -28,7 +28,7 @@ HOME_DIR = ../..
 SOURCE_DIR = $(HOME_DIR)/Sources
 CANAPI_DIR = $(HOME_DIR)/Sources/CANAPI
 MACCAN_DIR = $(HOME_DIR)/Sources/MacCAN
-TOUCAN_DIR = $(HOME_DIR)/Sources/Driver
+DRIVER_DIR = $(HOME_DIR)/Sources/Driver
 WRAPPER_DIR = $(HOME_DIR)/Sources/Wrapper
 
 OBJECTS = $(OUTDIR)/TouCAN.o \
@@ -41,7 +41,8 @@ OBJECTS = $(OUTDIR)/TouCAN.o \
 
 ifeq ($(current_OS),Darwin) # macOS - libTouCAN.dylib
 
-LIBRARY = libTouCAN
+PROJECT = TouCAN
+LIBRARY = lib$(PROJECT)
 
 MAJOR = 0
 MINOR = 2
@@ -77,7 +78,7 @@ DEFINES = -DOPTION_TOUCAN_DYLIB=1 \
 HEADERS = -I$(SOURCE_DIR) \
 	-I$(CANAPI_DIR) \
 	-I$(MACCAN_DIR) \
-	-I$(TOUCAN_DIR) \
+	-I$(DRIVER_DIR) \
 	-I$(WRAPPER_DIR)
 
 CFLAGS += -O2 -Wall -Wextra -Wno-parentheses \
@@ -139,10 +140,12 @@ bindir:
 incdir:
 	@mkdir -p $(INCDIR)
 	@cp $(SOURCE_DIR)/TouCAN_Defines.h $(INCDIR)
+	@cp $(SOURCE_DIR)/TouCAN_Defaults.h $(INCDIR)
 	@cp $(SOURCE_DIR)/TouCAN.h $(INCDIR)
 	@cp $(CANAPI_DIR)/CANAPI.h $(INCDIR)
 	@cp $(CANAPI_DIR)/CANAPI_Types.h $(INCDIR)
 	@cp $(CANAPI_DIR)/CANAPI_Defines.h $(INCDIR)
+	@cp $(CANAPI_DIR)/CANBTR_Defaults.h $(INCDIR)
 
 clean:
 	$(RM) $(TARGET) $(STATIC) $(OUTDIR)/*.o $(OUTDIR)/*.d
@@ -163,16 +166,16 @@ endif
 $(OUTDIR)/TouCAN.o: $(SOURCE_DIR)/TouCAN.cpp
 	$(CXX) $(CXXFLAGS) -MMD -MF $*.d -o $@ -c $<
 
-$(OUTDIR)/TouCAN_Driver.o: $(TOUCAN_DIR)/TouCAN_Driver.c
+$(OUTDIR)/TouCAN_Driver.o: $(DRIVER_DIR)/TouCAN_Driver.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
-$(OUTDIR)/TouCAN_USB_Driver.o: $(TOUCAN_DIR)/TouCAN_USB_Driver.c
+$(OUTDIR)/TouCAN_USB_Driver.o: $(DRIVER_DIR)/TouCAN_USB_Driver.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
-$(OUTDIR)/TouCAN_USB_Device.o: $(TOUCAN_DIR)/TouCAN_USB_Device.c
+$(OUTDIR)/TouCAN_USB_Device.o: $(DRIVER_DIR)/TouCAN_USB_Device.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
-$(OUTDIR)/TouCAN_USB.o: $(TOUCAN_DIR)/TouCAN_USB.c
+$(OUTDIR)/TouCAN_USB.o: $(DRIVER_DIR)/TouCAN_USB.c
 	$(CC) $(CFLAGS) -MMD -MF $*.d -o $@ -c $<
 
 $(OUTDIR)/MacCAN_Debug.o: $(MACCAN_DIR)/MacCAN_Debug.c

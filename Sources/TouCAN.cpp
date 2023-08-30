@@ -1,7 +1,8 @@
+//  SPDX-License-Identifier: GPL-3.0-or-later 
 //
 //  TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Interfaces
 //
-//  Copyright (C) 2020-2022  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+//  Copyright (C) 2020-2023  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
 //
 //  This file is part of MacCAN-TouCAN.
 //
@@ -24,18 +25,12 @@
 #define VERSION_PATCH    99
 #define VERSION_BUILD    BUILD_NO
 #define VERSION_STRING   TOSTRING(VERSION_MAJOR) "." TOSTRING(VERSION_MINOR) "." TOSTRING(VERSION_PATCH) " (" TOSTRING(BUILD_NO) ")"
-#if defined(_WIN64)
-#define PLATFORM        "x64"
-#elif defined(_WIN32)
-#define PLATFORM        "x86"
-#elif defined(__linux__)
-#define PLATFORM        "Linux"
-#elif defined(__APPLE__)
+#if defined(__APPLE__)
 #define PLATFORM        "macOS"
 #else
 #error Unsupported architecture
 #endif
-static const char version[] = PLATFORM " Driver for Rusoku TouCAN USB Interfaces, Version " VERSION_STRING;
+static const char version[] = "CAN API V3 for Rusoku TouCAN USB Interfaces, Version " VERSION_STRING;
 
 #include "TouCAN.h"
 #include "can_defs.h"
@@ -51,9 +46,11 @@ static const char version[] = PLATFORM " Driver for Rusoku TouCAN USB Interfaces
 #if (OPTION_TOUCAN_DYLIB != 0)
 __attribute__((constructor))
 static void _initializer() {
+    // default initializer
 }
 __attribute__((destructor))
 static void _finalizer() {
+    // default finalizer
 }
 #define EXPORT  __attribute__((visibility("default")))
 #else
@@ -97,6 +94,7 @@ CTouCAN::CTouCAN() {
 
 EXPORT
 CTouCAN::~CTouCAN() {
+    // set CAN contoller into INIT mode and close USB device
     (void)TeardownChannel();
 }
 
@@ -108,12 +106,13 @@ bool CTouCAN::GetFirstChannel(SChannelInfo &info, void *param) {
     // set index to the first entry in the interface list (if any)
     CANAPI_Return_t rc = can_property((-1), CANPROP_SET_FIRST_CHANNEL, NULL, 0U);
     if (CANERR_NOERROR == rc) {
-        // get channel no, device name, etc. at actual index in the interface list
+        // get channel no, device name and device DLL name at actual index in the interface list
         if (((can_property((-1), CANPROP_GET_CHANNEL_NO, (void*)&info.m_nChannelNo, sizeof(int32_t))) == 0) &&
             ((can_property((-1), CANPROP_GET_CHANNEL_NAME, (void*)&info.m_szDeviceName, CANPROP_MAX_BUFFER_SIZE)) == 0) &&
-            ((can_property((-1), CANPROP_GET_CHANNEL_DLLNAME, (void*)&info.m_szDeviceDllName, CANPROP_MAX_BUFFER_SIZE)) == 0) &&
-            ((can_property((-1), CANPROP_GET_CHANNEL_VENDOR_ID, (void*)&info.m_nLibraryId, sizeof(int32_t))) == 0) &&
-            ((can_property((-1), CANPROP_GET_CHANNEL_VENDOR_NAME, (void*)&info.m_szVendorName, CANPROP_MAX_BUFFER_SIZE)) == 0)) {
+            ((can_property((-1), CANPROP_GET_CHANNEL_DLLNAME, (void*)&info.m_szDeviceDllName, CANPROP_MAX_BUFFER_SIZE)) == 0)) {
+            // we know the library id and its vendor already
+            info.m_nLibraryId = TOUCAN_LIB_ID;
+            strncpy(info.m_szVendorName, TOUCAN_LIB_VENDOR, CANPROP_MAX_BUFFER_SIZE-1);
             result = true;
         }
     }
@@ -129,12 +128,13 @@ bool CTouCAN::GetNextChannel(SChannelInfo &info, void *param) {
     // set index to the next entry in the interface list (if any)
     CANAPI_Return_t rc = can_property((-1), CANPROP_SET_NEXT_CHANNEL, NULL, 0U);
     if (CANERR_NOERROR == rc) {
-        // get channel no, device name, etc. at actual index in the interface list
+        // get channel no, device name and device DLL name at actual index in the interface list
         if (((can_property((-1), CANPROP_GET_CHANNEL_NO, (void*)&info.m_nChannelNo, sizeof(int32_t))) == 0) &&
             ((can_property((-1), CANPROP_GET_CHANNEL_NAME, (void*)&info.m_szDeviceName, CANPROP_MAX_BUFFER_SIZE)) == 0) &&
-            ((can_property((-1), CANPROP_GET_CHANNEL_DLLNAME, (void*)&info.m_szDeviceDllName, CANPROP_MAX_BUFFER_SIZE)) == 0) &&
-            ((can_property((-1), CANPROP_GET_CHANNEL_VENDOR_ID, (void*)&info.m_nLibraryId, sizeof(int32_t))) == 0) &&
-            ((can_property((-1), CANPROP_GET_CHANNEL_VENDOR_NAME, (void*)&info.m_szVendorName, CANPROP_MAX_BUFFER_SIZE)) == 0)) {
+            ((can_property((-1), CANPROP_GET_CHANNEL_DLLNAME, (void*)&info.m_szDeviceDllName, CANPROP_MAX_BUFFER_SIZE)) == 0)) {
+            // we know the library id and its vendor already
+            info.m_nLibraryId = TOUCAN_LIB_ID;
+            strncpy(info.m_szVendorName, TOUCAN_LIB_VENDOR, CANPROP_MAX_BUFFER_SIZE - 1);
             result = true;
         }
     }
@@ -299,6 +299,7 @@ char *CTouCAN::GetFirmwareVersion() {
 
 EXPORT
 char *CTouCAN::GetVersion() {
+    // get driver version
     return (char *)&version[0];
 }
 
@@ -393,21 +394,16 @@ CANAPI_Return_t CTouCAN::MapIndex2Bitrate(int32_t index, CANAPI_Bitrate_t &bitra
 }
 
 EXPORT
-CANAPI_Return_t CTouCAN::MapString2Bitrate(const char *string, CANAPI_Bitrate_t &bitrate) {
-    bool brse = false;
-    // TODO: rework function 'btr_string2bitrate'
-    return (CANAPI_Return_t)btr_string2bitrate((btr_string_t)string, &bitrate, &brse);
+CANAPI_Return_t CTouCAN::MapString2Bitrate(const char *string, CANAPI_Bitrate_t &bitrate, bool &data, bool &sam) {
+    return (CANAPI_Return_t)btr_string2bitrate((btr_string_t)string, &bitrate, &data, &sam);
 }
 
 EXPORT
-CANAPI_Return_t CTouCAN::MapBitrate2String(CANAPI_Bitrate_t bitrate, char *string, size_t length) {
-    (void) length;
-    // TODO: rework function 'btr_bitrate2string'
-    return (CANAPI_Return_t)btr_bitrate2string(&bitrate, false, (btr_string_t)string);
+CANAPI_Return_t CTouCAN::MapBitrate2String(CANAPI_Bitrate_t bitrate, char *string, size_t length, bool data, bool sam) {
+    return (CANAPI_Return_t)btr_bitrate2string(&bitrate, data, sam, (btr_string_t)string, length);
 }
 
 EXPORT
 CANAPI_Return_t CTouCAN::MapBitrate2Speed(CANAPI_Bitrate_t bitrate, CANAPI_BusSpeed_t &speed) {
-    // TODO: rework function 'btr_bitrate2speed'
-    return (CANAPI_Return_t)btr_bitrate2speed(&bitrate, false, false, &speed);
+    return (CANAPI_Return_t)btr_bitrate2speed(&bitrate, &speed);
 }

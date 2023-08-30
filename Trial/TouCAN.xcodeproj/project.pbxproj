@@ -97,6 +97,8 @@
 		0FC21A10276E78C900863E5A /* CANAPI_Defines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CANAPI_Defines.h; path = ../../Sources/CANAPI/CANAPI_Defines.h; sourceTree = "<group>"; };
 		0FC21A11276E90BC00863E5A /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0FFF2C3623FB2D6500AAC0C0 /* build_no.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = build_no.h; path = ../../Sources/build_no.h; sourceTree = "<group>"; };
+		440625D32A9F914300EEC97D /* TouCAN_Defaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TouCAN_Defaults.h; path = ../../Sources/TouCAN_Defaults.h; sourceTree = "<group>"; };
+		440625D42A9F917000EEC97D /* CANBTR_Defaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CANBTR_Defaults.h; path = ../../Sources/CANAPI/CANBTR_Defaults.h; sourceTree = "<group>"; };
 		44912E4E27BD95B0000EE31D /* Testing.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Testing.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		44912E5727BD9707000EE31D /* Timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Timer.cpp; path = ../Tests/UnitTests/Timer.cpp; sourceTree = "<group>"; };
 		44912E5827BD9707000EE31D /* test_can_version.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = test_can_version.mm; path = ../Tests/UnitTests/test_can_version.mm; sourceTree = "<group>"; };
@@ -171,6 +173,7 @@
 				0FC21A0E276E78C900863E5A /* CANAPI.h */,
 				0F39ACF8240D918300DA8EF5 /* CANAPI_Types.h */,
 				0FC21A10276E78C900863E5A /* CANAPI_Defines.h */,
+				440625D42A9F917000EEC97D /* CANBTR_Defaults.h */,
 				0F8B2A9C259F60BA00C8841C /* MacCAN_Common.h */,
 				0F60A9EC23F8043100D34D0E /* MacCAN_IOUsbKit.c */,
 				0F60A9ED23F8043100D34D0E /* MacCAN_IOUsbKit.h */,
@@ -190,6 +193,7 @@
 				0F0F8057276C8FC40012597F /* TouCAN_Driver.c */,
 				0F0F8056276C8FC40012597F /* TouCAN_Driver.h */,
 				0F0F805C276C98C20012597F /* TouCAN_Defines.h */,
+				440625D32A9F914300EEC97D /* TouCAN_Defaults.h */,
 				0F60A9E223F803E800D34D0E /* TouCAN.cpp */,
 				0F60A9E123F803E800D34D0E /* TouCAN.h */,
 				0FFF2C3623FB2D6500AAC0C0 /* build_no.h */,

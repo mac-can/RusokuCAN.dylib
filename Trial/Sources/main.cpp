@@ -16,12 +16,36 @@
 #else
  #include <windows.h>
 #endif
+
 #include <inttypes.h>
 #include "MacCAN_Debug.h"
 
 //#define SECOND_CHANNEL
 #define ISSUE_198   (0)
 
+#if (1)
+#define BITRATE_1M(x)    TOUCAN_BR_1M(x)
+#define BITRATE_800K(x)  TOUCAN_BR_800K(x)
+#define BITRATE_500K(x)  TOUCAN_BR_500K(x)
+#define BITRATE_250K(x)  TOUCAN_BR_250K(x)
+#define BITRATE_125K(x)  TOUCAN_BR_125K(x)
+#define BITRATE_100K(x)  TOUCAN_BR_100K(x)
+#define BITRATE_50K(x)   TOUCAN_BR_50K(x)
+#define BITRATE_20K(x)   TOUCAN_BR_20K(x)
+#define BITRATE_10K(x)   TOUCAN_BR_10K(x)
+#define BITRATE_5K(x)    TOUCAN_BR_5K(x)
+#else
+#define BITRATE_1M(x)    DEFAULT_CAN_BR_1M(x)  
+#define BITRATE_800K(x)  DEFAULT_CAN_BR_800K(x)
+#define BITRATE_500K(x)  DEFAULT_CAN_BR_500K(x)
+#define BITRATE_250K(x)  DEFAULT_CAN_BR_250K(x)
+#define BITRATE_125K(x)  DEFAULT_CAN_BR_125K(x)
+#define BITRATE_100K(x)  DEFAULT_CAN_BR_100K(x)
+#define BITRATE_50K(x)   DEFAULT_CAN_BR_50K(x) 
+#define BITRATE_20K(x)   DEFAULT_CAN_BR_20K(x) 
+#define BITRATE_10K(x)   DEFAULT_CAN_BR_10K(x) 
+#define BITRATE_5K(x)    DEFAULT_CAN_BR_5K(x)  
+#endif
 #define OPTION_NO   (0)
 #define OPTION_YES  (1)
 
@@ -121,6 +145,16 @@ int main(int argc, const char * argv[]) {
         if (!strcmp(argv[i], "BD:6") || !strcmp(argv[i], "BD:50")) bitrate.index = CANBTR_INDEX_50K;
         if (!strcmp(argv[i], "BD:7") || !strcmp(argv[i], "BD:20")) bitrate.index = CANBTR_INDEX_20K;
         if (!strcmp(argv[i], "BD:8") || !strcmp(argv[i], "BD:10")) bitrate.index = CANBTR_INDEX_10K;
+        if (!strcmp(argv[i], "BD:1M")) BITRATE_1M(bitrate);
+        if (!strcmp(argv[i], "BD:800K")) BITRATE_800K(bitrate);
+        if (!strcmp(argv[i], "BD:500K")) BITRATE_500K(bitrate);
+        if (!strcmp(argv[i], "BD:250K")) BITRATE_250K(bitrate);
+        if (!strcmp(argv[i], "BD:125K")) BITRATE_125K(bitrate);
+        if (!strcmp(argv[i], "BD:100K")) BITRATE_100K(bitrate);
+        if (!strcmp(argv[i], "BD:50K")) BITRATE_50K(bitrate);
+        if (!strcmp(argv[i], "BD:20K")) BITRATE_20K(bitrate);
+        if (!strcmp(argv[i], "BD:10K")) BITRATE_10K(bitrate);
+//        if (!strcmp(argv[i], "BD:5K")) BITRATE_5K(bitrate);
         /* asynchronous IO */
         if (!strcmp(argv[i], "POLLING")) timeout = 0U;
         if (!strcmp(argv[i], "BLOCKING")) timeout = CANREAD_INFINITE;
@@ -192,7 +226,7 @@ int main(int argc, const char * argv[]) {
             fprintf(stderr, "+++ error: myDriver.GetProperty(CANPROP_GET_PATCH_NO) returned %i\n", retVal);
         retVal = myDriver.GetProperty(CANPROP_GET_BUILD_NO, (void *)&u32Val, sizeof(uint32_t));
         if (retVal == CCanApi::NoError)
-            fprintf(stdout, ">>> myDriver.GetProperty(CANPROP_GET_BUILD_NO): value = %" PRIx32 "\n", u32Val);
+            fprintf(stdout, ">>> myDriver.GetProperty(CANPROP_GET_BUILD_NO): value = 0x%07" PRIx32 "\n", u32Val);
         else
             fprintf(stderr, "+++ error: myDriver.GetProperty(CANPROP_GET_BUILD_NO) returned %i\n", retVal);
         retVal = myDriver.GetProperty(CANPROP_GET_LIBRARY_ID, (void *)&i32Val, sizeof(int32_t));
@@ -665,6 +699,37 @@ static void verbose(const can_mode_t &mode, const can_bitrate_t &bitrate, const 
             bitrate.index == -CANBDR_10 ? "10" : "?", -bitrate.index);
     }
 }
+
+#if defined(_WIN32) || defined(_WIN64)
+ /* usleep(3) - Linux man page
+  *
+  * Notes
+  * The type useconds_t is an unsigned integer type capable of holding integers in the range [0,1000000].
+  * Programs will be more portable if they never mention this type explicitly. Use
+  *
+  *    #include <unistd.h>
+  *    ...
+  *        unsigned int usecs;
+  *    ...
+  *        usleep(usecs);
+  */
+ static void usleep(unsigned int usec) {
+    HANDLE timer;
+    LARGE_INTEGER ft;
+
+    ft.QuadPart = -(10 * (LONGLONG)usec); // Convert to 100 nanosecond interval, negative value indicates relative time
+    if (usec >= 100) {
+        if ((timer = CreateWaitableTimer(NULL, TRUE, NULL)) != NULL) {
+            SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0);
+            WaitForSingleObject(timer, INFINITE);
+            CloseHandle(timer);
+        }
+    }
+    else {
+        Sleep(0);
+    }
+ }
+#endif
 
 static void sigterm(int signo) {
     //fprintf(stderr, "%s: got signal %d\n", __FILE__, signo);
