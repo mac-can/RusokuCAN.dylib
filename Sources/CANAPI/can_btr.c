@@ -1,6 +1,4 @@
 /*  SPDX-License-Identifier: BSD-2-Clause OR GPL-3.0-or-later */
-//
-//  TODO: Commit this revision into ths CAN API V3 SVN repo!
 /*
  *  CAN Interface API, Version 3 (Bit-rate Conversion)
  *
@@ -57,9 +55,9 @@
  *               |  SJW  |          BRP          |SAM|   TSEG2   |     TSEG1     |<br>
  *               +-7-+-6-+-5-+---+---+---+---+-0-+-7-+-6-+---+-4-+-3-+---+---+-0-+<br>
  *
- *  @author      $Author: haumea $
+ *  @author      $Author: makemake $
  *
- *  @version     $Rev: 1155 $
+ *  @version     $Rev: 1186 $
  *
  *  @addtogroup  can_btr
  *  @{
