@@ -27,6 +27,7 @@ all:
 	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Utilities/can_test $@
 	$(MAKE) -C Utilities/can_moni $@
+#	$(MAKE) -C Tests/CANAPI $@
 
 clean:
 	$(MAKE) -C Trial $@
@@ -34,6 +35,7 @@ clean:
 	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Utilities/can_test $@
 	$(MAKE) -C Utilities/can_moni $@
+#	$(MAKE) -C Tests/CANAPI $@
 
 pristine:
 	$(MAKE) -C Trial $@
@@ -41,6 +43,7 @@ pristine:
 	$(MAKE) -C Libraries/TouCAN $@
 	$(MAKE) -C Utilities/can_test $@
 	$(MAKE) -C Utilities/can_moni $@
+#	$(MAKE) -C Tests/CANAPI $@
 
 install:
 #	$(MAKE) -C Trial $@
@@ -48,6 +51,7 @@ install:
 	$(MAKE) -C Libraries/TouCAN $@
 #	$(MAKE) -C Utilities/can_test $@
 #	$(MAKE) -C Utilities/can_moni $@
+#	$(MAKE) -C Tests/CANAPI $@
 
 test:
 	$(MAKE) -C Trial $@
@@ -57,6 +61,10 @@ check:
 
 xctest:
 	$(MAKE) -C Trial $@
+
+smoketest:
+	$(MAKE) -C Tests/CANAPI clean all
+	./Tests/CANAPI/tou_testing --gtest_filter="SmokeTest.*"
 
 build_no:
 	@./build_no.sh

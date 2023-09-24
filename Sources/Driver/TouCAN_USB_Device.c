@@ -2,7 +2,7 @@
 /*
  *  TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Adapters
  *
- *  Copyright (C) 2021-2022  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+ *  Copyright (C) 2021-2023  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
  *  This file is part of MacCAN-TouCAN.
  *
@@ -83,7 +83,7 @@ static CANUSB_Return_t GetUsbConfiguration(CANUSB_Handle_t handle, TouCAN_Device
     }
 #endif
     /* set device name, vendor name and website (zero-terminated strings) */
-    if (CANUSB_GetDeviceName(handle, device->name, TOUCAN_MAX_NAME_LENGTH) < 0)
+    if (CANUSB_GetDeviceUsbName(handle, device->name, TOUCAN_MAX_NAME_LENGTH) < 0)
         strncpy(device->name, "(unkown)", TOUCAN_MAX_NAME_LENGTH);
     strncpy(device->vendor, TOUCAN_VENDOR_NAME, TOUCAN_MAX_STRING_LENGTH);
     strncpy(device->website, TOUCAN_VENDOR_URL, TOUCAN_MAX_STRING_LENGTH);
@@ -176,7 +176,7 @@ CANUSB_Return_t TouCAN_CloseUsbDevice(TouCAN_Device_t *device) {
 //        return CANUSB_ERROR_NOTINIT;
 
     /* abort asynchronous pipe */
-    /*retVal =*/ CANUSB_ReadPipeAsyncAbort(device->recvPipe);
+    /*retVal =*/ CANUSB_AbortPipeAsync(device->recvPipe);
 //    if (retVal < 0)
 //        MACCAN_DEBUG_ERROR("+++ %s CAN%u: asynchronous pipe could not be stopped (%i)\n", device->name, device->channelNo+1, retVal);
     /* close the USB device */
@@ -200,7 +200,7 @@ CANUSB_Return_t TouCAN_CloseUsbDevice(TouCAN_Device_t *device) {
     return retVal;
 }
 
-CANUSB_Return_t TouCAN_StartReception(TouCAN_Device_t *device, CANUSB_Callback_t callback) {
+CANUSB_Return_t TouCAN_StartReception(TouCAN_Device_t *device, CANUSB_AsyncPipeCbk_t callback) {
     CANUSB_Return_t retVal = CANUSB_ERROR_FATAL;
 
     /* sanity check */
@@ -210,7 +210,7 @@ CANUSB_Return_t TouCAN_StartReception(TouCAN_Device_t *device, CANUSB_Callback_t
         return CANUSB_ERROR_NOTINIT;
 
     /* start asynchronous read on endpoint */
-    retVal = CANUSB_ReadPipeAsyncStart(device->recvPipe, callback, (void*)&device->recvData);
+    retVal = CANUSB_ReadPipeAsync(device->recvPipe, callback, (void*)&device->recvData);
 //    if (retVal < 0)
 //        MACCAN_DEBUG_ERROR("+++ %s #%u: reception loop could not be started (%i)\n", device->name, device->channelNo, retVal);
 
@@ -227,7 +227,7 @@ CANUSB_Return_t TouCAN_AbortReception(TouCAN_Device_t *device) {
         return CANUSB_ERROR_NOTINIT;
 
     /* stop asynchronous read on endpoint */
-    retVal = CANUSB_ReadPipeAsyncAbort(device->recvPipe);
+    retVal = CANUSB_AbortPipeAsync(device->recvPipe);
 //    if (retVal < 0)
 //        MACCAN_DEBUG_ERROR("+++ %s #%u: reception loop could not be stopped (%i)\n", device->name, device->channelNo, retVal);
 

@@ -1,7 +1,7 @@
 //
 //  TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Interfaces
 //
-//  Copyright (C) 2020-2022 Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+//  Copyright (C) 2020-2023 Uwe Vogt, UV Software, Berlin (info@mac-can.com)
 //
 //  This file is part of MacCAN-TouCAN.
 //
@@ -22,6 +22,7 @@
 #define TOUCAN_H_INCLUDED
 
 #include "TouCAN_Defines.h"
+#include "TouCAN_Defaults.h"
 #include "CANAPI.h"
 
 /// \name   TouCAN
@@ -35,7 +36,7 @@
 #endif
 #define TOUCAN_LIBRARY_VENDOR  "UV Software, Berlin"
 #define TOUCAN_LIBRARY_LICENSE  "GNU General Public License, Version 3"
-#define TOUCAN_LIBRARY_COPYRIGHT  "Copyright (C) 2020-2022  Uwe Vogt, UV Software, Berlin"
+#define TOUCAN_LIBRARY_COPYRIGHT  "Copyright (C) 2020-2023  Uwe Vogt, UV Software, Berlin"
 #define TOUCAN_LIBRARY_HAZARD_NOTE  "If you connect your CAN device to a real CAN network when using this library,\n" \
                                     "you might damage your application."
 /// \}
@@ -94,8 +95,8 @@ public:
     static char *GetVersion();  // (for compatibility reasons)
 
     static CANAPI_Return_t MapIndex2Bitrate(int32_t index, CANAPI_Bitrate_t &bitrate);
-    static CANAPI_Return_t MapString2Bitrate(const char *string, CANAPI_Bitrate_t &bitrate);
-    static CANAPI_Return_t MapBitrate2String(CANAPI_Bitrate_t bitrate, char *string, size_t length);
+    static CANAPI_Return_t MapString2Bitrate(const char *string, CANAPI_Bitrate_t &bitrate, bool &data, bool &sam);
+    static CANAPI_Return_t MapBitrate2String(CANAPI_Bitrate_t bitrate, char *string, size_t length, bool data = false, bool sam = false);
     static CANAPI_Return_t MapBitrate2Speed(CANAPI_Bitrate_t bitrate, CANAPI_BusSpeed_t &speed);
 };
 /// \}

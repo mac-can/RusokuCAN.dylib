@@ -2,7 +2,7 @@
 /*
  *  CAN Interface API, Version 3 (for Rusoku TouCAN Interface)
  *
- *  Copyright (C) 2020-2022  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+ *  Copyright (C) 2020-2023  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
  *  This file is part of MacCAN-TouCAN.
  *
@@ -25,16 +25,10 @@
 #include "build_no.h"
 #define VERSION_MAJOR    0
 #define VERSION_MINOR    2
-#define VERSION_PATCH    4
+#define VERSION_PATCH    5
 #define VERSION_BUILD    BUILD_NO
 #define VERSION_STRING   TOSTRING(VERSION_MAJOR) "." TOSTRING(VERSION_MINOR) "." TOSTRING(VERSION_PATCH) " (" TOSTRING(BUILD_NO) ")"
-#if defined(_WIN64)
-#define PLATFORM        "x64"
-#elif defined(_WIN32)
-#define PLATFORM        "x86"
-#elif defined(__linux__)
-#define PLATFORM        "Linux"
-#elif defined(__APPLE__)
+#if defined(__APPLE__)
 #define PLATFORM        "macOS"
 #else
 #error Unsupported architecture
@@ -506,15 +500,8 @@ int can_bitrate(int handle, can_bitrate_t *bitrate, can_speed_t *speed)
     tmpBitrate.btr.nominal.tseg2 = can[handle].device.bitRate.tseg2;
     tmpBitrate.btr.nominal.sjw = can[handle].device.bitRate.sjw;
 	tmpBitrate.btr.nominal.sam = 0U;    // note: SAM not used by TouCAN
-#if (OPTION_CAN_2_0_ONLY == 0)
-    bool fdoe = can[handle].mode.fdoe ? true : false;
-    bool brse = can[handle].mode.brse ? true : false;
-#else
-    bool fdoe = false;
-    bool brse = false;
-#endif
     // calculate bus speed from bit-rate settings
-    if ((rc = btr_bitrate2speed(&tmpBitrate, fdoe, brse, &tmpSpeed)) < 0)
+    if ((rc = btr_bitrate2speed(&tmpBitrate, &tmpSpeed)) < 0)
         return CANERR_BAUDRATE;
     if (bitrate)
         memcpy(bitrate, &tmpBitrate, sizeof(can_bitrate_t));

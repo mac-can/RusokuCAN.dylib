@@ -19,6 +19,8 @@
 		0F8B2A9E259F60BA00C8841C /* MacCAN_MsgQueue.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F8B2A9D259F60BA00C8841C /* MacCAN_MsgQueue.c */; };
 		0FC21A0D276E77A900863E5A /* TouCAN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F60A9E223F803E800D34D0E /* TouCAN.cpp */; };
 		0FC21A12276E90C100863E5A /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FC21A11276E90BC00863E5A /* main.cpp */; };
+		440625D82A9FB7E900EEC97D /* test_can_btr.mm in Sources */ = {isa = PBXBuildFile; fileRef = 440625D52A9FB7E900EEC97D /* test_can_btr.mm */; };
+		440625D92A9FB7E900EEC97D /* Bitrates.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 440625D62A9FB7E900EEC97D /* Bitrates.cpp */; };
 		44912E6D27BD9707000EE31D /* Timer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44912E5727BD9707000EE31D /* Timer.cpp */; };
 		44912E6E27BD9707000EE31D /* test_can_version.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44912E5827BD9707000EE31D /* test_can_version.mm */; };
 		44912E6F27BD9707000EE31D /* test_can_test.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44912E5927BD9707000EE31D /* test_can_test.mm */; };
@@ -97,6 +99,11 @@
 		0FC21A10276E78C900863E5A /* CANAPI_Defines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CANAPI_Defines.h; path = ../../Sources/CANAPI/CANAPI_Defines.h; sourceTree = "<group>"; };
 		0FC21A11276E90BC00863E5A /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0FFF2C3623FB2D6500AAC0C0 /* build_no.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = build_no.h; path = ../../Sources/build_no.h; sourceTree = "<group>"; };
+		440625D32A9F914300EEC97D /* TouCAN_Defaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TouCAN_Defaults.h; path = ../../Sources/TouCAN_Defaults.h; sourceTree = "<group>"; };
+		440625D42A9F917000EEC97D /* CANBTR_Defaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CANBTR_Defaults.h; path = ../../Sources/CANAPI/CANBTR_Defaults.h; sourceTree = "<group>"; };
+		440625D52A9FB7E900EEC97D /* test_can_btr.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = test_can_btr.mm; path = ../Tests/UnitTests/test_can_btr.mm; sourceTree = "<group>"; };
+		440625D62A9FB7E900EEC97D /* Bitrates.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Bitrates.cpp; path = ../Tests/UnitTests/Bitrates.cpp; sourceTree = "<group>"; };
+		440625D72A9FB7E900EEC97D /* Bitrates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Bitrates.h; path = ../Tests/UnitTests/Bitrates.h; sourceTree = "<group>"; };
 		44912E4E27BD95B0000EE31D /* Testing.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Testing.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		44912E5727BD9707000EE31D /* Timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Timer.cpp; path = ../Tests/UnitTests/Timer.cpp; sourceTree = "<group>"; };
 		44912E5827BD9707000EE31D /* test_can_version.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = test_can_version.mm; path = ../Tests/UnitTests/test_can_version.mm; sourceTree = "<group>"; };
@@ -171,6 +178,7 @@
 				0FC21A0E276E78C900863E5A /* CANAPI.h */,
 				0F39ACF8240D918300DA8EF5 /* CANAPI_Types.h */,
 				0FC21A10276E78C900863E5A /* CANAPI_Defines.h */,
+				440625D42A9F917000EEC97D /* CANBTR_Defaults.h */,
 				0F8B2A9C259F60BA00C8841C /* MacCAN_Common.h */,
 				0F60A9EC23F8043100D34D0E /* MacCAN_IOUsbKit.c */,
 				0F60A9ED23F8043100D34D0E /* MacCAN_IOUsbKit.h */,
@@ -190,6 +198,7 @@
 				0F0F8057276C8FC40012597F /* TouCAN_Driver.c */,
 				0F0F8056276C8FC40012597F /* TouCAN_Driver.h */,
 				0F0F805C276C98C20012597F /* TouCAN_Defines.h */,
+				440625D32A9F914300EEC97D /* TouCAN_Defaults.h */,
 				0F60A9E223F803E800D34D0E /* TouCAN.cpp */,
 				0F60A9E123F803E800D34D0E /* TouCAN.h */,
 				0FFF2C3623FB2D6500AAC0C0 /* build_no.h */,
@@ -218,6 +227,9 @@
 				44912E5927BD9707000EE31D /* test_can_test.mm */,
 				44912E5827BD9707000EE31D /* test_can_version.mm */,
 				44912E6B27BD9707000EE31D /* test_can_write.mm */,
+				440625D52A9FB7E900EEC97D /* test_can_btr.mm */,
+				440625D62A9FB7E900EEC97D /* Bitrates.cpp */,
+				440625D72A9FB7E900EEC97D /* Bitrates.h */,
 				44912E6127BD9707000EE31D /* Tester.cpp */,
 				44912E5D27BD9707000EE31D /* Tester.h */,
 				44912E6C27BD9707000EE31D /* Testing.mm */,
@@ -335,7 +347,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				44912E7627BD9707000EE31D /* test_can_kill.mm in Sources */,
+				440625D82A9FB7E900EEC97D /* test_can_btr.mm in Sources */,
 				44912E7C27BD9707000EE31D /* test_can_property.mm in Sources */,
+				440625D92A9FB7E900EEC97D /* Bitrates.cpp in Sources */,
 				44912E7127BD9707000EE31D /* test_can_start.mm in Sources */,
 				44912E8027BD971E000EE31D /* can_btr.c in Sources */,
 				44912E8727BD9742000EE31D /* TouCAN_USB_Driver.c in Sources */,
@@ -419,7 +433,7 @@
 					"OPTION_CANAPI_COMPANIONS=1",
 					"OPTION_CANBTR_PEAK_FREQUENCIES=0",
 					"OPTION_MACCAN_MULTICHANNEL=0",
-					"OPTION_MACCAN_PIPE_TIMEOUT=0",
+					"OPTION_MACCAN_PIPE_TIMEOUT=1",
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -489,7 +503,7 @@
 					"OPTION_CANAPI_COMPANIONS=1",
 					"OPTION_MACCAN_LOGGER=0",
 					"OPTION_MACCAN_MULTICHANNEL=0",
-					"OPTION_MACCAN_PIPE_TIMEOUT=0",
+					"OPTION_MACCAN_PIPE_TIMEOUT=1",
 					"OPTION_MACCAN_DEBUG_LEVEL=0",
 					"OPTION_MACCAN_INSTRUMENTATION=0",
 				);
