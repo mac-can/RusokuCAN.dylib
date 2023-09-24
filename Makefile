@@ -64,7 +64,7 @@ xctest:
 
 smoketest:
 	$(MAKE) -C Tests/CANAPI clean all
-	./Tests/CANAPI/pcb_testing --gtest_filter="SmokeTest.*"
+	./Tests/CANAPI/tou_testing --gtest_filter="SmokeTest.*"
 
 build_no:
 	@./build_no.sh
