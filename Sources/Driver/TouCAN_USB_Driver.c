@@ -195,8 +195,8 @@ CANUSB_Return_t TouCAN_USB_TeardownChannel(TouCAN_Device_t *device) {
     MACCAN_DEBUG_DRIVER("%8"PRIu64" CAN frame(s) written to endpoint\n", device->sendData.msgCounter);
     MACCAN_DEBUG_DRIVER("%8"PRIu64" error(s) while writing to endpoint\n", device->sendData.errCounter);
     MACCAN_DEBUG_DRIVER("%8"PRIu64" CAN frame(s) received and enqueued\n", device->recvData.msgCounter);
-    //MACCAN_DEBUG_DRIVER("%8"PRIu64" status frame(s) received and ...\n", device->recvData.stsCounter);
-    //MACCAN_DEBUG_DRIVER("%8"PRIu64" error frame(s) received and ...\n", device->recvData.errCounter);
+    MACCAN_DEBUG_DRIVER("%8"PRIu64" status frame(s) received and enqueued\n", device->recvData.stsCounter);
+    //MACCAN_DEBUG_DRIVER("%8"PRIu64" error frame(s) received  and enqueued\n", device->recvData.errCounter);
     MACCAN_DEBUG_DRIVER("%10.1f%% highest level of the receive queue\n", ((float)CANQUE_QueueHigh(device->recvData.msgQueue) * 100.0) \
                                                                        /  (float)CANQUE_QueueSize(device->recvData.msgQueue));
     MACCAN_DEBUG_DRIVER("%8"PRIu64" overrun event(s) of the receive queue\n", CANQUE_OverflowCounter(device->recvData.msgQueue));
@@ -506,11 +506,16 @@ static void ReceptionCallback(void *refCon, UInt8 *buffer, UInt32 length) {
         (void)TouCAN_DecodeMessage(&message, &buffer[index], &context->msgParam);
         if ((message.xtd && context->msgParam.suppressXtd) ||
             (message.rtr && context->msgParam.suppressRtr) ||
-            (message.sts && context->msgParam.suppressSts)) {
+            (message.sts && context->msgParam.suppressSts) ||
+            (message.sts && !message.timestamp.tv_sec && !message.timestamp.tv_nsec)) {
             /* suppress certain CAN messages depending on the operation mode*/
         } else {
-            if (CANQUE_Enqueue(context->msgQueue, &message) == CANUSB_SUCCESS)
-                context->msgCounter++;
+            if (CANQUE_Enqueue(context->msgQueue, &message) == CANUSB_SUCCESS) {
+                if (!message.sts)
+                    context->msgCounter++;
+                else
+                    context->stsCounter++;
+            }
         }
         index += TOUCAN_USB_RX_DATA_FRAME_SIZE;
         length -= TOUCAN_USB_RX_DATA_FRAME_SIZE;
@@ -597,12 +602,13 @@ static int TouCAN_DecodeMessage(TouCAN_CanMessage_t *message, const UInt8 *buffe
     }
     /* status frame: data[0...] (bus status in byte 0) */
     if (message->sts && message->dlc && param) {
+#if (1)
         switch (message->data[0]) {
         case TOUCAN_STS_OK:  // Normal condition.
-            param->statusByte = 0x00U;
+            param->statusByte &= ~(CANSTAT_BOFF | CANSTAT_EWRN | CANSTAT_BERR);
             break;
         case TOUCAN_STS_OVERRUN:  // Overrun occured when sending data to CAN bus.
-            //param->m_u8StatusByte |= ...;
+            // param->m_u8StatusByte |= ...;
             break;
         case TOUCAN_STS_BUSLIGHT:  // Error counter has reached 96.
             if (param->statusByte & CANSTAT_EWRN)
@@ -616,14 +622,33 @@ static int TouCAN_DecodeMessage(TouCAN_CanMessage_t *message, const UInt8 *buffe
             param->statusByte |= CANSTAT_BOFF;
             break;
         case TOUCAN_STS_STUFF:  // Stuff Error.
-        case TOUCAN_STS_FORM:  // Form Error.
-        case TOUCAN_STS_ACK:  // Ack Error.
-        case TOUCAN_STS_BIT1:  // Bit1 Error.
-        case TOUCAN_STS_BIT0:  // Bit0 Error.
-        case TOUCAN_STS_CRC:  // CRC Error.
+        case TOUCAN_STS_FORM:   // Form Error.
+        case TOUCAN_STS_ACK:    // Ack Error.
+        case TOUCAN_STS_BIT1:   // Bit1 Error.
+        case TOUCAN_STS_BIT0:   // Bit0 Error.
+        case TOUCAN_STS_CRC:    // CRC Error.
             param->statusByte |= CANSTAT_BERR;
             break;
         }
+#else
+        // TODO: check above code with Windows driver!
+#endif
+        if (message->dlc >= 1)  // bus status from device
+            param->busStatus = message->data[0];
+        if (message->dlc >= 2)  // receive error counter (?)
+            param->rxErrors = message->data[1];
+        if (message->dlc >= 3)  // transmit error counter (?)
+            param->txErrors = message->data[2];
+        /* map status frame to CAN API error frame */
+        message->id = 0U;
+        message->xtd = 0;
+        message->rtr = 0;
+        message->sts = 1;
+        message->dlc = 4U;
+        message->data[0] = param->statusByte;
+        message->data[1] = param->busStatus;
+        message->data[2] = param->rxErrors;
+        message->data[3] = param->txErrors;
     }
     return index;
 }

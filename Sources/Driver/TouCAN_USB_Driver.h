@@ -2,7 +2,7 @@
 /*
  *  TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Interfaces
  *
- *  Copyright (C) 2020-2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+ *  Copyright (C) 2020-2023  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
  *  This file is part of MacCAN-TouCAN.
  *
@@ -48,8 +48,8 @@
 #define TOUCAN_USB_MODE_BRSE  0 /* bit-rate switch enable/disable */
 #define TOUCAN_USB_MODE_NISO  0 /* Non-ISO CAN FD enable/disable */
 #define TOUCAN_USB_MODE_SHRD  0 /* shared access enable/disable */
-#define TOUCAN_USB_MODE_NXTD  0 /* extended format disable/enable */  // TODO: do it
-#define TOUCAN_USB_MODE_NRTR  0 /* remote frames disable/enable */    // TODO: do it
+#define TOUCAN_USB_MODE_NXTD  1 /* extended format disable/enable */
+#define TOUCAN_USB_MODE_NRTR  1 /* remote frames disable/enable */
 #define TOUCAN_USB_MODE_ERR   1 /* error frames enable/disable */
 #define TOUCAN_USB_MODE_MON   1 /* monitor mode enable/disable */
 

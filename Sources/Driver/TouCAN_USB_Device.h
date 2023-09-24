@@ -42,7 +42,10 @@ typedef uint8_t TouCAN_Status_t;        /* bus status (CAN API V1 compatible) */
 
 typedef struct receive_param_t {        /* additional reception data: */
     uint64_t startTime;                 /* - time synchronization */
-    TouCAN_Status_t statusByte;         /* - status byte from device */
+    uint8_t busStatus;                  /* - bus status from devive */
+    uint8_t rxErrors;                   /* - receive error counter */
+    uint8_t txErrors;                   /* - transmit error counter */
+    TouCAN_Status_t statusByte;         /* - status register */
     bool suppressXtd;                   /* - suppress extended CAN frames */
     bool suppressRtr;                   /* - suppress remote CAN frames */
     bool suppressSts;                   /* - suppress error frames */
@@ -52,10 +55,8 @@ typedef struct receive_data_t {         /* USB read pipe context: */
     CANQUE_MsgQueue_t msgQueue;         /* - message queue for received CAN frames */
     TouCAN_MsgParam_t msgParam;         /* - additional data on/for reception */
     uint64_t msgCounter;                /* - number of received CAN frames */
-#if (0)
     uint64_t stsCounter;                /* - number of received status frames */
-    uint64_t errCounter;                /* - number of received error frames */
-#endif
+//    uint64_t errCounter;                /* - number of received error frames */
 } TouCAN_ReceiveData_t;
 
 typedef struct transmit_context_t_ {    /* USB write pipe context: */
