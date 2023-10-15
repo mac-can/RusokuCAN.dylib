@@ -2,7 +2,7 @@
 /*
  *  MacCAN - macOS User-Space Driver for USB-to-CAN Interfaces
  *
- *  Copyright (c) 2012-2021 Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+ *  Copyright (c) 2012-2022 Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *  All rights reserved.
  *
  *  This file is part of MacCAN-Core.
@@ -50,12 +50,19 @@
 
 #include "MacCAN_Common.h"
 
-#define CANDEV_LAST_ENTRY_IN_DEVICE_LIST  {0xFFFFU, 0xFFFFU, 0U}
+#define CANDEV_LAST_ENTRY_IN_DEVICE_LIST  {0xFFFFU, 0xFFFFU, 0U, NULL, NULL}
 
-typedef struct can_device_t_ {
+typedef int CANDEV_Index_t;
+
+typedef void *CANDEV_Descriptor_t;
+typedef void (*CANDEV_Callback_t)(CANDEV_Index_t index, CANDEV_Descriptor_t *descriptor);
+
+typedef struct can_device_tag {
     UInt16 vendorId;
     UInt16 productId;
     UInt8 numChannels;
+    CANDEV_Callback_t cbkAdded;
+    CANDEV_Callback_t cbkRemoved;
 } CANDEV_Device_t, MacCAN_Device_t;
 
 #ifdef __cplusplus
@@ -68,10 +75,20 @@ extern const CANDEV_Device_t *CANDEV_GetNextDevice(void);
 
 extern const CANDEV_Device_t *CANDEV_GetDeviceById(UInt16 vendorId, UInt16 productId);
 
+extern UInt16 CANDEV_GetVendorId(const CANDEV_Device_t *device);
+
+extern UInt16 CANDEV_GetProductId(const CANDEV_Device_t *device);
+
+extern UInt8 CANDEV_GetNumChannels(const CANDEV_Device_t *device);
+
+extern void CANDEV_DeviceAdded(const CANDEV_Device_t *device, CANDEV_Index_t index, CANDEV_Descriptor_t *descriptor);
+
+extern void CANDEV_DeviceRemoved(const CANDEV_Device_t *device, CANDEV_Index_t index, CANDEV_Descriptor_t *descriptor);
+
 #ifdef __cplusplus
 }
 #endif
 #endif /* MACCAN_DEVICES_H_INCLUDED */
 
-/* * $Id: MacCAN_Devices.h 1001 2021-05-25 17:57:49Z eris $ *** (c) UV Software, Berlin ***
+/* * $Id: MacCAN_Devices.h 1550 2022-10-06 16:34:34Z makemake $ *** (c) UV Software, Berlin ***
  */

@@ -2,7 +2,7 @@
 /*
  *  MacCAN - macOS User-Space Driver for USB-to-CAN Interfaces
  *
- *  Copyright (c) 2012-2021 Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+ *  Copyright (c) 2012-2022 Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *  All rights reserved.
  *
  *  This file is part of MacCAN-Core.
@@ -91,5 +91,36 @@ const CANDEV_Device_t *CANDEV_GetDeviceById(UInt16 vendorId, UInt16 productId)
     return ptrDevice;
 }
 
-/* * $Id: MacCAN_Devices.c 1001 2021-05-25 17:57:49Z eris $ *** (c) UV Software, Berlin ***
+UInt16 CANDEV_GetVendorId(const CANDEV_Device_t *device) {
+    if (device)
+        return device->vendorId;
+    else
+        return 0U;
+}
+
+UInt16 CANDEV_GetProductId(const CANDEV_Device_t *device) {
+    if (device)
+        return device->productId;
+    else
+        return 0U;
+}
+
+UInt8 CANDEV_GetNumChannels(const CANDEV_Device_t *device) {
+    if (device)
+        return device->numChannels;
+    else
+        return 0U;
+}
+
+void CANDEV_DeviceAdded(const CANDEV_Device_t *device, CANDEV_Index_t index, CANDEV_Descriptor_t *descriptor) {
+    if (device && device->cbkAdded)
+        device->cbkAdded(index, descriptor);
+}
+
+void CANDEV_DeviceRemoved(const CANDEV_Device_t *device, CANDEV_Index_t index, CANDEV_Descriptor_t *descriptor) {
+    if (device && device->cbkRemoved)
+        device->cbkRemoved(index, descriptor);
+}
+
+/* * $Id: MacCAN_Devices.c 1550 2022-10-06 16:34:34Z makemake $ *** (c) UV Software, Berlin ***
  */

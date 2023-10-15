@@ -60,9 +60,8 @@ typedef struct receive_data_t {         /* USB read pipe context: */
 } TouCAN_ReceiveData_t;
 
 typedef struct transmit_context_t_ {    /* USB write pipe context: */
-#if (0)
+#if (OPTION_DRIVER_TRM_QUEUE_ENABLED != 0)
     CANQUE_MsgQueue_t msgQueue;         /* - message queue for CAN frames to be sent */
-    bool isBusy;                        /* - to indicate a transmission in progress */
 #endif
     uint64_t msgCounter;                /* - number of written CAN frames */
     uint64_t errCounter;                /* - number of write pipe errors */
@@ -84,8 +83,11 @@ typedef struct toucan_device_t_ {       /* TouCAN device: */
     uint16_t releaseNo;                 /* - USB release no. */
     CANUSB_Handle_t handle;             /* - USB device hanlde */
     CANUSB_AsyncPipe_t recvPipe;        /* - USB receive pipe */
+#if (OPTION_DRIVER_TRM_QUEUE_ENABLED != 0)
+    CANUSB_AsyncPipe_t sendPipe;        /* - USB transmit pipe */
+#endif
     TouCAN_ReceiveData_t recvData;      /* - CAN receive data (queue) */
-    TouCAN_TransmitData_t sendData;     /* - CAN transmit data (no queue) */
+    TouCAN_TransmitData_t sendData;     /* - CAN transmit data (queue) */
     TouCAN_OpMode_t opCapa;             /* - CAN operation mode capability */
     TouCAN_OpMode_t opMode;             /* - CAN operation mode (demanded) */
     TouCAN_Bitrate_t bitRate;           /* - CAN bit-rate settings (demanded) */

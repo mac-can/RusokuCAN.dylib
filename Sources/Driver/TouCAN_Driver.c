@@ -2,7 +2,7 @@
 /*
  *  TouCAN - macOS User-Space Driver for Rusoku TouCAN USB Adapters
  *
- *  Copyright (C) 2021  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+ *  Copyright (C) 2021-2023  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
  *
  *  This file is part of MacCAN-TouCAN.
  *
@@ -29,7 +29,7 @@
 #include <assert.h>
 
 const CANDEV_Device_t CANDEV_Devices[] = {
-    {TOUCAN_USB_VENDOR_ID, TOUCAN_USB_PRODUCT_ID, 1U},
+    {TOUCAN_USB_VENDOR_ID, TOUCAN_USB_PRODUCT_ID, 1U, NULL, NULL},
     CANDEV_LAST_ENTRY_IN_DEVICE_LIST
 };
 

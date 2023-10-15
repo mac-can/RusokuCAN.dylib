@@ -67,7 +67,8 @@
 #define CANUSB_ERROR_BUSY      (-20)
 #define CANUSB_ERROR_OK          (0)
 /* MacCAN specific error codes */
-#define CANUSB_ERROR_STALLED   CANUSB_ERROR_BUSY
+#define CANUSB_ERROR_STALLED   (-21) // TX_STUCK
+#define CANUSB_ERROR_FULL      CANUSB_ERROR_OVERRUN
 #define CANUSB_SUCCESS         CANUSB_ERROR_OK
 
 /* CAN API V3 compatible board states */
@@ -88,5 +89,5 @@ extern "C" {
 #endif
 #endif /* MACCAN_COMMAN_H_INCLUDED */
 
-/* * $Id: MacCAN_Common.h 1757 2023-07-07 06:24:29Z makemake $ *** (c) UV Software, Berlin ***
+/* * $Id: MacCAN_Common.h 1814 2023-10-14 10:02:16Z makemake $ *** (c) UV Software, Berlin ***
  */

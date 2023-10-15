@@ -50,7 +50,10 @@
 #define TOUCAN_STS_BIT0       (UInt8)0x25  // CANAL_STATUSMSG_BIT0
 #define TOUCAN_STS_CRC        (UInt8)0x27  // CANAL_STATUSMSG_CRC
 
-static void ReceptionCallback(void *refCon, UInt8 *buffer, UInt32 length);
+static int ReceivedCallback(void *refCon, UInt8 *buffer, UInt32 length);
+#if (OPTION_DRIVER_TRM_QUEUE_ENABLED != 0)
+static int TransmittedCallback(void *refCon, UInt8 *buffer, UInt32 length);
+#endif
 static int TouCAN_EncodeMessage(UInt8 *buffer, const TouCAN_CanMessage_t *message);
 static int TouCAN_DecodeMessage(TouCAN_CanMessage_t *message, const UInt8 *buffer, TouCAN_MsgParam_t *param);
 static int TouCAN_ResetDevice(CANUSB_Handle_t handle);
@@ -116,7 +119,7 @@ CANUSB_Return_t TouCAN_USB_InitializeChannel(TouCAN_Device_t *device, TouCAN_OpM
         goto end_init;
     }
     /* start the reception loop */
-    retVal = TouCAN_StartReception(device, ReceptionCallback);
+    retVal = TouCAN_StartReception(device, ReceivedCallback);
     if (retVal < 0) {
         MACCAN_DEBUG_ERROR("+++ %s (device #%u): reception loop could not be started (%i)\n", device->name, device->handle, retVal);
         goto end_init;
@@ -191,15 +194,19 @@ CANUSB_Return_t TouCAN_USB_TeardownChannel(TouCAN_Device_t *device) {
         return retVal;
     }
     /* now we are off :( */
-    MACCAN_DEBUG_DRIVER("Statistical data:\n");
-    MACCAN_DEBUG_DRIVER("%8"PRIu64" CAN frame(s) written to endpoint\n", device->sendData.msgCounter);
-    MACCAN_DEBUG_DRIVER("%8"PRIu64" error(s) while writing to endpoint\n", device->sendData.errCounter);
-    MACCAN_DEBUG_DRIVER("%8"PRIu64" CAN frame(s) received and enqueued\n", device->recvData.msgCounter);
-    MACCAN_DEBUG_DRIVER("%8"PRIu64" status frame(s) received and enqueued\n", device->recvData.stsCounter);
-    //MACCAN_DEBUG_DRIVER("%8"PRIu64" error frame(s) received  and enqueued\n", device->recvData.errCounter);
-    MACCAN_DEBUG_DRIVER("%10.1f%% highest level of the receive queue\n", ((float)CANQUE_QueueHigh(device->recvData.msgQueue) * 100.0) \
-                                                                       /  (float)CANQUE_QueueSize(device->recvData.msgQueue));
-    MACCAN_DEBUG_DRIVER("%8"PRIu64" overrun event(s) of the receive queue\n", CANQUE_OverflowCounter(device->recvData.msgQueue));
+    MACCAN_DEBUG_DRIVER("    %8" PRIu64 " CAN frame(s) written to endpoint\n", device->sendData.msgCounter);
+    MACCAN_DEBUG_DRIVER("    %8" PRIu64 " error(s) while writing to endpoint\n", device->sendData.errCounter);
+    MACCAN_DEBUG_DRIVER("    %8" PRIu64 " CAN frame(s) received and enqueued\n", device->recvData.msgCounter);
+    MACCAN_DEBUG_DRIVER("    %8" PRIu64 " status frame(s) received and enqueued\n", device->recvData.stsCounter);
+    //MACCAN_DEBUG_DRIVER("    %8" PRIu64 " error frame(s) received and enqueued\n", device->recvData.errCounter);
+    MACCAN_DEBUG_DRIVER("    %10.1f%% max. fill ratio of the receive queue\n", ((float)CANQUE_QueueHigh(device->recvData.msgQueue) * 100.0) \
+                                                                             /  (float)CANQUE_QueueSize(device->recvData.msgQueue));
+    MACCAN_DEBUG_DRIVER("    %8" PRIu64 " overrun event(s) of the receive queue\n", CANQUE_OverflowCounter(device->recvData.msgQueue));
+#if (OPTION_DRIVER_TRM_QUEUE_ENABLED != 0)
+    MACCAN_DEBUG_DRIVER("    %10.1f%% max. fill ratio of the transmit queue\n", ((float)CANQUE_QueueHigh(device->sendData.msgQueue) * 100.0) \
+                                                                              /  (float)CANQUE_QueueSize(device->sendData.msgQueue));
+    MACCAN_DEBUG_DRIVER("    %8" PRIu64 " overrun event(s) of the transmit queue\n", CANQUE_OverflowCounter(device->sendData.msgQueue));
+#endif
     return retVal;
 }
 
@@ -290,19 +297,20 @@ CANUSB_Return_t TouCAN_USB_WriteMessage(TouCAN_Device_t *device, const TouCAN_Ca
     if (message->sts)  /* note: error frames cannot be sent */
         return CANUSB_ERROR_ILLPARA;
 
+#if (OPTION_DRIVER_TRM_QUEUE_ENABLED == 0)
+    (void)timeout;
     /* encode and send the message (w/o achknowledge) */
     int size = TouCAN_EncodeMessage(buffer, message);
     MACCAN_LOG_WRITE(buffer, (UInt32)size, ">");
-    retVal = CANUSB_WritePipe(device->handle, TOUCAN_USB_TX_DATA_PIPE_REF, buffer, (UInt32)size, 0U);  // FIXME: time-out
-
-    // TODO: implement a transmit queue to speed up sending
-    (void) timeout;
-
+    retVal = CANUSB_WritePipe(device->handle, TOUCAN_USB_TX_DATA_PIPE_REF, buffer, (UInt32)size, 30U);  // FIXME: magic number
     /* counting */
     if (retVal == CANUSB_SUCCESS)
         device->sendData.msgCounter++;
     else
         device->sendData.errCounter++;
+#else
+    // TODO: insert coin here
+#endif /* OPTION_DRIVER_TRM_QUEUE_ENABLED */
     return retVal;
 }
 
@@ -492,7 +500,7 @@ static int TouCAN_ResetDevice(CANUSB_Handle_t handle) {
     return retVal;
 }
 
-static void ReceptionCallback(void *refCon, UInt8 *buffer, UInt32 length) {
+static int ReceivedCallback(void *refCon, UInt8 *buffer, UInt32 length) {
     TouCAN_ReceiveData_t *context = (TouCAN_ReceiveData_t *)refCon;
     TouCAN_CanMessage_t message;
     UInt32 index = 0;
@@ -508,9 +516,9 @@ static void ReceptionCallback(void *refCon, UInt8 *buffer, UInt32 length) {
             (message.rtr && context->msgParam.suppressRtr) ||
             (message.sts && context->msgParam.suppressSts) ||
             (message.sts && !message.timestamp.tv_sec && !message.timestamp.tv_nsec)) {
-            /* suppress certain CAN messages depending on the operation mode*/
+            /* suppress certain CAN messages depending on the operation mode */
         } else {
-            if (CANQUE_Enqueue(context->msgQueue, &message) == CANUSB_SUCCESS) {
+            if (CANQUE_Enqueue(context->msgQueue, &message, 0U) == CANUSB_SUCCESS) {
                 if (!message.sts)
                     context->msgCounter++;
                 else
@@ -520,7 +528,15 @@ static void ReceptionCallback(void *refCon, UInt8 *buffer, UInt32 length) {
         index += TOUCAN_USB_RX_DATA_FRAME_SIZE;
         length -= TOUCAN_USB_RX_DATA_FRAME_SIZE;
     }
+    return 0;
 }
+
+#if (OPTION_DRIVER_TRM_QUEUE_ENABLED != 0)
+static int TransmittedCallback(void *refCon, UInt8 *buffer, UInt32 length) {
+    // TODO: insert coin here
+    return 0;
+}
+#endif /* OPTION_DRIVER_TRM_QUEUE_ENABLED */
 
 static int TouCAN_EncodeMessage(UInt8 *buffer, const TouCAN_CanMessage_t *message) {
     int index = 0;

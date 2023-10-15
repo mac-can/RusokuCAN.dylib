@@ -76,9 +76,9 @@
 #include <CoreFoundation/CFPlugInCOM.h>
 
 #define VERSION_MAJOR     0
-#define VERSION_MINOR     4
-#define VERSION_PATCH     1
-#define SVN_REVISION     "$Rev: 1816 $"
+#define VERSION_MINOR     5
+#define VERSION_PATCH     0
+#define SVN_REVISION     "$Rev: 1814 $"
 
 /*#define OPTION_MACCAN_MULTICHANNEL  0  !* set globally: 0 = only one channel on multi-channel devices */
 /*#define OPTION_MACCAN_PIPE_TIMEOUT  0  !* set globally: 0 = do not use xxxPipeTO variant (e.g. macOS < 10.15) */
@@ -101,6 +101,8 @@
 #endif
 #define MAX_STRING_LENGTH  256
 
+#define MIN(x,y)  ((x) <= (y)) ? (x) : (y)
+
 #define IS_INDEX_VALID(idx)  ((0 <= (idx)) && ((idx) < CANUSB_MAX_DEVICES))
 #define IS_HANDLE_VALID(hnd)  IS_INDEX_VALID(hnd)
 
@@ -108,6 +110,7 @@
 #define LEAVE_CRITICAL_SECTION(idx)  assert(0 == pthread_mutex_unlock(&usbDevice[idx].ptMutex))
 
 static void ReadPipeCallback(void *refCon, IOReturn result, void *arg0);
+static void WritePipeCallback(void *refCon, IOReturn result, void *arg0);
 static int SetupDirectory(SInt32 vendorID, SInt32 productID);
 static void DeviceAdded(void *refCon, io_iterator_t iterator);
 static void DeviceRemoved(void *refCon, io_iterator_t iterator);
@@ -127,6 +130,10 @@ typedef struct usb_async_pipe_tag {         /* Asynchrounous pipe: */
     CANUSB_Buffer_t buffer;                 /*   double buffer */
     CANUSB_AsyncPipeCbk_t callback;         /*   callback from notification function */
     CANUSB_Context_t context;               /*   pointer to user context for callback */
+#if (OPTION_MACCAN_PIPE_TIMEOUT != 0)
+    UInt32 noDataTimeout;                   /*   time-out (in [ms]) if no data is transferred */
+    UInt32 completionTimeout;               /*   time-out (in [ms]) if the entire request is not completed */
+#endif
     Boolean running;                        /*   flag to indicate the pipe state */
 } *CANUSB_AsyncPipe_t;                      /*   note: forward declaration requires C11 */
 
@@ -137,6 +144,8 @@ typedef struct usb_interface_tag {          /* USB interface: */
     UInt8 u8Protocol;                       /*   protocol of the interface (8-bit) */
     UInt8 u8NumEndpoints;                   /*   number of endpoints of the interface */
     IOUSBInterfaceInterface **ioInterface;  /*   interface interface (instance) */
+    CANUSB_DetachedCbk_t cbkDeviceRemoved;  /*   callback when device has been removed */
+    CANUSB_Context_t refDeviceRemoved;      /*   pointer to user context for callback */
 } USBInterface_t;
 
 typedef struct usb_device_tag {             /* USB device: */
@@ -149,6 +158,7 @@ typedef struct usb_device_tag {             /* USB device: */
     UInt32 u32Location;                     /*   unique location ID (32-bit) */
     UInt16 u16Address;                      /*   device address (16-bit?) */
     IOUSBDeviceInterface **ioDevice;        /*   device interface (instance) */
+    CANUSB_Descriptor_t ptrCanDevice;       /*   device descriptor (pointer) */
     USBInterface_t usbInterface/*[x]*/;     /*   interface interface (only first one supported) */
     pthread_mutex_t ptMutex;                /*   pthread mutex for mutual exclusion */
 } USBDevice_t;
@@ -481,6 +491,32 @@ CANUSB_Return_t CANUSB_CloseDevice(CANUSB_Handle_t handle) {
     return ret;
 }
 
+CANUSB_Return_t CANUSB_RegisterDetachedCallback(CANUSB_Handle_t handle, CANUSB_DetachedCbk_t callback, CANUSB_Context_t context) {
+    int ret = 0;
+
+    /* must be initialized */
+    if (!fInitialized)
+        return CANUSB_ERROR_NOTINIT;
+    /* must be a valid handle */
+    if (!IS_HANDLE_VALID(handle))
+        return CANUSB_ERROR_HANDLE;
+
+    MACCAN_DEBUG_FUNC("lock #%i\n", handle);
+    ENTER_CRITICAL_SECTION(handle);
+    if (usbDevice[handle].fPresent &&
+        (usbDevice[handle].usbInterface.fOpened) &&
+        (usbDevice[handle].usbInterface.ioInterface != NULL)) {
+        usbDevice[handle].usbInterface.cbkDeviceRemoved = callback;
+        usbDevice[handle].usbInterface.refDeviceRemoved = context;
+    } else {
+        MACCAN_DEBUG_ERROR("+++ Sorry, device #%i is not opened or not available (RegisterDetachedCallback)\n", handle);
+        ret = !usbDevice[handle].fPresent ? CANUSB_ERROR_HANDLE : CANUSB_ERROR_NOTINIT;
+    }
+    LEAVE_CRITICAL_SECTION(handle);
+    MACCAN_DEBUG_FUNC("unlocked\n");
+    return ret;
+}
+
 CANUSB_Return_t CANUSB_ReadPipe(CANUSB_Handle_t handle, UInt8 pipeRef, void *buffer, UInt32 *size, UInt16 timeout) {
     IOReturn kr;
     int ret = 0;
@@ -647,7 +683,7 @@ CANUSB_Return_t CANUSB_ResetPipe(CANUSB_Handle_t handle, UInt8 pipeRef) {
     return ret;
 }
 
-CANUSB_AsyncPipe_t CANUSB_CreatePipeAsync(CANUSB_Handle_t handle, UInt8 pipeRef, size_t bufferSize) {
+CANUSB_AsyncPipe_t CANUSB_CreatePipeAsync(CANUSB_Handle_t handle, UInt8 pipeRef, size_t bufferSize, Boolean doubleBuffer) {
     CANUSB_AsyncPipe_t asyncPipe = NULL;
 
     /* must be initialized */
@@ -664,19 +700,35 @@ CANUSB_AsyncPipe_t CANUSB_CreatePipeAsync(CANUSB_Handle_t handle, UInt8 pipeRef,
     }
     bzero(asyncPipe, sizeof(struct usb_async_pipe_tag));
     asyncPipe->handle = CANUSB_INVALID_HANDLE;
-    /* create a double buffer for USB data transfer */
-    MACCAN_DEBUG_CORE("        - Double buffer each of size %u bytes for endpoint #%u\n", bufferSize, pipeRef);
-    if ((asyncPipe->buffer.data[0] = malloc(bufferSize)) &&
-        (asyncPipe->buffer.data[1] = malloc(bufferSize))) {
-        asyncPipe->buffer.size = (UInt32)bufferSize;
-        asyncPipe->callback = NULL;
-        asyncPipe->context = NULL;
-        asyncPipe->pipeRef = pipeRef;
-        asyncPipe->handle = handle;
+    /* create buffer for USB data transfer */
+    if (doubleBuffer) {
+        MACCAN_DEBUG_CORE("        - Double buffer each of size %u bytes for endpoint #%u\n", bufferSize, pipeRef);
+        if ((asyncPipe->buffer.data[0] = malloc(bufferSize)) &&
+            (asyncPipe->buffer.data[1] = malloc(bufferSize))) {
+            asyncPipe->buffer.size = (UInt32)bufferSize;
+            asyncPipe->callback = NULL;
+            asyncPipe->context = NULL;
+            asyncPipe->pipeRef = pipeRef;
+            asyncPipe->handle = handle;
+        } else {
+            MACCAN_DEBUG_ERROR("+++ Unable to create double buffer (2 * %u bytes) for endpoint #%u\n", bufferSize, pipeRef);
+            free(asyncPipe);
+            asyncPipe = NULL;
+        }
     } else {
-        MACCAN_DEBUG_ERROR("+++ Unable to create double buffer (2 * %u bytes) for endpoint #%u\n", bufferSize, pipeRef);
-        free(asyncPipe);
-        asyncPipe = NULL;
+        MACCAN_DEBUG_CORE("        - Single buffer of size %u bytes for endpoint #%u\n", bufferSize, pipeRef);
+        if ((asyncPipe->buffer.data[0] = malloc(bufferSize))) {
+            asyncPipe->buffer.size = (UInt32)bufferSize;
+            asyncPipe->buffer.data[1] = NULL;
+            asyncPipe->callback = NULL;
+            asyncPipe->context = NULL;
+            asyncPipe->pipeRef = pipeRef;
+            asyncPipe->handle = handle;
+        } else {
+            MACCAN_DEBUG_ERROR("+++ Unable to create single buffer (1 * %u bytes) for endpoint #%u\n", bufferSize, pipeRef);
+            free(asyncPipe);
+            asyncPipe = NULL;
+        }
     }
     return asyncPipe;
 }
@@ -696,7 +748,7 @@ CANUSB_Return_t CANUSB_DestroyPipeAsync(CANUSB_AsyncPipe_t asyncPipe) {
     if (asyncPipe->running)
         (void)CANUSB_AbortPipeAsync(asyncPipe);
 
-    /* free double buffer and asynchronous pipe context */
+    /* free buffer(s) and asynchronous pipe context */
     if (asyncPipe->buffer.data[1])
         free(asyncPipe->buffer.data[1]);
     if (asyncPipe->buffer.data[0])
@@ -742,7 +794,7 @@ static void ReadPipeCallback(void *refCon, IOReturn result, void *arg0) {
             }
             /* call the CALLBACK routine with the referenced pipe context */
             if (asyncPipe->callback && length) {
-                asyncPipe->callback(asyncPipe->context, buffer, (UInt32)length);
+                (void)asyncPipe->callback(asyncPipe->context, buffer, (UInt32)length);
             }
         }
         break;
@@ -848,7 +900,181 @@ CANUSB_Return_t CANUSB_AbortPipeAsync(CANUSB_AsyncPipe_t asyncPipe) {
             return CANUSB_ERROR_RESOURCE;
         }
     } else {
-        MACCAN_DEBUG_ERROR("+++ Sorry, device #%i is not opened or not available (AbortPipeAsync)\n", asyncPipe->handle);
+        MACCAN_DEBUG_ERROR("+++ Sorry, device #%i is not opened or not available (AbortPipeAsync #%d)\n", asyncPipe->handle, asyncPipe->pipeRef);
+        ret = !usbDevice[asyncPipe->handle].fPresent ? CANUSB_ERROR_HANDLE : CANUSB_ERROR_NOTINIT;
+    }
+    LEAVE_CRITICAL_SECTION(asyncPipe->handle);
+    MACCAN_DEBUG_FUNC("unlocked\n");
+    return ret;
+}
+
+static void WritePipeCallback(void *refCon, IOReturn result, void *arg0) {
+    CANUSB_AsyncPipe_t asyncPipe = (CANUSB_AsyncPipe_t)refCon;
+    IOReturn kr;
+
+    (void)arg0;
+    
+    switch(result)
+    {
+    case kIOReturnSuccess:
+        if (asyncPipe) {
+            if (!IS_HANDLE_VALID(asyncPipe->handle))
+                return;
+            if (!usbDevice[asyncPipe->handle].usbInterface.ioInterface)
+                return;
+            if (!asyncPipe->buffer.data[0])
+                return;
+            /* check if there are more data to be sent */
+            if (asyncPipe->callback &&
+                asyncPipe->callback(asyncPipe->context, asyncPipe->buffer.data[0], asyncPipe->buffer.size)) {
+                /* preparation of the next asynchronous pipe write event (with our pipe context as reference, 8th resp. 6th argument) */
+#if (OPTION_MACCAN_PIPE_TIMEOUT == 0)
+                kr = (*usbDevice[asyncPipe->handle].usbInterface.ioInterface)->WritePipeAsync(usbDevice[asyncPipe->handle].usbInterface.ioInterface,
+                                                                                              asyncPipe->pipeRef,
+                                                                                              asyncPipe->buffer.data[0],
+                                                                                              asyncPipe->buffer.size,
+                                                                                              WritePipeCallback,
+                                                                                              (void*)asyncPipe);
+#else
+                if (asyncPipe->noDataTimeout && asyncPipe->completionTimeout)
+                    kr = (*usbDevice[asyncPipe->handle].usbInterface.ioInterface)->WritePipeAsyncTO(usbDevice[asyncPipe->handle].usbInterface.ioInterface,
+                                                                                                    asyncPipe->pipeRef,
+                                                                                                    asyncPipe->buffer.data[0],
+                                                                                                    asyncPipe->buffer.size,
+                                                                                                    asyncPipe->noDataTimeout,
+                                                                                                    asyncPipe->completionTimeout,
+                                                                                                    WritePipeCallback,
+                                                                                                    (void*)asyncPipe);
+                else
+                    kr = (*usbDevice[asyncPipe->handle].usbInterface.ioInterface)->WritePipeAsync(usbDevice[asyncPipe->handle].usbInterface.ioInterface,
+                                                                                                  asyncPipe->pipeRef,
+                                                                                                  asyncPipe->buffer.data[0],
+                                                                                                  asyncPipe->buffer.size,
+                                                                                                  WritePipeCallback,
+                                                                                                  (void*)asyncPipe);
+#endif
+                if (kIOReturnSuccess != kr) {
+                    MACCAN_DEBUG_ERROR("+++ Unable to write async pipe #%d of device #%d (%08x)\n", asyncPipe->pipeRef, asyncPipe->handle, kr);
+                    /* error: something went wrong */
+                    asyncPipe->running = false;
+                } else {
+                    /* success: write event armed */
+                    asyncPipe->running = true;
+                }
+            } else {
+                /* no more data to be sent */
+                asyncPipe->running = false;
+            }
+        }
+        break;
+    case kIOReturnAborted:
+        if (asyncPipe) {
+            MACCAN_DEBUG_CORE("!!! Aborted: write async pipe #%d of device #%d (%08x)\n", asyncPipe->pipeRef, asyncPipe->handle, result);
+            asyncPipe->running = false;
+        } else {
+            MACCAN_DEBUG_CORE("!!! Aborted: write async pipe #%d of device #%d (%08x)\n", 0, CANUSB_INVALID_HANDLE, result);
+        }
+        break;
+    default:
+        if (asyncPipe) {
+            MACCAN_DEBUG_ERROR("+++ Error: write async pipe #%d of device #%d (%08x)\n", asyncPipe->pipeRef, asyncPipe->handle, result);
+            asyncPipe->running = false;
+        } else {
+            MACCAN_DEBUG_ERROR("+++ Error: write async pipe #%d of device #%d (%08x)\n", 0, CANUSB_INVALID_HANDLE, result);
+        }
+        break;
+    }
+    return;
+}
+
+CANUSB_Return_t CANUSB_WritePipeAsync(CANUSB_AsyncPipe_t asyncPipe, const void *buffer, UInt32 size, UInt16 timeout,
+                                      CANUSB_AsyncPipeCbk_t callback, CANUSB_Context_t context) {
+    IOReturn kr;
+    int ret = 0;
+#if (OPTION_MACCAN_PIPE_TIMEOUT == 0)
+    (void)timeout;
+#else
+    UInt32 noDataTimeout = (UInt32)(((UInt32)timeout * (UInt32)2) / (UInt32)5);
+    UInt32 completionTimeout = (UInt32)timeout;
+#endif
+    /* must be initialized */
+    if (!fInitialized)
+        return CANUSB_ERROR_NOTINIT;
+    /* check for NULL pointer */
+    if (!asyncPipe || !buffer ||
+        !asyncPipe->buffer.data[0])
+        return CANUSB_ERROR_NULLPTR;
+    /* must be a valid handle */
+    if (!IS_HANDLE_VALID(asyncPipe->handle))
+        return CANUSB_ERROR_HANDLE;
+
+    MACCAN_DEBUG_FUNC("lock #%i (%u)\n", asyncPipe->handle, asyncPipe->pipeRef);
+    ENTER_CRITICAL_SECTION(asyncPipe->handle);
+    if (asyncPipe->running) {
+        MACCAN_DEBUG_ERROR("+++ Async write of pipe #%d already started\n", asyncPipe->pipeRef);
+        LEAVE_CRITICAL_SECTION(asyncPipe->handle);
+        MACCAN_DEBUG_FUNC("unlocked\n");
+        return CANUSB_ERROR_RESOURCE;
+    }
+    if (usbDevice[asyncPipe->handle].fPresent &&
+        (usbDevice[asyncPipe->handle].usbInterface.fOpened) &&
+        (usbDevice[asyncPipe->handle].usbInterface.ioInterface != NULL)) {
+        kr = (*usbDevice[asyncPipe->handle].usbInterface.ioInterface)->GetPipeStatus(usbDevice[asyncPipe->handle].usbInterface.ioInterface,
+                                                                                     asyncPipe->pipeRef);
+        if (kIOReturnSuccess != kr) {
+            MACCAN_DEBUG_ERROR("+++ Unable to get status of pipe #%d (%08x)\n", asyncPipe->pipeRef, kr);
+            LEAVE_CRITICAL_SECTION(asyncPipe->handle);
+            MACCAN_DEBUG_FUNC("unlocked\n");
+            return (kIOUSBPipeStalled != kr) ? CANUSB_ERROR_RESOURCE : CANUSB_ERROR_STALLED;
+        }
+        /* copy data into the transfer buffer (at index 0) */
+        bzero(asyncPipe->buffer.data[0], (size_t)asyncPipe->buffer.size);
+        memcpy(asyncPipe->buffer.data[0], buffer, (size_t)MIN(size, asyncPipe->buffer.size));
+        asyncPipe->buffer.index = 0;
+        /* register the callback function and the transmission data context */
+        asyncPipe->callback = callback;
+        asyncPipe->context = context;
+        /* preparation of the asynchronous pipe write event (with our pipe context as reference, 6th or 8th argument) */
+#if (OPTION_MACCAN_PIPE_TIMEOUT == 0)
+        /* note: deactivate define if WritePipeAsyncTO() is not available in IOUSBInterfaceStructXYZ for the device. */
+        kr = (*usbDevice[asyncPipe->handle].usbInterface.ioInterface)->WritePipeAsync(usbDevice[asyncPipe->handle].usbInterface.ioInterface,
+                                                                                      asyncPipe->pipeRef,
+                                                                                      asyncPipe->buffer.data[0],
+                                                                                      asyncPipe->buffer.size,
+                                                                                      WritePipeCallback,
+                                                                                      (void*)asyncPipe);
+#else
+        /* register also the time-out values */
+        asyncPipe->noDataTimeout = noDataTimeout;
+        asyncPipe->completionTimeout = completionTimeout;
+        /* start the transmission pump (w/ or w/o time-out) */
+        if (timeout)
+            kr = (*usbDevice[asyncPipe->handle].usbInterface.ioInterface)->WritePipeAsyncTO(usbDevice[asyncPipe->handle].usbInterface.ioInterface,
+                                                                                            asyncPipe->pipeRef,
+                                                                                            asyncPipe->buffer.data[0],
+                                                                                            asyncPipe->buffer.size,
+                                                                                            asyncPipe->noDataTimeout,
+                                                                                            asyncPipe->completionTimeout,
+                                                                                            WritePipeCallback,
+                                                                                            (void*)asyncPipe);
+        else
+            kr = (*usbDevice[asyncPipe->handle].usbInterface.ioInterface)->WritePipeAsync(usbDevice[asyncPipe->handle].usbInterface.ioInterface,
+                                                                                          asyncPipe->pipeRef,
+                                                                                          asyncPipe->buffer.data[0],
+                                                                                          asyncPipe->buffer.size,
+                                                                                          WritePipeCallback,
+                                                                                          (void*)asyncPipe);
+#endif
+        if (kIOReturnSuccess != kr) {
+            MACCAN_DEBUG_ERROR("+++ Unable to start async write pipe #%d of device #%d (%08x)\n", asyncPipe->pipeRef, asyncPipe->handle, kr);
+            LEAVE_CRITICAL_SECTION(asyncPipe->handle);
+            MACCAN_DEBUG_FUNC("unlocked\n");
+            return (kIOUSBTransactionTimeout != kr) ? CANUSB_ERROR_RESOURCE : CANUSB_ERROR_TIMEOUT;
+        }
+        /* asynchronous pipe write event armed */
+        asyncPipe->running = true;
+    } else {
+        MACCAN_DEBUG_ERROR("+++ Sorry, device #%i is not opened or not available (WritePipeAsync)\n", asyncPipe->handle);
         ret = !usbDevice[asyncPipe->handle].fPresent ? CANUSB_ERROR_HANDLE : CANUSB_ERROR_NOTINIT;
     }
     LEAVE_CRITICAL_SECTION(asyncPipe->handle);
@@ -993,6 +1219,46 @@ Boolean CANUSB_IsDeviceOpened(CANUSB_Index_t index) {
     return ret;
 }
 
+CANUSB_Return_t CANUSB_GetDeviceState(CANUSB_Index_t index, CANUSB_DeviceState_t *state) {
+    int ret = 0;
+    IOReturn kr;
+
+    /* must be initialized */
+    if (!fInitialized)
+        return CANUSB_ERROR_NOTINIT;
+    /* must be a valid index */
+    if (!IS_INDEX_VALID(index))
+        return CANUSB_ERROR_HANDLE;
+    /* check for NULL pointer */
+    if (!state)
+        return CANUSB_ERROR_NULLPTR;
+
+    MACCAN_DEBUG_FUNC("lock #%i\n", index);
+    ENTER_CRITICAL_SECTION(index);
+    if (usbDevice[index].fPresent &&
+        (usbDevice[index].ioDevice != NULL)) {
+        if (usbDevice[index].usbInterface.fOpened &&
+            (usbDevice[index].usbInterface.ioInterface != NULL)) {
+            /* device used by own process */
+            *state = CANUSB_DEVICE_ATTACHED;
+            ret = CANUSB_SUCCESS;
+        } else {
+            /* check if the device is used by another process by trying to open it in exclusive mode */
+            kr = (*usbDevice[index].ioDevice)->USBDeviceOpen(usbDevice[index].ioDevice);
+            if (kIOReturnSuccess == kr)  /* note: if successful then close the device immediately! */
+                (void)(*usbDevice[index].ioDevice)->USBDeviceClose(usbDevice[index].ioDevice);
+            *state = (kIOReturnSuccess != kr) ? CANUSB_DEVICE_HIJACKED : CANUSB_DEVICE_AVAILABLE;
+            ret = CANUSB_SUCCESS;
+        }
+    } else {
+        *state = CANUSB_DEVICE_UNAVAILABLE;
+        ret = CANUSB_SUCCESS;
+    }
+    LEAVE_CRITICAL_SECTION(index);
+    MACCAN_DEBUG_FUNC("unlocked\n");
+    return ret;
+}
+
 CANUSB_Return_t CANUSB_GetDeviceUsbName(CANUSB_Index_t index, char *buffer, size_t n) {
     int ret = 0;
 
@@ -1024,6 +1290,128 @@ CANUSB_Return_t CANUSB_GetDeviceUsbName(CANUSB_Index_t index, char *buffer, size
     MACCAN_DEBUG_FUNC("unlocked\n");
     return ret;
 }
+
+#if (0)
+CANUSB_Return_t CANUSB_GetDeviceVendorName(CANUSB_Index_t index, char *buffer, size_t n) {
+    /*
+     * note: USBGetManufacturerStringIndex() is not available in OS X before 10.15!
+     */
+    int ret = 0;
+    UInt8    si;
+    IOReturn kr;
+
+    /* must be initialized */
+    if (!fInitialized)
+        return CANUSB_ERROR_NOTINIT;
+    /* must be a valid index */
+    if (!IS_INDEX_VALID(index))
+        return CANUSB_ERROR_HANDLE;
+    /* check for NULL pointer */
+    if (!buffer)
+        return CANUSB_ERROR_NULLPTR;
+    /* empty string for the error case */
+    bzero(buffer, n);
+
+    MACCAN_DEBUG_FUNC("lock #%i\n", index);
+    ENTER_CRITICAL_SECTION(index);
+    if (usbDevice[index].fPresent &&
+        (usbDevice[index].ioDevice != NULL)) {
+        kr = (*usbDevice[index].ioDevice)->USBGetManufacturerStringIndex(usbDevice[index].ioDevice, &si);
+        if ((kIOReturnSuccess == kr) && (si != 0)) {
+            ret = GetStringFromIndex(usbDevice[index].ioDevice, si, buffer, n) ? CANUSB_SUCCESS : CANUSB_ERROR_RESOURCE;
+        } else {
+            MACCAN_DEBUG_ERROR("+++ Sorry, device #%i has no manufacturer string index\n", index);
+            ret = CANUSB_ERROR_RESOURCE;
+        }
+    } else {
+        MACCAN_DEBUG_ERROR("+++ Sorry, device #%i is not available\n", index);
+        ret = CANUSB_ERROR_HANDLE;
+    }
+    LEAVE_CRITICAL_SECTION(index);
+    MACCAN_DEBUG_FUNC("unlocked\n");
+    return ret;
+}
+
+CANUSB_Return_t CANUSB_GetDeviceProductName(CANUSB_Index_t index, char *buffer, size_t n) {
+    /*
+     * note: USBGetProductStringIndex() is not available in OS X before 10.15!
+     */
+    int ret = 0;
+    UInt8    si;
+    IOReturn kr;
+
+    /* must be initialized */
+    if (!fInitialized)
+        return CANUSB_ERROR_NOTINIT;
+    /* must be a valid index */
+    if (!IS_INDEX_VALID(index))
+        return CANUSB_ERROR_HANDLE;
+    /* check for NULL pointer */
+    if (!buffer)
+        return CANUSB_ERROR_NULLPTR;
+    /* empty string for the error case */
+    bzero(buffer, n);
+
+    MACCAN_DEBUG_FUNC("lock #%i\n", index);
+    ENTER_CRITICAL_SECTION(index);
+    if (usbDevice[index].fPresent &&
+        (usbDevice[index].ioDevice != NULL)) {
+        kr = (*usbDevice[index].ioDevice)->USBGetProductStringIndex(usbDevice[index].ioDevice, &si);
+        if ((kIOReturnSuccess == kr) && (si != 0)) {
+            ret = GetStringFromIndex(usbDevice[index].ioDevice, si, buffer, n) ? CANUSB_SUCCESS : CANUSB_ERROR_RESOURCE;
+        } else {
+            MACCAN_DEBUG_ERROR("+++ Sorry, device #%i has no product string index\n", index);
+            ret = CANUSB_ERROR_RESOURCE;
+        }
+    } else {
+        MACCAN_DEBUG_ERROR("+++ Sorry, device #%i is not available\n", index);
+        ret = CANUSB_ERROR_HANDLE;
+    }
+    LEAVE_CRITICAL_SECTION(index);
+    MACCAN_DEBUG_FUNC("unlocked\n");
+    return ret;
+}
+
+CANUSB_Return_t CANUSB_GetDeviceSerialNumber(CANUSB_Index_t index, char *buffer, size_t n) {
+    /*
+     * note: USBGetSerialNumberStringIndex() is not available in OS X before 10.15!
+     */
+    int ret = 0;
+    UInt8    si;
+    IOReturn kr;
+
+    /* must be initialized */
+    if (!fInitialized)
+        return CANUSB_ERROR_NOTINIT;
+    /* must be a valid index */
+    if (!IS_INDEX_VALID(index))
+        return CANUSB_ERROR_HANDLE;
+    /* check for NULL pointer */
+    if (!buffer)
+        return CANUSB_ERROR_NULLPTR;
+    /* empty string for the error case */
+    bzero(buffer, n);
+    
+    MACCAN_DEBUG_FUNC("lock #%i\n", index);
+    ENTER_CRITICAL_SECTION(index);
+    if (usbDevice[index].fPresent &&
+        (usbDevice[index].ioDevice != NULL)) {
+        kr = (*usbDevice[index].ioDevice)->USBGetSerialNumberStringIndex(usbDevice[index].ioDevice, &si);
+        if ((kIOReturnSuccess == kr) && (si != 0)) {
+            ret = GetStringFromIndex(usbDevice[index].ioDevice, si, buffer, n) ? CANUSB_SUCCESS : CANUSB_ERROR_RESOURCE;
+        } else {
+            MACCAN_DEBUG_ERROR("+++ Sorry, device #%i has no serial number string index\n", index);
+            ret = CANUSB_ERROR_RESOURCE;
+        }
+    } else {
+        MACCAN_DEBUG_ERROR("+++ Sorry, device #%i is not available\n", index);
+        ret = CANUSB_ERROR_HANDLE;
+    }
+    LEAVE_CRITICAL_SECTION(index);
+    MACCAN_DEBUG_FUNC("unlocked\n");
+    return ret;
+}
+#endif
 
 CANUSB_Return_t CANUSB_GetDeviceVendorId(CANUSB_Index_t index, UInt16 *value) {
     int ret = 0;
@@ -1187,7 +1575,7 @@ CANUSB_Return_t CANUSB_GetDeviceNumCanChannels(CANUSB_Index_t index, UInt8 *valu
     return ret;
 }
 
-CANUSB_Return_t CANUSB_GetDeviceCanChannelsOpened(CANUSB_Index_t index, UInt8 *value) {
+CANUSB_Return_t CANUSB_GetDeviceCanDescriptor(CANUSB_Index_t index, CANUSB_Descriptor_t descriptor, size_t size) {
     int ret = 0;
 
     /* must be initialized */
@@ -1197,14 +1585,21 @@ CANUSB_Return_t CANUSB_GetDeviceCanChannelsOpened(CANUSB_Index_t index, UInt8 *v
     if (!IS_INDEX_VALID(index))
         return CANUSB_ERROR_HANDLE;
     /* check for NULL pointer */
-    if (!value)
+    if (!descriptor)
         return CANUSB_ERROR_NULLPTR;
+    /* empty descriptor for the error case */
+    bzero(descriptor, size);
 
     MACCAN_DEBUG_FUNC("lock #%i\n", index);
     ENTER_CRITICAL_SECTION(index);
     if (usbDevice[index].fPresent &&
         (usbDevice[index].ioDevice != NULL)) {
-        *value = (UInt8)usbDevice[index].usbInterface.fOpened ? 1U : 0U;
+        if (usbDevice[index].ptrCanDevice) {
+            memcpy(descriptor, usbDevice[index].ptrCanDevice, size);
+        } else {
+            MACCAN_DEBUG_ERROR("+++ Sorry, device #%i has no CAN descriptor\n", index);
+            ret = CANUSB_ERROR_RESOURCE;
+        }
     } else {
         MACCAN_DEBUG_ERROR("+++ Sorry, device #%i is not available\n", index);
         ret = CANUSB_ERROR_HANDLE;
@@ -1469,6 +1864,44 @@ UInt32 CANUSB_GetRevision(void) {
     return (UInt32)usbDriver.nRevision;
 }
 
+#if (0)
+static Boolean GetStringFromIndex(IOUSBDeviceInterface **dev, UInt8 idx, char *str, size_t n) {
+    /*
+     * note: Access to indexed strings is not available in OS X before 10.15!
+     */
+    IOUSBDevRequest request;
+    IOReturn        kr;
+    
+    char buffer[MAX_STRING_LENGTH+1];
+    bzero(buffer, MAX_STRING_LENGTH+1);
+    
+    request.bmRequestType = USBmakebmRequestType(kUSBIn, kUSBStandard, kUSBDevice);
+    request.bRequest      = kUSBRqGetDescriptor;
+    request.wValue        = (kUSBStringDesc << 8) | idx;
+    request.wIndex        = 0x409;
+    request.pData         = (void*)buffer;
+    request.wLength       = (UInt16)MAX_STRING_LENGTH;
+
+    kr = (*dev)->DeviceRequest(dev, &request);
+    if (kIOReturnSuccess != kr) {
+        MACCAN_DEBUG_ERROR("+++ Unable to request the string at index #%i (%08x)\n", idx, kr);
+        return false;
+    }
+    if (str == NULL || n == 0 || request.wLenDone <= 2) {
+        return true;
+    }
+    CFStringRef cfstr = CFStringCreateWithBytes(NULL, (const UInt8 *)buffer+2, request.wLenDone-2, kCFStringEncodingUTF16LE, false);
+    CFIndex     len   = CFStringGetMaximumSizeForEncoding(CFStringGetLength(cfstr), kCFStringEncodingUTF8) + 1;
+    if (len >= 0) {
+        CFStringGetCString(cfstr, buffer, len, kCFStringEncodingUTF8);
+        strncpy(str, buffer, n);
+        str[n-1] = '\0';
+    }
+    CFRelease(cfstr);
+    return true;
+}
+#endif
+
 /*
  *  Working with USB Device Interfaces on macOS
  *  See https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/USBBook
@@ -1623,9 +2056,14 @@ static void DeviceAdded(void *refCon, io_iterator_t iterator)
                 usbDevice[index].fPresent = true;
                 found = 1;
                 /* get number of CAN channels from device list */
-                usbDevice[index].nCanChannels = canDevice->numChannels;
+                usbDevice[index].nCanChannels = CANDEV_GetNumChannels(canDevice);
+                LEAVE_CRITICAL_SECTION(index);
+                /* call the core callback function when a matching device has been added (if any) */
+                CANDEV_DeviceAdded(canDevice, index, &usbDevice[index].ptrCanDevice);
+            } else {
+                /* entry already used */
+                LEAVE_CRITICAL_SECTION(index);
             }
-            LEAVE_CRITICAL_SECTION(index);
         }
         if (!found) {
             /* no free entry available */
@@ -1665,7 +2103,23 @@ static void DeviceRemoved(void *refCon, io_iterator_t iterator)
             ENTER_CRITICAL_SECTION(index);
             if ((UInt32)location == usbDevice[index].u32Location) {
                 MACCAN_DEBUG_CORE("      - Device #%i is %s available (vendor = %03x, product = %03x)\n", index,
-                             usbDevice[index].fPresent? "not longer" : "not", usbDevice[index].u16VendorId, usbDevice[index].u16ProductId);
+                    usbDevice[index].fPresent? "no longer" : "not", usbDevice[index].u16VendorId, usbDevice[index].u16ProductId);
+                if (usbDevice[index].fPresent &&
+                    (usbDevice[index].ioDevice != NULL)) {
+                    if (usbDevice[index].usbInterface.fOpened &&
+                        (usbDevice[index].usbInterface.ioInterface != NULL) &&
+                        (usbDevice[index].usbInterface.cbkDeviceRemoved != NULL)) {
+                        LEAVE_CRITICAL_SECTION(index);
+                        /* call the driver callback function when the device has been removed */
+                        usbDevice[index].usbInterface.cbkDeviceRemoved(usbDevice[index].usbInterface.refDeviceRemoved);
+                    } else {
+                        /* note: all callbacks must be called outside the critical section! */
+                        LEAVE_CRITICAL_SECTION(index);
+                    }
+                    /* call the core callback function when the device has been removed (if any) */
+                    CANDEV_DeviceRemoved(CANDEV_GetDeviceById(usbDevice[index].u16VendorId, usbDevice[index].u16ProductId), index, &usbDevice[index].ptrCanDevice);
+                    ENTER_CRITICAL_SECTION(index);
+                }
                 /* reset the properties of the removed device */
                 bzero(&usbDevice[index].usbInterface, sizeof(USBInterface_t));
                 usbDevice[index].usbInterface.fOpened = false;
@@ -1908,5 +2362,5 @@ exit_worker_thread:
     return NULL;
 }
 
-/* * $Id: MacCAN_IOUsbKit.c 1816 2023-10-14 18:22:59Z makemake $ *** (c) UV Software, Berlin ***
+/* * $Id: MacCAN_IOUsbKit.c 1814 2023-10-14 10:02:16Z makemake $ *** (c) UV Software, Berlin ***
  */

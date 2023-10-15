@@ -141,28 +141,32 @@ CANUSB_Return_t TouCAN_OpenUsbDevice(CANUSB_Index_t channel, TouCAN_Device_t *de
         (void)CANUSB_CloseDevice(handle);
         return retVal;
     }
-    /* create a message queue for received CAN frames */
-    device->recvData.msgQueue = CANQUE_Create(TOUCAN_RCV_QUEUE_SIZE, sizeof(TouCAN_CanMessage_t));
+    /* create a message queue for received CAN frames (w/ blocking read on client side) */
+    device->recvData.msgQueue = CANQUE_Create(TOUCAN_RCV_QUEUE_SIZE, sizeof(TouCAN_CanMessage_t), CANQUE_BLOCKING_READ);
     if (device->recvData.msgQueue == NULL) {
-//        MACCAN_DEBUG_ERROR("+++ %s CAN%u: message queue could not be created (NULL)\n", device->name, device->channelNo+1);
+//        MACCAN_DEBUG_ERROR("+++ %s CAN%u: receive queue could not be created (NULL)\n", device->name, device->channelNo+1);
         (void)CANUSB_CloseDevice(handle);
         return retVal;;
     }
-    /* create a pipe context for the selected CAN channel on the device */
+    /* create a read pipe context for the selected CAN channel (w/ double buffer) */
 #if (0)
     uint8_t pipeRef = device->endpoints.bulkIn.pipeRef;
     size_t bufSize = device->endpoints.bulkIn.packetSize;
     device->recvPipe = CANUSB_CreatePipeAsync(device->handle, pipeRef, bufSize);
     // TODO: realize general MacCAN endpoint module
 #else
-    device->recvPipe = CANUSB_CreatePipeAsync(device->handle, TOUCAN_USB_RX_DATA_PIPE_REF, TOUCAN_USB_RX_DATA_PIPE_SIZE);
+    device->recvPipe = CANUSB_CreatePipeAsync(device->handle, TOUCAN_USB_RX_DATA_PIPE_REF, TOUCAN_USB_RX_DATA_PIPE_SIZE, true);
 #endif
     if (device->recvPipe == NULL) {
-//        MACCAN_DEBUG_ERROR("+++ %s CAN%u: asynchronous pipe context could not be created (NULL)\n", device->name, device->channelNo+1);
+//        MACCAN_DEBUG_ERROR("+++ %s CAN%u: asynchronous read pipe context could not be created (NULL)\n", device->name, device->channelNo+1);
         (void)CANQUE_Destroy(device->recvData.msgQueue);
         (void)CANUSB_CloseDevice(handle);
         return CANUSB_ERROR_RESOURCE;
     }
+#if (OPTION_DRIVER_TRM_QUEUE_ENABLED != 0)
+    // TODO: insert coin here
+    // ...
+#endif /* OPTION_DRIVER_TRM_QUEUE_ENABLED */
     return retVal;
 }
 
@@ -175,26 +179,25 @@ CANUSB_Return_t TouCAN_CloseUsbDevice(TouCAN_Device_t *device) {
 //    if (!device->configured)
 //        return CANUSB_ERROR_NOTINIT;
 
-    /* abort asynchronous pipe */
-    /*retVal =*/ CANUSB_AbortPipeAsync(device->recvPipe);
-//    if (retVal < 0)
-//        MACCAN_DEBUG_ERROR("+++ %s CAN%u: asynchronous pipe could not be stopped (%i)\n", device->name, device->channelNo+1, retVal);
+    /* abort asynchronous read pipe */
+    (void)CANUSB_AbortPipeAsync(device->recvPipe);
+    usleep(54945);
+#if (OPTION_DRIVER_TRM_QUEUE_ENABLED != 0)
+    // TODO: insert coin here
+    // ...
+#endif /* OPTION_DRIVER_TRM_QUEUE_ENABLED */
+    /* release the read pipe context */
+    (void)CANUSB_DestroyPipeAsync(device->recvPipe);
+    device->recvPipe = NULL;
+    /* release the receive message queue */
+    (void)CANQUE_Destroy(device->recvData.msgQueue);
+    device->recvData.msgQueue = NULL;
     /* close the USB device */
     retVal = CANUSB_CloseDevice(device->handle);
 //    if (retVal < 0)
 //        MACCAN_DEBUG_ERROR("+++ %s CAN%u: device could not be closed (%i)\n", device->name, device->channelNo+1, retVal);
-    /* destroy the pipe context */
-    /*retVal =*/ CANUSB_DestroyPipeAsync(device->recvPipe);
-//    if (retVal < 0)
-//        MACCAN_DEBUG_ERROR("+++ %s CAN%u: asynchronous pipe context could not be released (%i)\n", device->name, device->channelNo+1, retVal);
-    /* destroy the message queue */
-    /*retVal =*/ CANQUE_Destroy(device->recvData.msgQueue);
-//    if (retVal < 0)
-//        MACCAN_DEBUG_ERROR("+++ %s CAN%u: message queue could not be released (%i)\n", device->name, device->channelNo+1, retVal);
     /* Live long and prosper! */
     device->handle = CANUSB_INVALID_HANDLE;
-    device->recvData.msgQueue = NULL;
-    device->recvPipe = NULL;
     device->configured = false;
 
     return retVal;

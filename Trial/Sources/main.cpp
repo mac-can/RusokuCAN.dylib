@@ -167,7 +167,9 @@ int main(int argc, const char * argv[]) {
         if (!strncmp(argv[i], "R:", 2) && sscanf(argv[i], "R:%i", &opt) == 1) rxTimeout = (useconds_t)opt;
         /* transmit messages */
         if ((sscanf(argv[i], "%i", &opt) == 1) && (opt > 0)) option_transmit = opt;
-//        if (!strncmp(argv[i], "T:", 2) && sscanf(argv[i], "T:%i", &opt) == 1) txTimeout = (useconds_t)opt;
+#if (OPTION_DRIVER_TRM_QUEUE_ENABLED != 0)
+        if (!strncmp(argv[i], "T:", 2) && sscanf(argv[i], "T:%i", &opt) == 1) txTimeout = (useconds_t)opt;
+#endif
         if (!strncmp(argv[i], "C:", 2) && sscanf(argv[i], "C:%i", &opt) == 1) txDelay = (useconds_t)opt * 1000U;
         if (!strncmp(argv[i], "U:", 2) && sscanf(argv[i], "U:%i", &opt) == 1) txDelay = (useconds_t)opt;
         /* receive messages */
@@ -460,9 +462,11 @@ int main(int argc, const char * argv[]) {
 #endif
     /* transmit messages */
     if (option_transmit) {
-//        if (!option_retry)
-//            fprintf(stdout, "Attention: The program will be aborted when the transmitter is busy.\n"
-//                            "           Use program option RETRY or T:<timeout> to avoid this.\n");
+#if (OPTION_DRIVER_TRM_QUEUE_ENABLED != 0)
+        if ((txTimeout == 0U) && !option_retry)
+            fprintf(stdout, "Attention: The program will be aborted when the transmitter is busy.\n"
+                            "           Use program option RETRY or T:<timeout> to avoid this.\n");
+#endif
         fprintf(stdout, "Press Ctrl+C to abort..."); fflush(stdout);
         frames = 0;
         now = time(NULL);
