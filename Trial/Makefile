@@ -49,12 +49,12 @@ HEADERS = -I$(SOURCE_DIR) \
 	-I$(WRAPPER_DIR) \
 	-I$(MAIN_DIR)
 
-CFLAGS += -O2 -Wall -Wno-parentheses \
-	-fno-strict-aliasing \
+CFLAGS += -O0 -g -Wall -Wextra -Wno-parentheses \
+	-fmessage-length=0 -fno-strict-aliasing \
 	$(DEFINES) \
 	$(HEADERS)
 
-CXXFLAGS += -O2 -g -Wall -Wextra -pthread \
+CXXFLAGS += -O0 -g -Wall -Wextra -pthread \
 	$(DEFINES) \
 	$(HEADERS)
 
