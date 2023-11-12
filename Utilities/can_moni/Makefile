@@ -1,7 +1,7 @@
 #
 #	CAN Monitor for Rusoku TouCAN USB Interfaces (CAN API V3)
 #
-#	Copyright (c) 2007,2012-2022  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
+#	Copyright (c) 2007,2012-2023  Uwe Vogt, UV Software, Berlin (info@mac-can.com)
 #
 #	This program is free software: you can redistribute it and/or modify
 #	it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ OBJECTS = $(OUTDIR)/main.o $(OUTDIR)/Timer.o \
 
 ifeq ($(current_OS),Darwin) # macOS - libTouCAN.dylib
 
-VERSION = 0.2.5
+VERSION = 0.2.6
 
 TARGET  = can_moni
 

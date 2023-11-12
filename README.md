@@ -47,7 +47,7 @@ public:
     CANAPI_Return_t ResetController();
 
     CANAPI_Return_t WriteMessage(CANAPI_Message_t message, uint16_t timeout = 0U);
-    CANAPI_Return_t ReadMessage(CANAPI_Message_t &message, uint16_t timeout = CANREAD_INFINITE);
+    CANAPI_Return_t ReadMessage(CANAPI_Message_t &message, uint16_t timeout = CANWAIT_INFINITE);
 
     CANAPI_Return_t GetStatus(CANAPI_Status_t &status);
     CANAPI_Return_t GetBusLoad(uint8_t &load);
@@ -122,15 +122,15 @@ Type `can_test --help` to display all program options.
 
 ### Target Platform
 
-- macOS 11.0 and later (Intel and Apple silicon)
+- macOS 11.0 and later (Intel x64 and Apple silicon)
 
 ### Development Environment
 
 #### macOS Ventura
 
-- macOS Ventura (13.5.2) on a Mac mini (M1, 2020)
+- macOS Ventura (13.6.1) on a Mac mini (M1, 2020)
 - Apple clang version 15.0.0 (clang-1500.0.40.1)
-- Xcode Version 15.0 (15A240d)
+- Xcode Version 15.0.1 (15A507)
 
 #### macOS Big Sur
 
@@ -138,16 +138,9 @@ Type `can_test --help` to display all program options.
 - Apple clang version 13.0.0 (clang-1300.0.29.30)
 - Xcode Version 13.2.1 (13C100)
 
-#### macOS High Sierra
-
-- macOS High Sierra (10.13.6) on a MacBook Pro (late 2011)
-- Apple LLVM version 10.0.0 (clang-1000.11.45.5)
-- Xcode Version 10.1 (10B61)
-
 ### Supported CAN Hardware
 
-- TouCAN USB (Model F4FS1, Hardware 1.0.0, Firmware 1.0.1)
-- TouCAN USB (Model F4FS1, Hardware 1.0.0, Firmware 1.0.4)
+- TouCAN USB (Model F4FS1, Hardware 1.0.0, Firmware 1.0.x)
 
 ## Known Bugs and Caveats
 
@@ -181,6 +174,8 @@ along with MacCAN-TouCAN.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
 MacCAN-Core (which includes CAN API V3) is dual-licensed under the terms of the BSD 2-Clause "Simplified" License
 and under the terms of the GNU General Public License v3.0 (or any later version).
 The terms of the GNU General Public License v3.0 (or any later version) apply to this work, see above.
+
+`SPDX-License-Identifier: GPL-3.0-or-later`
 
 ### Trademarks
 
