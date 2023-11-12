@@ -34,7 +34,7 @@ OBJECTS = $(OUTDIR)/main.o $(OUTDIR)/Timer.o \
 
 ifeq ($(current_OS),Darwin) # macOS - libTouCAN.dylib
 
-VERSION = 0.2.5
+VERSION = 0.2.6
 
 TARGET  = can_test
 
